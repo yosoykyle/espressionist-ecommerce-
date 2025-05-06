@@ -1,0 +1,149 @@
+hi so, I have  school project an eccomerce site we only have short time to accomplish this our prof sugested to focus on the back end of our system we are using java spring boot mariabd / mysql thymleaf HTML tailwind CSS and JS
+
+here is the initial requairements:
+
+# ☕ **Espressionist E-Commerce – Backend Requirements**
+
+### Technologies to Use:
+
+* **Spring Boot (Java)**
+* **MySQL / MariaDB**
+* **Thymeleaf (for views)**
+* **HTML + Tailwind CSS + JS**
+* **Spring Security (for admin login)**
+* **JavaMailSender (for order confirmation)**
+
+---
+
+## ✅ GENERAL NOTES
+
+* Focus on backend first.
+* Frontend (static HTML + Thymeleaf) only needs to demonstrate basic interaction.
+* Use `archived = true` instead of deleting records from the database.
+
+---
+
+## 🛍️ USER SIDE (No Login Required)
+
+### 1. **Product Listing**
+
+* `/products` – Show active (non-archived) products with image, name, price, and stock.
+
+### 2. **Shopping Cart (Frontend/JS Side)**
+
+* Handled in JavaScript only (no database).
+* On checkout, cart data will be submitted to backend.
+
+### 3. **Checkout**
+
+* POST to `/checkout`
+* Required fields:
+
+  * Name
+  * Email
+  * Shipping Address
+  * Cart Items (IDs + quantity)
+* VAT: Add 12% to total
+* Save order to database
+
+### 4. **Payment Method**
+
+* Only **Cash on Delivery**
+* No integration needed
+
+### 5. **Order Confirmation Email**
+
+* Send email to customer:
+
+  * Items
+  * Total with VAT
+  * Shipping info
+  * **Order Tracking Code**
+
+### 6. **Order Status Tracking (No Login)**
+
+* Generate a unique `orderCode` when order is placed (e.g. `ESP-3A9KZT1D`)
+* Email this code to the customer
+* `/order-status/{orderCode}` – Show:
+
+  * Order date
+  * Items
+  * Status (`Pending`, `Processing`, etc.)
+  * Shipping info
+
+---
+
+## 🔐 ADMIN SIDE (Login Required)
+
+### Default Admin Credentials:
+
+* **Username:** `ADMIN`
+* **Password:** `Espressionist2025`
+
+### 1. **Authentication**
+
+* Use Spring Security
+* Admin-only routes (`/admin/**`)
+* Allow creating/deleting/updating other admin accounts
+* Hash passwords (use BCrypt)
+
+### 2. **Product Management**
+
+* Create Product:
+
+  * Name (required)
+  * Price (> 0)
+  * Quantity (≥ 1)
+  * Category
+  * **Image Upload** (save to server or DB as BLOB)
+* Edit Product:
+
+  * Update all fields
+* Delete Product:
+
+  * Confirm then set `archived = true`
+* Only show `archived = false` products to users
+
+### 3. **Customer Order Management**
+
+* View all customer orders
+
+  * Customer info
+  * Items ordered
+  * Status
+  * Total + VAT
+* Admin can update **Order Status** (via dropdown)
+
+### 4. **Admin Account Management**
+
+* Create, update, and delete admin accounts (with safety checks)
+* Prevent self-deletion
+* All actions require login
+
+---
+
+## 📦 DATABASE DESIGN GUIDELINES
+
+* Use standard JPA/Hibernate annotations
+* Add `archived: boolean` to all deletable entities (products, users if needed)
+* Entity relationships:
+
+  * One `Order` → many `OrderItems`
+  * Each `OrderItem` links to a `Product`
+  * Each `Order` stores customer name, email, shipping address
+
+---
+
+## 💡 BRANDING
+
+* **Name:** espressionist (lowercase)
+* **Tagline:** *coffee. canvas. culture.*
+* **Logo Font:** Seagull Serial (white)
+* **Tagline Font:** Pruno Deck Medium (white)
+
+---
+
+Let me know if you want this broken down into a GitHub-ready folder structure, or want to begin with the Spring Boot base setup next.
+
+
+WE ARE GOING TO USE CODESPACE GitHub
