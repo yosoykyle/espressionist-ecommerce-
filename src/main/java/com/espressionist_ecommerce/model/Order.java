@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@Table(name = "orders") // Ensure table name is not a reserved keyword
 public class Order {
 
     @Id
@@ -23,6 +24,7 @@ public class Order {
     @Column(nullable = false, unique = true)
     private String orderCode;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date orderDate;
 
@@ -31,6 +33,9 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
+
+    @Column(nullable = false)
+    private boolean archived = false;
 
     // Getters and Setters
     public Long getId() {
@@ -95,5 +100,13 @@ public class Order {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }

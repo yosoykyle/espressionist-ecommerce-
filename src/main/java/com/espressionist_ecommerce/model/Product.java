@@ -1,6 +1,7 @@
 package com.espressionist_ecommerce.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Product {
@@ -22,6 +23,7 @@ public class Product {
     private String category;
 
     @Lob
+    @JsonIgnore
     private byte[] image;
 
     @Column(nullable = false)

@@ -113,6 +113,7 @@ here is the initial requairements:
   * Status
   * Total + VAT
 * Admin can update **Order Status** (via dropdown)
+after order flaged successful manually it will be archived when press done or something 
 
 ### 4. **Admin Account Management**
 
