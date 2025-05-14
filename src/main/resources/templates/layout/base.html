@@ -3,7 +3,7 @@
 <head th:fragment="head">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>espressionist - coffee. canvas. culture.</title>
+    <title th:replace="${title}">espressionist - coffee. canvas. culture.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @font-face {
@@ -30,88 +30,126 @@
                 extend: {
                     colors: {
                         primary: '#F56401',
-                    },
-                },
+                        accent: '#F5F5DC', // Beige
+                    }
+                }
             },
         }
     </script>
 </head>
 <body class="min-h-screen flex flex-col bg-white">
     <!-- Navigation -->
-    <nav th:fragment="nav" class="bg-primary p-4">
+    <nav th:fragment="nav" class="bg-primary p-4 relative z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <a th:href="@{/}" class="brand-font text-white text-3xl">espressionist</a>
+            <a th:href="@{/}" class="brand-font text-white text-3xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary" aria-label="espressionist home">espressionist</a>
             <div class="hidden md:flex space-x-6 text-white">
-                <a th:href="@{/}" class="hover:underline">Home</a>
-                <a th:href="@{/products}" class="hover:underline">Products</a>
-                <a th:href="@{/cart}" class="hover:underline flex items-center">
-                    <span>Cart</span>
-                    <span id="cartCount" class="ml-2 bg-white text-primary rounded-full w-6 h-6 flex items-center justify-center text-sm">0</span>
+                <a th:href="@{/}" class="hover:text-white/80 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary" aria-label="Home">Home</a>
+                <a th:href="@{/products}" class="hover:text-white/80 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary" aria-label="Products">Products</a>
+                <a th:href="@{/order-status}" class="hover:text-white/80 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary" aria-label="Track Order">Track Order</a>
+                <a th:href="@{/cart}" class="hover:text-white/80 flex items-center space-x-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary" aria-label="Shopping Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                    </svg>
+                    <span id="cartCount" class="text-sm">0</span>
                 </a>
-                <a th:href="@{/order-status}" class="hover:underline">Track Order</a>
             </div>
             <!-- Mobile menu button -->
-            <button class="md:hidden text-white" aria-label="Menu">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-16 6h16"></path>
+            <button class="md:hidden text-white p-2 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary" 
+                    aria-label="Menu" 
+                    aria-expanded="false"
+                    aria-controls="mobileMenu">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
         </div>
         <!-- Mobile menu -->
-        <div class="md:hidden hidden" id="mobileMenu">
+        <div class="md:hidden hidden absolute left-0 right-0 bg-primary" id="mobileMenu">
             <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="/" class="block text-white p-2 hover:bg-white/10 rounded">Home</a>
-                <a href="/products" class="block text-white p-2 hover:bg-white/10 rounded">Products</a>
-                <a href="/cart" class="block text-white p-2 hover:bg-white/10 rounded">Cart</a>
-                <a href="/order-status" class="block text-white p-2 hover:bg-white/10 rounded">Track Order</a>
+                <a th:href="@{/}" class="block text-white hover:text-white/80 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary">Home</a>
+                <a th:href="@{/products}" class="block text-white hover:text-white/80 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary">Products</a>
+                <a th:href="@{/order-status}" class="block text-white hover:text-white/80 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary">Track Order</a>
+                <a th:href="@{/cart}" class="block text-white hover:text-white/80 py-2 px-4 flex items-center space-x-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                    </svg>
+                    <span>Cart (<span class="cartCount">0</span>)</span>
+                </a>
             </div>
         </div>
     </nav>
 
+    <!-- Main Content -->
+    <div th:fragment="content">
+        <th:block th:replace="${content}"/>
+    </div>
+
     <!-- Footer -->
-    <footer th:fragment="footer" class="bg-gray-100 text-gray-600 py-8">
+    <footer th:fragment="footer" class="bg-gray-100 text-gray-600 py-8 mt-auto">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="hover:text-primary">Home</a></li>
+                        <li><a href="/products" class="hover:text-primary">Products</a></li>
+                        <li><a href="/order-status" class="hover:text-primary">Track Order</a></li>
+                        <li><a href="/cart" class="hover:text-primary">Cart</a></li>
+                        <li><a href="/admin/login" class="hover:text-primary">Admin</a></li>
+                    </ul>
+                </div>
+
                 <!-- Contact Info -->
                 <div>
-                    <h3 class="font-bold mb-4">Contact Us</h3>
-                    <p class="mb-2">109 Rizal Blvd, Santa Rosa, Philippines</p>
-                    <p class="mb-2">Phone: 0995 965 9332</p>
-                    <p><a href="mailto:espressionist.ph@gmail.com" class="hover:text-primary">espressionist.ph@gmail.com</a></p>
+                    <h3 class="font-semibold text-lg mb-4">Contact Us</h3>
+                    <ul class="space-y-2">
+                        <li>109 Rizal Blvd, Santa Rosa, Philippines</li>
+                        <li>Phone: <a href="tel:09959659332" class="hover:text-primary">0995 965 9332</a></li>
+                        <li>Email: <a href="mailto:espressionist.ph@gmail.com" class="hover:text-primary">espressionist.ph@gmail.com</a></li>
+                    </ul>
                 </div>
+
                 <!-- Social Links -->
                 <div>
-                    <h3 class="font-bold mb-4">Follow Us</h3>
+                    <h3 class="font-semibold text-lg mb-4">Follow Us</h3>
                     <div class="flex space-x-4">
-                        <a href="https://www.instagram.com/espressionist.ph" target="_blank" rel="noopener noreferrer" class="hover:text-primary">
-                            <span class="sr-only">Instagram</span>
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        <a href="https://www.instagram.com/espressionist.ph" target="_blank" rel="noopener noreferrer" class="text-gray-600 hover:text-primary" aria-label="Instagram">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"></svg>
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
                         </a>
-                        <a href="https://www.facebook.com/espressionist.ph" target="_blank" rel="noopener noreferrer" class="hover:text-primary">
-                            <span class="sr-only">Facebook</span>
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        <a href="https://www.facebook.com/espressionist.ph" target="_blank" rel="noopener noreferrer" class="text-gray-600 hover:text-primary" aria-label="Facebook">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
                         </a>
-                        <a href="https://linktr.ee/espressionist.ph" target="_blank" rel="noopener noreferrer" class="hover:text-primary">
-                            <span class="sr-only">Linktree</span>
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.953 15.066c-.08.163-.08.324-.08.486.08.162.08.323.161.404.08.162.242.242.403.323.162.081.323.081.484.081.162 0 .323 0 .484-.081.162-.081.323-.162.404-.323.08-.08.161-.242.161-.404.081-.162.081-.323 0-.486-.08-.161-.08-.323-.161-.404-.081-.161-.242-.242-.404-.323-.161-.08-.322-.08-.484-.08-.161 0-.322 0-.484.08-.161.081-.322.162-.403.323-.081.081-.161.243-.161.404zm8.794-.486c-.161-.161-.322-.242-.564-.242-.161 0-.322.081-.484.162-.161.081-.242.242-.322.404-.081.161-.081.323-.081.485 0 .161 0 .323.081.485.08.161.161.323.322.404.162.08.323.161.484.161.242 0 .403-.081.564-.242.162-.161.242-.323.242-.565 0-.242-.08-.404-.242-.565zm-4.316.486c-.08.163-.08.324-.08.486 0 .162.08.323.161.404.08.162.242.242.403.323.162.081.323.081.484.081.162 0 .323 0 .485-.081.161-.081.322-.162.403-.323.081-.08.161-.242.161-.404.081-.162.081-.323 0-.486-.08-.161-.08-.323-.161-.404-.081-.161-.242-.242-.403-.323-.162-.08-.323-.08-.485-.08-.161 0-.322 0-.484.08-.161.081-.322.162-.403.323-.081.081-.161.243-.161.404zm8.633-8.098v-.081c-.08-.162-.161-.242-.322-.323l-7.744-4.397c-.081-.081-.162-.081-.323-.081-.08 0-.161 0-.242.081L5.65 6.163c-.161.081-.242.242-.322.323v.081c-.081.162-.081.323-.081.485v8.794c0 .161 0 .323.081.484v.081c.08.162.161.242.322.323l7.744 4.397c.081.081.162.081.242.081.161 0 .242 0 .323-.081l7.744-4.397c.161-.081.242-.242.322-.323v-.081c.081-.161.081-.323.081-.484V6.97c0-.162 0-.323-.081-.485zm-8.633 9.36c-.242.161-.403.404-.484.646-.081.242-.081.484-.081.726.081.242.161.484.323.646.161.161.403.242.645.242s.484-.081.645-.242c.162-.162.242-.404.323-.646 0-.242 0-.484-.081-.726-.081-.242-.242-.485-.484-.646-.161-.161-.403-.242-.645-.242s-.484.081-.645.242h.484zm4.235 0c-.242.161-.404.404-.484.646-.081.242-.081.484-.081.726.08.242.161.484.322.646.162.161.404.242.646.242.241 0 .483-.081.645-.242.161-.162.242-.404.322-.646.081-.242.081-.484 0-.726-.08-.242-.242-.485-.483-.646-.162-.161-.404-.242-.646-.242-.241 0-.483.081-.645.242h.404z"/></svg>
+                        <a href="https://linktr.ee/espressionist.ph" target="_blank" rel="noopener noreferrer" class="text-gray-600 hover:text-primary" aria-label="Linktree"></a>
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8.092 2.588a1 1 0 011.027.031L21.5 11.5l-12.38 8.882a1 1 0 01-1.627-.782V3.4a1 1 0 01.599-.812zM2.5 11.5v-1h6v1h-6zm0 4v-1h6v1h-6zm0 4v-1h6v1h-6z"/>
+                            </svg>
                         </a>
                     </div>
                 </div>
+
                 <!-- Map -->
                 <div>
-                    <h3 class="font-bold mb-4">Visit Us</h3>
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7731.682543584867!2d121.100823!3d14.320651!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397d9006b676453%3A0xfba2c30aae1cf0d3!2sEspressionist!5e0!3m2!1sen!2sph!4v1745721835963!5m2!1sen!2sph" 
-                        width="100%" 
-                        height="200" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy" 
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                    <h3 class="font-semibold text-lg mb-4">Visit Us</h3>
+                    <div class="aspect-video">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7731.682543584867!2d121.100823!3d14.320651!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397d9006b676453%3A0xfba2c30aae1cf0d3!2sEspressionist!5e0!3m2!1sen!2sph!4v1745721835963!5m2!1sen!2sph" 
+                                width="100%" 
+                                height="100%" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="Espressionist location map"></iframe>
+                    </div>
                 </div>
             </div>
-            <div class="mt-8 text-center">
-                <p class="tagline-font text-sm">coffee. canvas. culture.</p>
+
+            <div class="mt-8 text-center text-sm">
+                <p>&copy; 2025 espressionist. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -121,20 +159,39 @@
         // Update cart count
         function updateCartCount() {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const count = cart.reduce((acc, item) => acc + item.quantity, 0);
-            document.getElementById('cartCount').textContent = count;
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.querySelectorAll('.cartCount').forEach(el => el.textContent = count);
         }
 
         // Mobile menu toggle
         const menuButton = document.querySelector('button[aria-label="Menu"]');
         const mobileMenu = document.getElementById('mobileMenu');
+        
         menuButton.addEventListener('click', () => {
+            const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+            menuButton.setAttribute('aria-expanded', !isExpanded);
             mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!menuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                menuButton.setAttribute('aria-expanded', 'false');
+                mobileMenu.classList.add('hidden');
+            }
         });
 
         // Initial cart count update
         document.addEventListener('DOMContentLoaded', updateCartCount);
         window.addEventListener('storage', updateCartCount);
+
+        // Handle keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') {
+                menuButton.setAttribute('aria-expanded', 'false');
+                mobileMenu.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>

@@ -170,7 +170,7 @@ Add archived: boolean to deletable records
 ---
  Embedded Google Maps iframe:  Google Maps <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7731.682543584867!2d121.100823!3d14.320651!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397d9006b676453%3A0xfba2c30aae1cf0d3!2sEspressionist!5e0!3m2!1sen!2sph!4v1745721835963!5m2!1sen!2sph" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> 
 * Footer:
-
+  - Quick links that has the links same options that is in the navbar with an adtional option/link for admin
   * **Address:** 109 Rizal Blvd, Santa Rosa, Philippines
   * **Phone:** 0995 965 9332
   * **Email:** [espressionist.ph@gmail.com](mailto:espressionist.ph@gmail.com)
@@ -195,10 +195,12 @@ Add archived: boolean to deletable records
 ### 🧩 COMPONENTS & INTERACTIONS
 
 - Buttons: Consistent look, touch-friendly (min 48x48px on mobile).
+- make use that all actions works on ever sizez of devices
 - Modals: For confirmations (e.g., delete, archive).
 - Alerts/Toasts: For Add to Cart, Order Placed, Login Failed/Success.
 - Forms: All forms must use <label> and be accessible.
 - Navigation: Responsive navbar with logo, links, and cart icon.
+
 
 ---
 
@@ -210,6 +212,8 @@ Add archived: boolean to deletable records
 - Footer with contact info and social links.
 
 #### 2. Products Page (`/products`)
+- include also a search bar
+- include caterory: all, coffee & Tea, Art & Merch, Gift Set, and Voucher
 - Product grid (image, name, price, stock).
 - "Add to Cart" button for each product.
 - Out-of-stock products are visually indicated and cannot be added.
