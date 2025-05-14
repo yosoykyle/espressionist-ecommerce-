@@ -1,177 +1,200 @@
-<!-- Checkout Page Template for Espressionist E-Commerce -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>espressionist | Checkout</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<head th:replace="layout/base :: head">
+    <title>espressionist - Checkout</title>
 </head>
-<body class="bg-beige min-h-screen flex flex-col justify-between">
-    <!-- Navbar -->
-    <nav class="flex items-center justify-between px-6 py-4 bg-white shadow-md">
-        <div class="flex items-center space-x-2">
-            <span class="font-seagull text-2xl text-white bg-[#F56401] px-3 py-1 rounded">espressionist</span>
-        </div>
-        <div class="flex items-center space-x-6">
-            <a th:href="@{/products}" class="text-[#F56401] font-semibold hover:underline">Products</a>
-            <a th:href="@{/cart}" class="text-[#F56401] font-semibold hover:underline">Cart</a>
-            <a th:href="@{/order-status}" class="text-[#F56401] font-semibold hover:underline">Order Status</a>
-            <a th:href="@{/admin/login}" class="text-[#F56401] font-semibold hover:underline">Admin</a>
-        </div>
-    </nav>
+<body class="min-h-screen flex flex-col bg-white">
+    <div th:replace="layout/base :: nav"></div>
+    
+    <main class="flex-grow">
+        <!-- Checkout Header -->
+        <section class="bg-primary text-white py-12 -mt-8">
+            <div class="container mx-auto text-center">
+                <h1 class="brand-font text-4xl mb-4">Checkout</h1>
+                <p class="tagline-font text-xl">Complete your order</p>
+            </div>
+        </section>
 
-    <!-- Checkout Content -->
-    <main class="flex-1 container mx-auto px-4 py-12 max-w-2xl">
-        <h1 class="text-3xl font-seagull text-[#F56401] mb-8 text-center">Checkout</h1>
-        <form id="checkout-form" class="bg-white rounded-lg shadow p-6 flex flex-col gap-4" autocomplete="off">
-            <div>
-                <label for="name" class="block font-bold mb-1">Full Name</label>
-                <input type="text" id="name" name="name" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#F56401]"/>
-            </div>
-            <div>
-                <label for="email" class="block font-bold mb-1">Email</label>
-                <input type="email" id="email" name="email" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#F56401]"/>
-            </div>
-            <div>
-                <label for="address" class="block font-bold mb-1">Shipping Address</label>
-                <textarea id="address" name="address" required rows="2" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#F56401]"></textarea>
-            </div>
-            <div class="mt-4">
-                <h2 class="font-bold mb-2">Order Summary</h2>
-                <div id="order-summary" class="text-sm"></div>
-                <div class="font-bold mt-2">Total (with 12% VAT): <span id="order-total">₱0.00</span></div>
-            </div>
-            <div class="mt-4">
-                <label class="block font-bold mb-1">Payment Method</label>
-                <div class="flex items-center gap-2">
-                    <input type="radio" id="cod" name="payment" value="cod" checked disabled class="accent-[#F56401]"/>
-                    <label for="cod">Cash on Delivery</label>
+        <!-- Checkout Form -->
+        <section class="py-12">
+            <div class="container mx-auto px-4 max-w-4xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Customer Information Form -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden p-6">
+                        <h2 class="text-xl font-semibold mb-6">Customer Information</h2>
+                        <form id="checkoutForm" class="space-y-4">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" id="name" name="name" required
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" id="email" name="email" required
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            </div>
+                            <div>
+                                <label for="address" class="block text-sm font-medium text-gray-700">Shipping Address</label>
+                                <textarea id="address" name="address" rows="4" required
+                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"></textarea>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-md">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span class="text-sm text-gray-600">Cash on Delivery Only</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div>
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="p-6">
+                                <h2 class="text-xl font-semibold mb-6">Order Summary</h2>
+                                <div id="orderItems" class="space-y-4 mb-6">
+                                    <!-- Order items will be inserted here -->
+                                </div>
+                                <div class="border-t pt-4">
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-600">Subtotal</span>
+                                        <span id="subtotal" class="text-gray-900"></span>
+                                    </div>
+                                    <div class="flex justify-between mb-4">
+                                        <span class="text-gray-600">VAT (12%)</span>
+                                        <span id="vat" class="text-gray-900"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-t pt-4">
+                                        <span class="text-lg font-semibold">Total</span>
+                                        <span id="total" class="text-2xl font-bold text-primary"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-6 pb-6">
+                                <button type="button" 
+                                        onclick="submitOrder()"
+                                        class="w-full bg-primary text-white py-3 rounded-full hover:bg-primary/90 transition flex items-center justify-center">
+                                    <span id="buttonText">Place Order</span>
+                                    <svg id="loadingSpinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button type="submit" id="place-order-btn" class="bg-[#F56401] text-white font-bold py-3 px-8 rounded shadow hover:bg-[#d35400] transition mt-4 flex items-center justify-center gap-2">
-                <span>Place Order</span>
-                <svg id="loading-spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
-            </button>
-            <div id="checkout-error" class="text-red-600 text-sm mt-2 hidden"></div>
-        </form>
+        </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-[#F56401] text-white py-6 mt-8">
-        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center px-6">
-            <div class="mb-4 md:mb-0">
-                <span class="font-seagull text-xl">espressionist</span>
-                <span class="ml-2">&copy; 2025</span>
-            </div>
-            <div class="flex space-x-4">
-                <a href="mailto:info@espressionist.com" class="hover:underline">info@espressionist.com</a>
-                <a href="#" class="hover:underline">Instagram</a>
-                <a href="#" class="hover:underline">Facebook</a>
-            </div>
-        </div>
-    </footer>
+    <div th:replace="layout/base :: footer"></div>
 
-    <!-- Custom Fonts (Seagull Serial, Pruno Deck Medium) -->
-    <style>
-        @font-face {
-            font-family: 'Seagull Serial';
-            src: url('/fonts/SeagullSerial.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-        @font-face {
-            font-family: 'Pruno Deck Medium';
-            src: url('/fonts/PrunoDeckMedium.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-        .font-seagull { font-family: 'Seagull Serial', sans-serif; }
-        .font-pruno { font-family: 'Pruno Deck Medium', sans-serif; }
-        .bg-beige { background-color: #f5f5dc; }
-    </style>
     <script>
-        // Utility: Format price
         function formatPrice(price) {
-            return '₱' + price.toFixed(2);
+            return '₱' + price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
         }
-        // Fetch product data for cart items
-        async function fetchProductData(productId) {
-            const res = await fetch(`/products`);
-            const products = await res.json();
-            return products.find(p => p.id == productId);
-        }
-        // Render order summary
-        async function renderOrderSummary() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '{}');
-            const summaryDiv = document.getElementById('order-summary');
-            summaryDiv.innerHTML = '';
-            let total = 0;
-            let summaryHtml = '';
-            for (const [productId, quantity] of Object.entries(cart)) {
-                const product = await fetchProductData(productId);
-                if (!product) continue;
-                const subtotal = product.price * quantity;
-                total += subtotal;
-                summaryHtml += `<div class="flex justify-between mb-1"><span>${product.name} x <span class="font-bold">${quantity}</span></span><span>${formatPrice(subtotal)}</span></div>`;
-            }
-            summaryDiv.innerHTML = summaryHtml || '<span class="text-gray-500">No items in cart.</span>';
-            const totalWithVAT = total * 1.12;
-            document.getElementById('order-total').textContent = formatPrice(totalWithVAT);
-            return { total, totalWithVAT };
-        }
-        // Handle checkout form submission
-        document.addEventListener('DOMContentLoaded', function() {
-            renderOrderSummary();
-            document.getElementById('checkout-form').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                document.getElementById('checkout-error').classList.add('hidden');
-                const spinner = document.getElementById('loading-spinner');
-                spinner.classList.remove('hidden');
-                const name = document.getElementById('name').value.trim();
-                const email = document.getElementById('email').value.trim();
-                const address = document.getElementById('address').value.trim();
-                const cart = JSON.parse(localStorage.getItem('cart') || '{}');
-                if (!name || !email || !address || Object.keys(cart).length === 0) {
-                    document.getElementById('checkout-error').textContent = 'Please fill out all fields and ensure your cart is not empty.';
-                    document.getElementById('checkout-error').classList.remove('hidden');
-                    spinner.classList.add('hidden');
-                    return;
-                }
-                // Prepare order data
-                const items = [];
-                for (const [productId, quantity] of Object.entries(cart)) {
-                    items.push({ product: { id: productId }, quantity: quantity });
-                }
-                const orderData = {
-                    customerName: name,
-                    customerEmail: email,
-                    shippingAddress: address,
-                    orderItems: items
-                };
-                try {
-                    const res = await fetch('/orders/checkout', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(orderData)
-                    });
-                    if (res.ok) {
-                        localStorage.removeItem('cart');
-                        window.location.href = '/order-success';
-                    } else {
-                        const err = await res.json();
-                        document.getElementById('checkout-error').textContent = err.message || 'Checkout failed. Please try again.';
-                        document.getElementById('checkout-error').classList.remove('hidden');
-                    }
-                } catch (error) {
-                    document.getElementById('checkout-error').textContent = 'Checkout failed. Please try again.';
-                    document.getElementById('checkout-error').classList.remove('hidden');
-                } finally {
-                    spinner.classList.add('hidden');
-                }
+
+        function displayOrderSummary() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const orderItems = document.getElementById('orderItems');
+            
+            // Clear existing items
+            orderItems.innerHTML = '';
+            
+            let subtotal = 0;
+            
+            cart.forEach(item => {
+                const itemSubtotal = item.price * item.quantity;
+                subtotal += itemSubtotal;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = 'flex items-center';
+                itemElement.innerHTML = `
+                    <img src="/api/products/image/${item.id}" alt="${item.name}" class="w-12 h-12 object-cover rounded">
+                    <div class="ml-4 flex-grow">
+                        <div class="text-sm font-medium text-gray-900">${item.name}</div>
+                        <div class="text-sm text-gray-500">Qty: ${item.quantity}</div>
+                    </div>
+                    <div class="text-sm font-medium text-gray-900">${formatPrice(itemSubtotal)}</div>
+                `;
+                orderItems.appendChild(itemElement);
             });
-        });
+
+            const vat = subtotal * 0.12;
+            const total = subtotal + vat;
+
+            document.getElementById('subtotal').textContent = formatPrice(subtotal);
+            document.getElementById('vat').textContent = formatPrice(vat);
+            document.getElementById('total').textContent = formatPrice(total);
+        }
+
+        async function submitOrder() {
+            const form = document.getElementById('checkoutForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cart.length === 0) {
+                alert('Your cart is empty');
+                return;
+            }
+
+            // Show loading state
+            const button = document.querySelector('button[type="button"]');
+            const buttonText = document.getElementById('buttonText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            button.disabled = true;
+            buttonText.textContent = 'Processing...';
+            loadingSpinner.classList.remove('hidden');
+
+            try {
+                const response = await fetch('/api/orders/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        customerName: document.getElementById('name').value,
+                        customerEmail: document.getElementById('email').value,
+                        shippingAddress: document.getElementById('address').value,
+                        items: cart.map(item => ({
+                            productId: item.id,
+                            quantity: item.quantity
+                        }))
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Checkout failed');
+                }
+
+                const result = await response.json();
+                
+                // Clear the cart
+                localStorage.removeItem('cart');
+                
+                // Store order details for the success page
+                sessionStorage.setItem('orderSuccess', JSON.stringify(result));
+                
+                // Redirect to success page
+                window.location.href = '/order-success';
+            } catch (error) {
+                alert('Error processing your order. Please try again.');
+                
+                // Reset button state
+                button.disabled = false;
+                buttonText.textContent = 'Place Order';
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // Initialize order summary on page load
+        document.addEventListener('DOMContentLoaded', displayOrderSummary);
     </script>
 </body>
 </html>

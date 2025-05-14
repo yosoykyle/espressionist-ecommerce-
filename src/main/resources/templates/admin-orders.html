@@ -1,95 +1,216 @@
-<!-- Admin Orders Management Page Template for Espressionist E-Commerce -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>espressionist | Admin Orders</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout/admin-base :: head">
+    <title>Admin Orders - espressionist</title>
 </head>
-<body class="bg-beige min-h-screen flex flex-col justify-between">
-    <nav class="flex items-center justify-between px-6 py-4 bg-white shadow-md">
-        <div class="flex items-center space-x-2">
-            <span class="font-seagull text-2xl text-white bg-[#F56401] px-3 py-1 rounded">espressionist</span>
-        </div>
-        <div class="flex items-center space-x-6">
-            <a th:href="@{/admin/dashboard}" class="text-[#F56401] font-semibold hover:underline">Dashboard</a>
-            <a th:href="@{/admin/products}" class="text-[#F56401] font-semibold hover:underline">Products</a>
-            <a th:href="@{/admin/orders}" class="text-[#F56401] font-semibold hover:underline">Orders</a>
-            <a th:href="@{/admin/users}" class="text-[#F56401] font-semibold hover:underline">Admins</a>
-            <a th:href="@{/logout}" class="text-[#F56401] font-semibold hover:underline">Logout</a>
-        </div>
-    </nav>
-    <main class="flex-1 container mx-auto px-4 py-12">
-        <h1 class="text-3xl font-seagull text-[#F56401] mb-8 text-center">Manage Orders</h1>
-        <table class="min-w-full bg-white rounded-lg shadow">
-            <thead>
-                <tr>
-                    <th class="py-2 px-4">Order Code</th>
-                    <th class="py-2 px-4">Customer</th>
-                    <th class="py-2 px-4">Shipping</th>
-                    <th class="py-2 px-4">Total (with VAT)</th>
-                    <th class="py-2 px-4">Status</th>
-                    <th class="py-2 px-4">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="order : ${orders}">
-                    <td class="py-2 px-4" th:text="${order.orderCode}"></td>
-                    <td class="py-2 px-4" th:text="${order.customerName}"></td>
-                    <td class="py-2 px-4" th:text="${order.shippingAddress}"></td>
-                    <td class="py-2 px-4" th:text="'₱' + ${order.totalWithVAT}"></td>
-                    <td class="py-2 px-4">
-                        <form th:action="@{'/admin/orders/update-status/' + ${order.id}}" method="post">
-                            <select name="status" class="border rounded px-2 py-1">
-                                <option th:selected="${order.status == 'Pending'}">Pending</option>
-                                <option th:selected="${order.status == 'Processing'}">Processing</option>
-                                <option th:selected="${order.status == 'Shipped'}">Shipped</option>
-                                <option th:selected="${order.status == 'Delivered'}">Delivered</option>
-                                <option th:selected="${order.status == 'Completed'}">Completed</option>
-                            </select>
-                            <button type="submit" class="ml-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Update</button>
-                        </form>
-                    </td>
-                    <td class="py-2 px-4 flex gap-2">
-                        <form th:action="@{'/admin/orders/archive/' + ${order.id}}" method="post" th:onsubmit="return confirm('Archive this order?');" class="inline">
-                            <button type="submit" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">Archive</button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </main>
-    <footer class="bg-[#F56401] text-white py-6 mt-8">
-        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center px-6">
-            <div class="mb-4 md:mb-0">
-                <span class="font-seagull text-xl">espressionist</span>
-                <span class="ml-2">&copy; 2025</span>
+<body class="bg-gray-50 min-h-screen">
+    <div th:replace="layout/admin-base :: nav"></div>
+    
+    <div th:replace="layout/admin-base :: main">
+        <div th:fragment="content">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Orders</h2>
+
+            <!-- Orders Table -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Order Code
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Customer
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="order : ${orders}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <a href="#" th:text="${order.orderCode}"
+                                   th:onclick="'viewOrderDetails(\'' + ${order.orderCode} + '\')'"
+                                   class="text-[#F56401] hover:text-orange-700"></a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900" th:text="${order.customerName}"></div>
+                                <div class="text-sm text-gray-500" th:text="${order.customerEmail}"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <select th:id="'status-' + ${order.orderCode}"
+                                        th:onchange="'updateOrderStatus(\'' + ${order.orderCode} + '\')'"
+                                        class="rounded-md border-gray-300 text-sm focus:ring-[#F56401] focus:border-[#F56401]">
+                                    <option value="Pending" th:selected="${order.status == 'Pending'}">Pending</option>
+                                    <option value="Processing" th:selected="${order.status == 'Processing'}">Processing</option>
+                                    <option value="Shipped" th:selected="${order.status == 'Shipped'}">Shipped</option>
+                                    <option value="Delivered" th:selected="${order.status == 'Delivered'}">Delivered</option>
+                                </select>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${'₱' + order.total}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" 
+                                th:text="${#temporals.format(order.orderDate, 'MMM dd, yyyy')}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button th:if="${order.status == 'Delivered'}" 
+                                        type="button"
+                                        th:onclick="'archiveOrder(\'' + ${order.orderCode} + '\')'"
+                                        class="text-gray-600 hover:text-gray-900">
+                                    Complete
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="flex space-x-4">
-                <a href="mailto:info@espressionist.com" class="hover:underline">info@espressionist.com</a>
-                <a href="#" class="hover:underline">Instagram</a>
-                <a href="#" class="hover:underline">Facebook</a>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Order Details</h3>
+                <button type="button" onclick="closeModal('orderDetailsModal')"
+                        class="text-gray-400 hover:text-gray-500">
+                    <span class="sr-only">Close</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="orderDetailsContent" class="space-y-6">
+                <!-- Order details will be populated here -->
             </div>
         </div>
-    </footer>
-    <style>
-        @font-face {
-            font-family: 'Seagull Serial';
-            src: url('/fonts/SeagullSerial.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
+    </div>
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
         }
-        @font-face {
-            font-family: 'Pruno Deck Medium';
-            src: url('/fonts/PrunoDeckMedium.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
         }
-        .font-seagull { font-family: 'Seagull Serial', sans-serif; }
-        .font-pruno { font-family: 'Pruno Deck Medium', sans-serif; }
-        .bg-beige { background-color: #f5f5dc; }
-    </style>
+
+        async function viewOrderDetails(orderCode) {
+            try {
+                const response = await fetch(`/api/orders/${orderCode}`);
+                const order = await response.json();
+                
+                const content = document.getElementById('orderDetailsContent');
+                content.innerHTML = `
+                    <div class="border-b border-gray-200 pb-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">Order Code</h4>
+                                <p class="mt-1">${order.orderCode}</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">Order Date</h4>
+                                <p class="mt-1">${new Date(order.orderDate).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-b border-gray-200 py-4">
+                        <h4 class="text-sm font-medium text-gray-500 mb-2">Customer Information</h4>
+                        <p>${order.customerName}</p>
+                        <p>${order.customerEmail}</p>
+                        <p class="whitespace-pre-line">${order.shippingAddress}</p>
+                    </div>
+                    
+                    <div class="py-4">
+                        <h4 class="text-sm font-medium text-gray-500 mb-4">Order Items</h4>
+                        <div class="space-y-4">
+                            ${order.items.map(item => `
+                                <div class="flex items-center">
+                                    <img src="/api/products/image/${item.productId}" alt="Product" class="w-16 h-16 object-cover rounded">
+                                    <div class="ml-4 flex-grow">
+                                        <p class="font-medium">${item.name}</p>
+                                        <p class="text-sm text-gray-500">Quantity: ${item.quantity}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium">₱${item.price}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span>₱${order.subtotal}</span>
+                        </div>
+                        <div class="flex justify-between mt-2">
+                            <span class="text-gray-600">VAT (12%)</span>
+                            <span>₱${order.vat}</span>
+                        </div>
+                        <div class="flex justify-between mt-2 text-lg font-semibold">
+                            <span>Total</span>
+                            <span>₱${order.total}</span>
+                        </div>
+                    </div>
+                `;
+                
+                openModal('orderDetailsModal');
+            } catch (error) {
+                alert('Error loading order details');
+            }
+        }
+
+        async function updateOrderStatus(orderCode) {
+            const status = document.getElementById(`status-${orderCode}`).value;
+            try {
+                const response = await fetch(`/api/orders/${orderCode}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to update status');
+                }
+                
+                // Refresh the page if the status was updated to show any new actions
+                if (status === 'Delivered') {
+                    location.reload();
+                }
+            } catch (error) {
+                alert('Error updating order status');
+            }
+        }
+
+        async function archiveOrder(orderCode) {
+            if (confirm('Are you sure you want to complete and archive this order?')) {
+                try {
+                    const response = await fetch(`/api/orders/${orderCode}/archive`, {
+                        method: 'PUT'
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        throw new Error('Failed to archive order');
+                    }
+                } catch (error) {
+                    alert('Error archiving order');
+                }
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1,19 +1,17 @@
 version: '3.8'
-
 services:
-  db:
+  mariadb:
     image: mariadb:latest
     container_name: espressionist_db
-    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: yourpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: espressionist_ecommerce
       MYSQL_USER: espressionist_user
       MYSQL_PASSWORD: yourpassword
     ports:
       - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
 
 volumes:
-  db_data:
+  mariadb_data:

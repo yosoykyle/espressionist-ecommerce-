@@ -1,143 +1,235 @@
-<!-- Cart Page Template for Espressionist E-Commerce -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>espressionist | Cart</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<head th:replace="layout/base :: head">
+    <title>espressionist - Shopping Cart</title>
 </head>
-<body class="bg-beige min-h-screen flex flex-col justify-between">
-    <!-- Navbar -->
-    <nav class="flex items-center justify-between px-6 py-4 bg-white shadow-md">
-        <div class="flex items-center space-x-2">
-            <span class="font-seagull text-2xl text-white bg-[#F56401] px-3 py-1 rounded">espressionist</span>
-        </div>
-        <div class="flex items-center space-x-6">
-            <a th:href="@{/products}" class="text-[#F56401] font-semibold hover:underline">Products</a>
-            <a th:href="@{/cart}" class="text-[#F56401] font-semibold hover:underline">Cart</a>
-            <a th:href="@{/order-status}" class="text-[#F56401] font-semibold hover:underline">Order Status</a>
-            <a th:href="@{/admin/login}" class="text-[#F56401] font-semibold hover:underline">Admin</a>
-        </div>
-    </nav>
+<body class="min-h-screen flex flex-col bg-white">
+    <div th:replace="layout/base :: nav"></div>
+    
+    <main class="flex-grow">
+        <!-- Cart Header -->
+        <section class="bg-primary text-white py-12 -mt-8">
+            <div class="container mx-auto text-center">
+                <h1 class="brand-font text-4xl mb-4">Shopping Cart</h1>
+                <p class="tagline-font text-xl">Review your items</p>
+            </div>
+        </section>
 
-    <!-- Cart Content -->
-    <main class="flex-1 container mx-auto px-4 py-12">
-        <h1 class="text-3xl font-seagull text-[#F56401] mb-8 text-center">Your Cart</h1>
-        <div id="cart-empty" class="text-center text-gray-500 text-lg" style="display:none;">Your cart is empty.</div>
-        <div id="cart-items-container" class="space-y-6"></div>
-        <div id="cart-summary" class="mt-8 flex flex-col items-end" style="display:none;">
-            <div class="text-lg font-bold mb-2">Total: <span id="cart-total">₱0.00</span></div>
-            <button id="checkout-btn" class="bg-[#F56401] text-white font-bold py-3 px-8 rounded shadow hover:bg-[#d35400] transition mt-2">Checkout</button>
+        <!-- Cart Content -->
+        <section class="py-12">
+            <div class="container mx-auto px-4">
+                <!-- Empty Cart State -->
+                <div id="emptyCart" class="hidden text-center py-16">
+                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">Your cart is empty</h2>
+                    <p class="text-gray-600 mb-8">Add some items to your cart to get started</p>
+                    <a href="/products" class="inline-block bg-primary text-white px-8 py-3 rounded-full hover:bg-primary/90 transition">
+                        Browse Products
+                    </a>
+                </div>
+
+                <!-- Cart Items -->
+                <div id="cartContent" class="hidden">
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Product
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Price
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Quantity
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Subtotal
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="cartItems" class="bg-white divide-y divide-gray-200">
+                                <!-- Cart items will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cart Summary -->
+                    <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-600">Subtotal</span>
+                                <span id="subtotal" class="text-gray-900"></span>
+                            </div>
+                            <div class="flex justify-between mb-4">
+                                <span class="text-gray-600">VAT (12%)</span>
+                                <span id="vat" class="text-gray-900"></span>
+                            </div>
+                            <div class="flex justify-between items-center border-t pt-4">
+                                <span class="text-lg font-semibold">Total</span>
+                                <span id="total" class="text-2xl font-bold text-primary"></span>
+                            </div>
+                            <a href="/checkout" class="mt-6 block w-full bg-primary text-white text-center py-3 rounded-full hover:bg-primary/90 transition">
+                                Proceed to Checkout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Remove Confirmation Modal -->
+        <div id="removeModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Remove Item</h3>
+                <p class="text-gray-600 mb-6">Are you sure you want to remove this item from your cart?</p>
+                <div class="flex justify-end space-x-4">
+                    <button onclick="closeRemoveModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button id="confirmRemove" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        Remove
+                    </button>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-[#F56401] text-white py-6 mt-8">
-        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center px-6">
-            <div class="mb-4 md:mb-0">
-                <span class="font-seagull text-xl">espressionist</span>
-                <span class="ml-2">&copy; 2025</span>
-            </div>
-            <div class="flex space-x-4">
-                <a href="mailto:info@espressionist.com" class="hover:underline">info@espressionist.com</a>
-                <a href="#" class="hover:underline">Instagram</a>
-                <a href="#" class="hover:underline">Facebook</a>
-            </div>
-        </div>
-    </footer>
+    <div th:replace="layout/base :: footer"></div>
 
-    <!-- Custom Fonts (Seagull Serial, Pruno Deck Medium) -->
-    <style>
-        @font-face {
-            font-family: 'Seagull Serial';
-            src: url('/fonts/SeagullSerial.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-        @font-face {
-            font-family: 'Pruno Deck Medium';
-            src: url('/fonts/PrunoDeckMedium.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-        .font-seagull { font-family: 'Seagull Serial', sans-serif; }
-        .font-pruno { font-family: 'Pruno Deck Medium', sans-serif; }
-        .bg-beige { background-color: #f5f5dc; }
-    </style>
     <script>
-        // Utility: Format price
+        let currentRemoveId = null;
+
         function formatPrice(price) {
-            return '₱' + price.toFixed(2);
+            return '₱' + price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
         }
-        // Fetch product data for cart items
-        async function fetchProductData(productId) {
-            const res = await fetch(`/products`);
-            const products = await res.json();
-            return products.find(p => p.id == productId);
-        }
-        // Render cart
-        async function renderCart() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '{}');
-            const container = document.getElementById('cart-items-container');
-            container.innerHTML = '';
-            let total = 0;
-            let hasItems = false;
-            for (const [productId, quantity] of Object.entries(cart)) {
-                const product = await fetchProductData(productId);
-                if (!product) continue;
-                hasItems = true;
-                const subtotal = product.price * quantity;
-                total += subtotal;
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'flex flex-col sm:flex-row items-center bg-white rounded-lg shadow p-4 gap-4';
-                itemDiv.innerHTML = `
-                    <div class="w-24 h-24 flex items-center justify-center bg-beige rounded overflow-hidden">
-                        ${product.image ? `<img src="/products/image/${product.id}" alt="Product Image" class="object-cover w-full h-full"/>` : '<span class="text-gray-400">No Image</span>'}
-                    </div>
-                    <div class="flex-1 flex flex-col items-center sm:items-start">
-                        <h2 class="font-seagull text-lg text-[#F56401] mb-1">${product.name}</h2>
-                        <div class="text-gray-600 mb-1">${formatPrice(product.price)} x <span class="font-bold">${quantity}</span></div>
-                        <div class="text-gray-500 text-sm">Subtotal: <span class="font-bold">${formatPrice(subtotal)}</span></div>
-                        <div class="flex gap-2 mt-2">
-                            <button class="qty-btn bg-[#F56401] text-white rounded px-2" data-id="${product.id}" data-action="decrement">-</button>
-                            <button class="qty-btn bg-[#F56401] text-white rounded px-2" data-id="${product.id}" data-action="increment">+</button>
-                            <button class="remove-btn text-red-500 underline ml-2" data-id="${product.id}">Remove</button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(itemDiv);
+
+        function updateCartDisplay() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const cartContent = document.getElementById('cartContent');
+            const emptyCart = document.getElementById('emptyCart');
+            const cartItems = document.getElementById('cartItems');
+
+            if (cart.length === 0) {
+                cartContent.classList.add('hidden');
+                emptyCart.classList.remove('hidden');
+                return;
             }
-            document.getElementById('cart-empty').style.display = hasItems ? 'none' : '';
-            document.getElementById('cart-summary').style.display = hasItems ? '' : 'none';
-            document.getElementById('cart-total').textContent = formatPrice(total);
+
+            cartContent.classList.remove('hidden');
+            emptyCart.classList.add('hidden');
+            
+            // Clear existing items
+            cartItems.innerHTML = '';
+
+            // Calculate totals
+            let subtotal = 0;
+            
+            // Add each item
+            cart.forEach(item => {
+                const itemSubtotal = item.price * item.quantity;
+                subtotal += itemSubtotal;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <img src="/api/products/image/${item.id}" alt="${item.name}" class="w-12 h-12 object-cover rounded">
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${item.name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${formatPrice(item.price)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateQuantity('${item.id}', -1)" 
+                                    class="text-gray-500 hover:text-gray-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                </svg>
+                            </button>
+                            <span class="text-gray-900 w-8 text-center">${item.quantity}</span>
+                            <button onclick="updateQuantity('${item.id}', 1)"
+                                    class="text-gray-500 hover:text-gray-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${formatPrice(itemSubtotal)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="showRemoveModal('${item.id}')"
+                                class="text-red-600 hover:text-red-900">
+                            Remove
+                        </button>
+                    </td>
+                `;
+                cartItems.appendChild(row);
+            });
+
+            // Update totals
+            const vat = subtotal * 0.12;
+            const total = subtotal + vat;
+
+            document.getElementById('subtotal').textContent = formatPrice(subtotal);
+            document.getElementById('vat').textContent = formatPrice(vat);
+            document.getElementById('total').textContent = formatPrice(total);
+
+            // Update cart count in header
+            updateCartCount();
         }
-        // Cart event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            renderCart();
-            document.getElementById('cart-items-container').addEventListener('click', function(e) {
-                if (e.target.classList.contains('qty-btn')) {
-                    const id = e.target.getAttribute('data-id');
-                    const action = e.target.getAttribute('data-action');
-                    let cart = JSON.parse(localStorage.getItem('cart') || '{}');
-                    if (action === 'increment') cart[id] = (cart[id] || 0) + 1;
-                    if (action === 'decrement') cart[id] = Math.max(1, (cart[id] || 1) - 1);
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    renderCart();
-                }
-                if (e.target.classList.contains('remove-btn')) {
-                    const id = e.target.getAttribute('data-id');
-                    let cart = JSON.parse(localStorage.getItem('cart') || '{}');
-                    delete cart[id];
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    renderCart();
-                }
-            });
-            document.getElementById('checkout-btn').addEventListener('click', function() {
-                window.location.href = '/checkout';
-            });
+
+        function updateQuantity(id, change) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const item = cart.find(item => item.id === id);
+            
+            if (item) {
+                item.quantity = Math.max(1, item.quantity + change);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartDisplay();
+            }
+        }
+
+        function showRemoveModal(id) {
+            currentRemoveId = id;
+            document.getElementById('removeModal').classList.remove('hidden');
+        }
+
+        function closeRemoveModal() {
+            document.getElementById('removeModal').classList.add('hidden');
+            currentRemoveId = null;
+        }
+
+        document.getElementById('confirmRemove').addEventListener('click', () => {
+            if (currentRemoveId) {
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                const updatedCart = cart.filter(item => item.id !== currentRemoveId);
+                localStorage.setItem('cart', JSON.stringify(updatedCart));
+                updateCartDisplay();
+                closeRemoveModal();
+            }
         });
+
+        // Initialize cart display
+        document.addEventListener('DOMContentLoaded', updateCartDisplay);
+
+        // Update cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
     </script>
 </body>
 </html>

@@ -57,4 +57,10 @@ public class ProductService {
             }
         });
     }
+
+    public byte[] getImageById(Long id) {
+        return productRepository.findById(id)
+            .map(Product::getImage)
+            .orElse(null);
+    }
 }

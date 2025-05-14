@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 public class ProductController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
@@ -36,13 +36,6 @@ public class ProductController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
-    }
-
-    @GetMapping("")
-    public String productsPage(Model model) {
-        List<Product> products = productService.getAllActiveProducts();
-        model.addAttribute("products", products);
-        return "products";
     }
 
     @GetMapping("/image/{id}")

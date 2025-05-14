@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/admin/users")
-public class AdminUsersPageController {
+@RequestMapping("/checkout")
+public class CheckoutPageController {
     @GetMapping("")
-    public String adminUsersPage() {
-        return "admin-users";
+    public String checkoutPage() {
+        return "checkout";
     }
 }

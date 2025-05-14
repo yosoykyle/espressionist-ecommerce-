@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/admin/users")
-public class AdminUsersPageController {
+@RequestMapping("/")
+public class HomePageController {
     @GetMapping("")
-    public String adminUsersPage() {
-        return "admin-users";
+    public String homePage() {
+        return "index";
     }
 }
