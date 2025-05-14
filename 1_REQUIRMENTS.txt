@@ -1,0 +1,243 @@
+☕ Espressionist E-Commerce – Backend Requirements
+🔧 Technologies:
+Java 17 + Spring Boot
+
+MySQL/MariaDB (via Docker)
+
+Thymeleaf (for rendering views)
+
+Spring Security (admin login only)
+
+HTML, Tailwind CSS, JS (static pages only)
+
+✅ GENERAL GUIDELINES
+Focus on backend.
+
+Frontend only needs basic integration with Thymeleaf (static templates).
+
+Use archived = true instead of deleting records.
+
+Project runs in GitHub Codespaces.
+
+🛍️ USER SIDE (No Login Required)
+1. Product Listing
+/products — Return all products where archived = false
+
+Includes: image, name, price, stock quantity
+
+2. Shopping Cart
+Cart is handled in JavaScript only
+
+At checkout, cart data (productId + quantity) will be sent to backend
+
+3. Checkout
+POST /checkout
+
+Required fields:
+
+Name
+
+Email
+
+Shipping Address
+
+Cart Items (product ID + quantity)
+
+Add 12% VAT to total
+
+Save order and items in database
+
+4. Payment
+Only Cash on Delivery
+
+No payment gateway required
+
+5. Order Confirmation (No Email)
+After checkout, show in-browser confirmation page with:
+- Order code (e.g. ESP-3A9KZT1D)
+- Item details
+- Shipping info
+- Total (with VAT)
+- Message: “Please save this code to track your order.”
+
+6. Order Status Tracking
+/order-status/{orderCode}
+
+Display:
+
+Order date
+
+Item list
+
+Shipping info
+
+Status (Pending, Processing, etc.)
+
+🔐 ADMIN SIDE (Login Required)
+Login Credentials (Default):
+Username: ADMIN
+
+Password: Espressionist2025
+
+1. Authentication
+Use Spring Security
+
+Protect /admin/** routes
+
+Use BCrypt for password hashing
+
+Allow creation/deletion/update of other admins (prevent self-deletion)
+
+2. Product Management
+Create, update, archive products
+
+Fields:
+
+Name
+
+Price (> 0)
+
+Quantity (≥ 1)
+
+Category
+
+Image (stored in DB as BLOB or saved to file)
+
+Deletion = set archived = true
+
+3. Order Management
+View customer orders:
+
+Name, email, shipping address
+
+Items ordered
+
+Total with VAT
+
+Status
+
+Admin can manually update status (Pending → Shipped, etc.)
+
+Once marked as delivered, option to "complete" order (archives it)
+
+4. Admin Account Management
+Admins can manage other admins
+
+Prevent self-deletion for safety
+
+🧱 DATABASE DESIGN
+Use JPA (Hibernate) annotations
+
+Entity: Product, Order, OrderItem, Admin
+
+Relationships:
+
+One Order → Many OrderItems
+
+Each OrderItem links to a Product
+
+Add archived: boolean to deletable records
+
+☕ Espressionist E-Commerce – Frontend Requirements
+
+### ⚙️ TECHNOLOGIES
+
+- HTML5
+- Tailwind CSS (mobile-first, responsive)
+- Thymeleaf (server-side dynamic rendering)
+- Vanilla JavaScript (for cart and interactivity)
+- Optional: Alpine.js (for lightweight UI behavior)
+
+---
+
+### 🎨 BRAND & STYLE
+
+- Brand Name: espressionist (lowercase only)
+- Logo Font: Seagull Serial (white text)
+- Tagline Font: Pruno Deck Medium
+- Tagline: `coffee. canvas. culture.`
+- Brand Colors:
+  - Primary: #F56401
+  - Secondary: White
+  - Accent: Beige
+- Style: Minimalist, clean, modern café aesthetic
+- Responsive: Mobile, Tablet, Desktop
+- Accessibility:
+  - Use proper ARIA roles
+  - <label> for all inputs
+  - Keyboard-navigable pages
+
+---
+
+### ✅ GENERAL FRONTEND GUIDELINES
+
+- Use Thymeleaf for dynamic rendering of all server-rendered pages.
+- Use Tailwind utility classes for all styling.
+- Use JavaScript only where necessary (e.g., cart logic, modals, toasts).
+- All frontend actions must align with backend endpoints.
+- Cart uses localStorage until checkout.
+- Images uploaded via <input type="file">, not URLs.
+- Archived products are filtered out by default.
+
+---
+
+### 🧩 COMPONENTS & INTERACTIONS
+
+- Buttons: Consistent look, touch-friendly (min 48x48px on mobile).
+- Modals: For confirmations (e.g., delete, archive).
+- Alerts/Toasts: For Add to Cart, Order Placed, Login Failed/Success.
+- Forms: All forms must use <label> and be accessible.
+- Navigation: Responsive navbar with logo, links, and cart icon.
+
+---
+
+### 🗂️ PAGE-BY-PAGE REQUIREMENTS
+
+#### 1. Home Page (`/`)
+- Welcome banner with logo, tagline, and CTA buttons.
+- Embedded Google Maps for café location.
+- Footer with contact info and social links.
+
+#### 2. Products Page (`/products`)
+- Product grid (image, name, price, stock).
+- "Add to Cart" button for each product.
+- Out-of-stock products are visually indicated and cannot be added.
+- Only non-archived products are shown.
+
+#### 3. Cart Page (`/cart`)
+- List of cart items (image, name, price, quantity, subtotal).
+- Quantity controls (increment, decrement, remove).
+- Cart total (with VAT calculated at checkout).
+- "Checkout" button.
+
+#### 4. Checkout Page (`/checkout`)
+- Form: Name, Email, Shipping Address (all required, with validation).
+- Cart summary.
+- "Place Order" button (submits to backend).
+- Show loading indicator during submission.
+
+#### 5. Order Success Page (`/order-success`)
+- Order code, item details, shipping info, total (with VAT).
+- Message: “Please save this code to track your order.”
+- Button to go to Order Status page.
+
+#### 6. Order Status Page (`/order-status`)
+- Input for order code.
+- Display order date, item list, shipping info, and status.
+- If code invalid, show error.
+
+#### 7. Admin Pages (`/admin/**`)
+- Login Page: Username/password, error on failure.
+- Dashboard: Overview of orders and products.
+- Product Management: List, create, update, archive products (with image upload).
+- Order Management: List orders, update status, archive completed.
+- Admin Management: List, create, update, delete admins (prevent self-deletion).
+
+---
+
+### 🧪 TESTING & ACCESSIBILITY
+
+- All pages must be responsive and accessible.
+- Use keyboard navigation and ARIA roles.
+- Test all forms for validation and error handling.
+- Test cart and checkout flow end-to-end.

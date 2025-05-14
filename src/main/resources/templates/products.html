@@ -1,0 +1,91 @@
+<!-- Products Page Template for Espressionist E-Commerce -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>espressionist | Products</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-beige min-h-screen flex flex-col justify-between">
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between px-6 py-4 bg-white shadow-md">
+        <div class="flex items-center space-x-2">
+            <span class="font-seagull text-2xl text-white bg-[#F56401] px-3 py-1 rounded">espressionist</span>
+        </div>
+        <div class="flex items-center space-x-6">
+            <a th:href="@{/products}" class="text-[#F56401] font-semibold hover:underline">Products</a>
+            <a th:href="@{/cart}" class="text-[#F56401] font-semibold hover:underline">Cart</a>
+            <a th:href="@{/order-status}" class="text-[#F56401] font-semibold hover:underline">Order Status</a>
+            <a th:href="@{/admin/login}" class="text-[#F56401] font-semibold hover:underline">Admin</a>
+        </div>
+    </nav>
+
+    <!-- Products Grid -->
+    <main class="flex-1 container mx-auto px-4 py-12">
+        <h1 class="text-3xl font-seagull text-[#F56401] mb-8 text-center">Our Products</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div th:each="product : ${products}" class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+                <div class="w-32 h-32 mb-4 flex items-center justify-center bg-beige rounded overflow-hidden">
+                    <img th:if="${product.image != null}" th:src="@{'/products/image/' + ${product.id}}" alt="Product Image" class="object-cover w-full h-full"/>
+                    <span th:if="${product.image == null}" class="text-gray-400">No Image</span>
+                </div>
+                <h2 class="font-seagull text-xl text-[#F56401] mb-2" th:text="${product.name}"></h2>
+                <p class="text-lg font-bold mb-1" th:text="'₱' + ${product.price}"></p>
+                <p class="text-sm text-gray-600 mb-2" th:text="'Stock: ' + ${product.quantity}"></p>
+                <button th:if="${product.quantity > 0}" class="add-to-cart-btn bg-[#F56401] text-white font-bold py-2 px-6 rounded mt-2 w-full hover:bg-[#d35400] transition" th:attr="data-id=${product.id}">Add to Cart</button>
+                <span th:if="${product.quantity == 0}" class="bg-gray-300 text-gray-600 font-semibold py-2 px-6 rounded mt-2 w-full text-center cursor-not-allowed">Out of Stock</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#F56401] text-white py-6 mt-8">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center px-6">
+            <div class="mb-4 md:mb-0">
+                <span class="font-seagull text-xl">espressionist</span>
+                <span class="ml-2">&copy; 2025</span>
+            </div>
+            <div class="flex space-x-4">
+                <a href="mailto:info@espressionist.com" class="hover:underline">info@espressionist.com</a>
+                <a href="#" class="hover:underline">Instagram</a>
+                <a href="#" class="hover:underline">Facebook</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Fonts (Seagull Serial, Pruno Deck Medium) -->
+    <style>
+        @font-face {
+            font-family: 'Seagull Serial';
+            src: url('/fonts/SeagullSerial.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Pruno Deck Medium';
+            src: url('/fonts/PrunoDeckMedium.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        .font-seagull { font-family: 'Seagull Serial', sans-serif; }
+        .font-pruno { font-family: 'Pruno Deck Medium', sans-serif; }
+        .bg-beige { background-color: #f5f5dc; }
+    </style>
+    <script>
+        // Add to Cart button logic (localStorage)
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.add-to-cart-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-id');
+                    let cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                    cart[productId] = (cart[productId] || 0) + 1;
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    alert('Added to cart!');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

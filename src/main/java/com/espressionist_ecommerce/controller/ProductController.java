@@ -5,6 +5,7 @@ import com.espressionist_ecommerce.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.slf4j.Logger;
@@ -34,6 +35,23 @@ public class ProductController {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("")
+    public String productsPage(Model model) {
+        List<Product> products = productService.getAllActiveProducts();
+        model.addAttribute("products", products);
+        return "products";
+    }
+
+    @GetMapping("/image/{id}")
+    public ResponseEntity<byte[]> getProductImage(@PathVariable Long id) {
+        byte[] image = productService.getImageById(id);
+        if (image != null) {
+            return ResponseEntity.ok().header("Content-Type", "image/jpeg").body(image);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }

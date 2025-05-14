@@ -1,0 +1,143 @@
+<!-- Cart Page Template for Espressionist E-Commerce -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>espressionist | Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-beige min-h-screen flex flex-col justify-between">
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between px-6 py-4 bg-white shadow-md">
+        <div class="flex items-center space-x-2">
+            <span class="font-seagull text-2xl text-white bg-[#F56401] px-3 py-1 rounded">espressionist</span>
+        </div>
+        <div class="flex items-center space-x-6">
+            <a th:href="@{/products}" class="text-[#F56401] font-semibold hover:underline">Products</a>
+            <a th:href="@{/cart}" class="text-[#F56401] font-semibold hover:underline">Cart</a>
+            <a th:href="@{/order-status}" class="text-[#F56401] font-semibold hover:underline">Order Status</a>
+            <a th:href="@{/admin/login}" class="text-[#F56401] font-semibold hover:underline">Admin</a>
+        </div>
+    </nav>
+
+    <!-- Cart Content -->
+    <main class="flex-1 container mx-auto px-4 py-12">
+        <h1 class="text-3xl font-seagull text-[#F56401] mb-8 text-center">Your Cart</h1>
+        <div id="cart-empty" class="text-center text-gray-500 text-lg" style="display:none;">Your cart is empty.</div>
+        <div id="cart-items-container" class="space-y-6"></div>
+        <div id="cart-summary" class="mt-8 flex flex-col items-end" style="display:none;">
+            <div class="text-lg font-bold mb-2">Total: <span id="cart-total">₱0.00</span></div>
+            <button id="checkout-btn" class="bg-[#F56401] text-white font-bold py-3 px-8 rounded shadow hover:bg-[#d35400] transition mt-2">Checkout</button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#F56401] text-white py-6 mt-8">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center px-6">
+            <div class="mb-4 md:mb-0">
+                <span class="font-seagull text-xl">espressionist</span>
+                <span class="ml-2">&copy; 2025</span>
+            </div>
+            <div class="flex space-x-4">
+                <a href="mailto:info@espressionist.com" class="hover:underline">info@espressionist.com</a>
+                <a href="#" class="hover:underline">Instagram</a>
+                <a href="#" class="hover:underline">Facebook</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Fonts (Seagull Serial, Pruno Deck Medium) -->
+    <style>
+        @font-face {
+            font-family: 'Seagull Serial';
+            src: url('/fonts/SeagullSerial.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Pruno Deck Medium';
+            src: url('/fonts/PrunoDeckMedium.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        .font-seagull { font-family: 'Seagull Serial', sans-serif; }
+        .font-pruno { font-family: 'Pruno Deck Medium', sans-serif; }
+        .bg-beige { background-color: #f5f5dc; }
+    </style>
+    <script>
+        // Utility: Format price
+        function formatPrice(price) {
+            return '₱' + price.toFixed(2);
+        }
+        // Fetch product data for cart items
+        async function fetchProductData(productId) {
+            const res = await fetch(`/products`);
+            const products = await res.json();
+            return products.find(p => p.id == productId);
+        }
+        // Render cart
+        async function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let total = 0;
+            let hasItems = false;
+            for (const [productId, quantity] of Object.entries(cart)) {
+                const product = await fetchProductData(productId);
+                if (!product) continue;
+                hasItems = true;
+                const subtotal = product.price * quantity;
+                total += subtotal;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex flex-col sm:flex-row items-center bg-white rounded-lg shadow p-4 gap-4';
+                itemDiv.innerHTML = `
+                    <div class="w-24 h-24 flex items-center justify-center bg-beige rounded overflow-hidden">
+                        ${product.image ? `<img src="/products/image/${product.id}" alt="Product Image" class="object-cover w-full h-full"/>` : '<span class="text-gray-400">No Image</span>'}
+                    </div>
+                    <div class="flex-1 flex flex-col items-center sm:items-start">
+                        <h2 class="font-seagull text-lg text-[#F56401] mb-1">${product.name}</h2>
+                        <div class="text-gray-600 mb-1">${formatPrice(product.price)} x <span class="font-bold">${quantity}</span></div>
+                        <div class="text-gray-500 text-sm">Subtotal: <span class="font-bold">${formatPrice(subtotal)}</span></div>
+                        <div class="flex gap-2 mt-2">
+                            <button class="qty-btn bg-[#F56401] text-white rounded px-2" data-id="${product.id}" data-action="decrement">-</button>
+                            <button class="qty-btn bg-[#F56401] text-white rounded px-2" data-id="${product.id}" data-action="increment">+</button>
+                            <button class="remove-btn text-red-500 underline ml-2" data-id="${product.id}">Remove</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            }
+            document.getElementById('cart-empty').style.display = hasItems ? 'none' : '';
+            document.getElementById('cart-summary').style.display = hasItems ? '' : 'none';
+            document.getElementById('cart-total').textContent = formatPrice(total);
+        }
+        // Cart event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCart();
+            document.getElementById('cart-items-container').addEventListener('click', function(e) {
+                if (e.target.classList.contains('qty-btn')) {
+                    const id = e.target.getAttribute('data-id');
+                    const action = e.target.getAttribute('data-action');
+                    let cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                    if (action === 'increment') cart[id] = (cart[id] || 0) + 1;
+                    if (action === 'decrement') cart[id] = Math.max(1, (cart[id] || 1) - 1);
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    renderCart();
+                }
+                if (e.target.classList.contains('remove-btn')) {
+                    const id = e.target.getAttribute('data-id');
+                    let cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                    delete cart[id];
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    renderCart();
+                }
+            });
+            document.getElementById('checkout-btn').addEventListener('click', function() {
+                window.location.href = '/checkout';
+            });
+        });
+    </script>
+</body>
+</html>

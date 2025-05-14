@@ -1,0 +1,95 @@
+<!-- Admin Orders Management Page Template for Espressionist E-Commerce -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>espressionist | Admin Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-beige min-h-screen flex flex-col justify-between">
+    <nav class="flex items-center justify-between px-6 py-4 bg-white shadow-md">
+        <div class="flex items-center space-x-2">
+            <span class="font-seagull text-2xl text-white bg-[#F56401] px-3 py-1 rounded">espressionist</span>
+        </div>
+        <div class="flex items-center space-x-6">
+            <a th:href="@{/admin/dashboard}" class="text-[#F56401] font-semibold hover:underline">Dashboard</a>
+            <a th:href="@{/admin/products}" class="text-[#F56401] font-semibold hover:underline">Products</a>
+            <a th:href="@{/admin/orders}" class="text-[#F56401] font-semibold hover:underline">Orders</a>
+            <a th:href="@{/admin/users}" class="text-[#F56401] font-semibold hover:underline">Admins</a>
+            <a th:href="@{/logout}" class="text-[#F56401] font-semibold hover:underline">Logout</a>
+        </div>
+    </nav>
+    <main class="flex-1 container mx-auto px-4 py-12">
+        <h1 class="text-3xl font-seagull text-[#F56401] mb-8 text-center">Manage Orders</h1>
+        <table class="min-w-full bg-white rounded-lg shadow">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4">Order Code</th>
+                    <th class="py-2 px-4">Customer</th>
+                    <th class="py-2 px-4">Shipping</th>
+                    <th class="py-2 px-4">Total (with VAT)</th>
+                    <th class="py-2 px-4">Status</th>
+                    <th class="py-2 px-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order : ${orders}">
+                    <td class="py-2 px-4" th:text="${order.orderCode}"></td>
+                    <td class="py-2 px-4" th:text="${order.customerName}"></td>
+                    <td class="py-2 px-4" th:text="${order.shippingAddress}"></td>
+                    <td class="py-2 px-4" th:text="'₱' + ${order.totalWithVAT}"></td>
+                    <td class="py-2 px-4">
+                        <form th:action="@{'/admin/orders/update-status/' + ${order.id}}" method="post">
+                            <select name="status" class="border rounded px-2 py-1">
+                                <option th:selected="${order.status == 'Pending'}">Pending</option>
+                                <option th:selected="${order.status == 'Processing'}">Processing</option>
+                                <option th:selected="${order.status == 'Shipped'}">Shipped</option>
+                                <option th:selected="${order.status == 'Delivered'}">Delivered</option>
+                                <option th:selected="${order.status == 'Completed'}">Completed</option>
+                            </select>
+                            <button type="submit" class="ml-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Update</button>
+                        </form>
+                    </td>
+                    <td class="py-2 px-4 flex gap-2">
+                        <form th:action="@{'/admin/orders/archive/' + ${order.id}}" method="post" th:onsubmit="return confirm('Archive this order?');" class="inline">
+                            <button type="submit" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">Archive</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    <footer class="bg-[#F56401] text-white py-6 mt-8">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center px-6">
+            <div class="mb-4 md:mb-0">
+                <span class="font-seagull text-xl">espressionist</span>
+                <span class="ml-2">&copy; 2025</span>
+            </div>
+            <div class="flex space-x-4">
+                <a href="mailto:info@espressionist.com" class="hover:underline">info@espressionist.com</a>
+                <a href="#" class="hover:underline">Instagram</a>
+                <a href="#" class="hover:underline">Facebook</a>
+            </div>
+        </div>
+    </footer>
+    <style>
+        @font-face {
+            font-family: 'Seagull Serial';
+            src: url('/fonts/SeagullSerial.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Pruno Deck Medium';
+            src: url('/fonts/PrunoDeckMedium.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        .font-seagull { font-family: 'Seagull Serial', sans-serif; }
+        .font-pruno { font-family: 'Pruno Deck Medium', sans-serif; }
+        .bg-beige { background-color: #f5f5dc; }
+    </style>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!-- Order Status Page Template for Espressionist E-Commerce -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>espressionist | Order Status</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-beige min-h-screen flex flex-col justify-between">
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between px-6 py-4 bg-white shadow-md">
+        <div class="flex items-center space-x-2">
+            <span class="font-seagull text-2xl text-white bg-[#F56401] px-3 py-1 rounded">espressionist</span>
+        </div>
+        <div class="flex items-center space-x-6">
+            <a th:href="@{/products}" class="text-[#F56401] font-semibold hover:underline">Products</a>
+            <a th:href="@{/cart}" class="text-[#F56401] font-semibold hover:underline">Cart</a>
+            <a th:href="@{/order-status}" class="text-[#F56401] font-semibold hover:underline">Order Status</a>
+            <a th:href="@{/admin/login}" class="text-[#F56401] font-semibold hover:underline">Admin</a>
+        </div>
+    </nav>
+
+    <!-- Order Status Content -->
+    <main class="flex-1 container mx-auto px-4 py-12 max-w-xl flex flex-col items-center justify-center">
+        <div class="bg-white rounded-lg shadow p-8 flex flex-col items-center w-full">
+            <h1 class="text-2xl font-seagull text-[#F56401] mb-4">Track Your Order</h1>
+            <form id="order-status-form" class="w-full flex flex-col gap-4 mb-4">
+                <label for="order-code" class="font-bold">Order Code</label>
+                <input type="text" id="order-code" name="order-code" required placeholder="e.g. ESP-3A9KZT1D" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#F56401]"/>
+                <button type="submit" class="bg-[#F56401] text-white font-bold py-2 px-6 rounded shadow hover:bg-[#d35400] transition">Check Status</button>
+            </form>
+            <div id="order-status-result" class="w-full"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#F56401] text-white py-6 mt-8">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center px-6">
+            <div class="mb-4 md:mb-0">
+                <span class="font-seagull text-xl">espressionist</span>
+                <span class="ml-2">&copy; 2025</span>
+            </div>
+            <div class="flex space-x-4">
+                <a href="mailto:info@espressionist.com" class="hover:underline">info@espressionist.com</a>
+                <a href="#" class="hover:underline">Instagram</a>
+                <a href="#" class="hover:underline">Facebook</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Fonts (Seagull Serial, Pruno Deck Medium) -->
+    <style>
+        @font-face {
+            font-family: 'Seagull Serial';
+            src: url('/fonts/SeagullSerial.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Pruno Deck Medium';
+            src: url('/fonts/PrunoDeckMedium.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        .font-seagull { font-family: 'Seagull Serial', sans-serif; }
+        .font-pruno { font-family: 'Pruno Deck Medium', sans-serif; }
+        .bg-beige { background-color: #f5f5dc; }
+    </style>
+    <script>
+        // Utility: Format price
+        function formatPrice(price) {
+            return '₱' + price.toFixed(2);
+        }
+        // Render order status result
+        function renderOrderStatus(order) {
+            if (!order) return '';
+            let itemsHtml = '';
+            for (const item of order.orderItems) {
+                itemsHtml += `<div class="flex justify-between"><span>${item.product.name} x <span class="font-bold">${item.quantity}</span></span><span>₱${(item.product.price * item.quantity).toFixed(2)}</span></div>`;
+            }
+            return `
+                <div class="mb-2"><span class="font-bold">Order Code:</span> <span class="text-[#F56401]">${order.orderCode}</span></div>
+                <div class="mb-2"><span class="font-bold">Order Date:</span> ${new Date(order.createdAt).toLocaleString()}</div>
+                <div class="mb-2"><span class="font-bold">Shipping:</span> ${order.shippingAddress}</div>
+                <div class="mb-2"><span class="font-bold">Status:</span> <span class="text-[#F56401]">${order.status}</span></div>
+                <div class="mb-2"><span class="font-bold">Items:</span></div>
+                <div class="ml-4">${itemsHtml}</div>
+            `;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('order-status-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const code = document.getElementById('order-code').value.trim();
+                const resultDiv = document.getElementById('order-status-result');
+                resultDiv.innerHTML = '';
+                if (!code) {
+                    resultDiv.innerHTML = '<div class="text-red-600">Please enter your order code.</div>';
+                    return;
+                }
+                try {
+                    const res = await fetch(`/orders/order-status/${encodeURIComponent(code)}`);
+                    if (res.ok) {
+                        const order = await res.json();
+                        resultDiv.innerHTML = `<div class="bg-green-100 text-green-800 rounded p-4 mb-2">Order found!</div>` + renderOrderStatus(order);
+                    } else {
+                        resultDiv.innerHTML = '<div class="bg-red-100 text-red-800 rounded p-4">Order not found. Please check your code and try again.</div>';
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML = '<div class="bg-red-100 text-red-800 rounded p-4">An error occurred. Please try again later.</div>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
