@@ -15,7 +15,7 @@ public class Admin {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean active = true;
 
     // Getters and Setters

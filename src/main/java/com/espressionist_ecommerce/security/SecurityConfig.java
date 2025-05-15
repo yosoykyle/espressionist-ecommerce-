@@ -18,9 +18,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .csrf().disable()  // Disable CSRF for API endpoints
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/admin/**").authenticated()
-                .requestMatchers("/orders/checkout").permitAll()
+                .requestMatchers("/api/products/**").permitAll()  // Allow product API access
+                .requestMatchers("/orders/**").permitAll()
                 .anyRequest().permitAll()
             )
             .formLogin(form -> form

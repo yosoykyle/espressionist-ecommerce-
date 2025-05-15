@@ -26,7 +26,7 @@ public class Product {
     @JsonIgnore
     private byte[] image;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean archived = false;
 
     // Getters and Setters

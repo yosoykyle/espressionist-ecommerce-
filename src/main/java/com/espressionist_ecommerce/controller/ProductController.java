@@ -28,6 +28,38 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @PostMapping
+    public ResponseEntity<?> createProduct(@RequestBody Product product) {
+        if (product.getPrice() <= 0) {
+            return ResponseEntity.badRequest().body("Price must be greater than 0");
+        }
+        if (product.getQuantity() < 1) {
+            return ResponseEntity.badRequest().body("Quantity must be at least 1");
+        }
+        return ResponseEntity.ok(productService.createProduct(product));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product) {
+        if (product.getPrice() <= 0) {
+            return ResponseEntity.badRequest().body("Price must be greater than 0");
+        }
+        if (product.getQuantity() < 1) {
+            return ResponseEntity.badRequest().body("Quantity must be at least 1");
+        }
+        try {
+            return ResponseEntity.ok(productService.updateProduct(id, product));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> archiveProduct(@PathVariable Long id) {
+        productService.archiveProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/upload-image/{id}")
     public ResponseEntity<Void> uploadProductImage(@PathVariable Long id, @RequestParam("image") MultipartFile image) {
         try {

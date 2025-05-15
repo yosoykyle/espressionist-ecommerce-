@@ -39,4 +39,19 @@ public class AdminService {
             adminRepository.deleteById(id);
         });
     }
+
+    public Admin updateAdmin(Long id, Admin updatedAdmin, String currentUsername) {
+        return adminRepository.findById(id)
+            .map(admin -> {
+                if (admin.getUsername().equals(currentUsername)) {
+                    throw new RuntimeException("Cannot update your own account");
+                }
+                admin.setUsername(updatedAdmin.getUsername());
+                if (updatedAdmin.getPassword() != null && !updatedAdmin.getPassword().trim().isEmpty()) {
+                    admin.setPassword(passwordEncoder.encode(updatedAdmin.getPassword()));
+                }
+                return adminRepository.save(admin);
+            })
+            .orElseThrow(() -> new RuntimeException("Admin not found"));
+    }
 }

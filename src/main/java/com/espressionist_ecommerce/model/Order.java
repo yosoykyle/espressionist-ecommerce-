@@ -29,13 +29,17 @@ public class Order {
     private Date orderDate;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status = OrderStatus.PENDING;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean archived = false;
+
+    @Column(nullable = false)
+    private double totalWithVAT;
 
     // Getters and Setters
     public Long getId() {
@@ -86,11 +90,11 @@ public class Order {
         this.orderDate = orderDate;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 
@@ -108,5 +112,13 @@ public class Order {
 
     public void setArchived(boolean archived) {
         this.archived = archived;
+    }
+
+    public double getTotalWithVAT() {
+        return totalWithVAT;
+    }
+
+    public void setTotalWithVAT(double totalWithVAT) {
+        this.totalWithVAT = totalWithVAT;
     }
 }

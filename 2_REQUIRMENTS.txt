@@ -1,0 +1,441 @@
+update this: ☕ Espressionist E-Commerce – Frontend Requirements
+
+### ⚙️ TECHNOLOGIES
+
+* HTML5
+* Tailwind CSS (mobile-first, responsive)
+* Thymeleaf (server-side dynamic rendering)
+* Vanilla JavaScript (for cart and interactivity)
+* Optional: Alpine.js (for lightweight UI behavior)
+
+---
+
+### 🎨 BRAND & STYLE
+
+* Brand Name: espressionist (lowercase only)
+* Logo Font: Seagull Serial (white text)
+* Tagline Font: Pruno Deck Medium
+* Tagline: `coffee. canvas. culture.`
+* Brand Colors:
+
+  * Primary: #F56401
+  * Secondary: White
+  * Accent: Beige
+* Style: Minimalist, clean, modern café aesthetic
+* Responsive: Mobile, Tablet, Desktop
+* Accessibility:
+
+  * Use proper ARIA roles
+  * <label> for all inputs
+  * Keyboard-navigable pages
+
+---
+
+Embedded Google Maps iframe:  Google Maps <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7731.682543584867!2d121.100823!3d14.320651!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397d9006b676453%3A0xfba2c30aae1cf0d3!2sEspressionist!5e0!3m2!1sen!2sph!4v1745721835963!5m2!1sen!2sph" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+* Footer:
+
+  * Quick links that has the links same options that is in the navbar with an adtional option/link for admin
+
+  - **Address:** 109 Rizal Blvd, Santa Rosa, Philippines
+
+  - **Phone:** 0995 965 9332
+
+  - **Email:** [espressionist.ph@gmail.com](mailto:espressionist.ph@gmail.com)
+
+  - Social icons with links that **open in new tabs**:
+
+  - Instagram: [https://www.instagram.com/espressionist.ph?fbclid=IwY2xjawJ6qOJleHRuA2FlbQIxMABicmlkETFFcWRsZDJjZm92Tks4cFFsAR60VOshh\_hPe3adamtuDrzBQlWZeos22kWEymqH5fwtVqunERmZcX0wsvAsPA\_aem\_CZTjAhuNlKlXxz7hDP1eNQ](https://www.instagram.com/espressionist.ph?fbclid=IwY2xjawJ6qOJleHRuA2FlbQIxMABicmlkETFFcWRsZDJjZm92Tks4cFFsAR60VOshh_hPe3adamtuDrzBQlWZeos22kWEymqH5fwtVqunERmZcX0wsvAsPA_aem_CZTjAhuNlKlXxz7hDP1eNQ),
+
+  - Facebook: [https://www.facebook.com/espressionist.ph](https://www.facebook.com/espressionist.ph),
+
+  - Linktree: [https://linktr.ee/espressionist.ph?fbclid=IwY2xjawJ6qM9leHRuA2FlbQIxMABicmlkETFFcWRsZDJjZm92Tks4cFFsAR4LVuomHvWDn2YAFR2G7CM0JUxdCXDbURtYe17DvpDUY-yVqumsY2njJCUXxQ\_aem\_NSz3uTtWdI36iJ2Edv-V6g](https://linktr.ee/espressionist.ph?fbclid=IwY2xjawJ6qM9leHRuA2FlbQIxMABicmlkETFFcWRsZDJjZm92Tks4cFFsAR4LVuomHvWDn2YAFR2G7CM0JUxdCXDbURtYe17DvpDUY-yVqumsY2njJCUXxQ_aem_NSz3uTtWdI36iJ2Edv-V6g)
+
+---
+
+### ✅ GENERAL FRONTEND GUIDELINES
+
+* Use Thymeleaf for dynamic rendering of all server-rendered pages.
+* Use Tailwind utility classes for all styling.
+* Use JavaScript only where necessary (e.g., cart logic, modals, toasts).
+* All frontend actions must align with backend endpoints.
+* Cart uses localStorage until checkout.
+* Images uploaded via <input type="file">, not URLs.
+* Archived products are filtered out by default.
+
+---
+
+### 🧩 COMPONENTS & INTERACTIONS
+
+* Buttons: Consistent look, touch-friendly (min 48x48px on mobile).
+* make use that all actions works on ever sizez of devices
+* Modals: For confirmations (e.g., delete, archive).
+* Alerts/Toasts: For Add to Cart, Order Placed, Login Failed/Success.
+* Forms: All forms must use <label> and be accessible.
+* Navigation: Responsive navbar with logo, links, and cart icon.
+
+---
+
+### 🗂️ PAGE-BY-PAGE REQUIREMENTS
+
+#### 1. Home Page (`/`)
+
+* Welcome banner with logo, tagline, and CTA buttons.
+* Embedded Google Maps for café location.
+* Footer with contact info and social links.
+
+#### 2. Products Page (`/products`)
+
+* include also a search bar
+* include caterory: all, coffee & Tea, Art & Merch, Gift Set, and Voucher
+* Product grid (image, name, price, stock).
+* "Add to Cart" button for each product.
+* Out-of-stock products are visually indicated and cannot be added.
+* Only non-archived products are shown.
+
+#### 3. Cart Page (`/cart`)
+
+* List of cart items (image, name, price, quantity, subtotal).
+* Quantity controls (increment, decrement, remove).
+* Cart total (with VAT calculated at checkout).
+* "Checkout" button.
+
+#### 4. Checkout Page (`/checkout`)
+
+* Form: Name, Email, Shipping Address (all required, with validation).
+* Cart summary.
+* "Place Order" button (submits to backend).
+* Show loading indicator during submission.
+
+#### 5. Order Success Page (`/order-success`)
+
+* Order code, item details, shipping info, total (with VAT).
+* Message: “Please save this code to track your order.”
+* Button to go to Order Status page.
+
+#### 6. Order Status Page (`/order-status`)
+
+* Input for order code.
+* Display order date, item list, shipping info, and status.
+* If code invalid, show error.
+
+#### 7. Admin Pages (`/admin/**`)
+
+* Login Page: Username/password, error on failure.
+* Dashboard: Overview of orders and products.
+* Product Management: List, create, update, archive products (with image upload).
+* Order Management: List orders, update status, archive completed.
+* Admin Management: List, create, update, delete admins (prevent self-deletion).
+
+---
+
+### 🧪 TESTING & ACCESSIBILITY
+
+* All pages must be responsive and accessible.
+* Use keyboard navigation and ARIA roles.
+* Test all forms for validation and error handling.
+* Test cart and checkout flow end-to-end.
+
+baed on this: 📋 Complete API Documentation for Espressionist E-commerce
+
+🛍️ Product Endpoints
+
+1. Get All Products
+   📍 Route: /api/products
+   🔁 Method: GET
+   🧾 Request: No parameters needed
+   📦 Response: Array of Product objects
+   \[{
+   "id": number,
+   "name": string,
+   "price": number,
+   "quantity": number,
+   "category": string,
+   "archived": boolean
+   }]
+   🔐 Auth: Not required
+   ❌ Errors: 500 for server errors
+2. Get Product Image
+   📍 Route: /api/products/image/{id}
+   🔁 Method: GET
+   🧾 Request: URL parameter id
+   📦 Response: Binary image data (JPEG)
+   🔐 Auth: Not required
+   ❌ Errors: 404 if image not found
+3. Upload Product Image
+   📍 Route: /api/products/upload-image/{id}
+   🔁 Method: POST
+   🧾 Request: Multipart form data with image field
+   📦 Response: 204 No Content
+   🔐 Auth: Admin only
+   ❌ Errors: 400 for invalid image
+   🛒 Order Endpoints
+4. Create Order (Checkout)
+   📍 Route: /orders/checkout
+   🔁 Method: POST
+   🧾 Request:
+   {
+   "customerName": string,
+   "shippingAddress": string,
+   "orderItems": \[{
+   "productId": number,
+   "quantity": number
+   }]
+   }
+   📦 Response:
+   {
+   "customerName": string,
+   "items": array,
+   "shippingAddress": string,
+   "totalWithVAT": number,
+   "orderCode": string,
+   "message": "Please save this code to track your order."
+   }
+   🔐 Auth: Not required
+   ❌ Errors: 400 for invalid order data
+5. Get Order Status
+   📍 Route: /orders/order-status/{orderCode}
+   🔁 Method: GET
+   🧾 Request: URL parameter orderCode
+   📦 Response: Order object with status
+   🔐 Auth: Not required
+   ❌ Errors: 404 if order not found
+6. Update Order Status (Admin)
+   📍 Route: /orders/update-status/{id}
+   🔁 Method: PUT
+   🧾 Request: URL parameter id, query parameter status
+   📦 Response: 204 No Content
+   🔐 Auth: Admin only
+   ❌ Errors: 404 if order not found
+   👤 Admin Endpoints
+7. Admin Login
+   📍 Route: /admin/login
+   🔁 Method: POST
+   🧾 Request: Form data with username and password
+   📦 Response: Redirects to /admin/dashboard on success
+   🔐 Auth: Not required (login endpoint)
+   ❌ Errors: Redirects back with error param
+8. Get All Admins
+   📍 Route: /admin/all
+   🔁 Method: GET
+   📦 Response: Array of Admin objects
+   🔐 Auth: Admin only
+   ❌ Errors: 401/403 if unauthorized
+9. Create Admin
+   📍 Route: /admin/create
+   🔁 Method: POST
+   🧾 Request: Admin object
+   📦 Response: Created Admin object
+   🔐 Auth: Admin only
+   ❌ Errors: 400 for invalid data
+10. Delete Admin
+    📍 Route: /admin/delete/{id}
+    🔁 Method: DELETE
+    🧾 Request: URL parameter id, query parameter currentUsername
+    📦 Response: 204 No Content
+    🔐 Auth: Admin only
+    ❌ Errors: 400 if trying to delete self
+    🔐 Authentication Details
+    Admin Authentication:
+
+Uses Spring Security Form-based authentication
+Default credentials:
+Username: ADMIN
+Password: Espressionist2025
+Session-based (cookie)
+Protected routes: All /admin/\*\* paths
+CSRF Protection:
+
+Spring Security's CSRF protection is enabled
+For POST/PUT/DELETE requests, include the CSRF token
+Token is available in Thymeleaf forms as: \${\_csrf.token}
+🌐 CORS & Security
+Based on the SecurityConfig, the setup is:
+
+Public endpoints (no auth required):
+
+/products/\*
+/orders/checkout
+/orders/order-status/\*
+/ (home)
+/cart
+/checkout
+Protected endpoints (admin auth required):
+
+/admin/\*\*
+All product management endpoints
+Order status updates
+🧪 Testing Notes
+Test Data:
+
+Use the default admin credentials for admin features
+Create test products via admin interface
+Order codes format: ESP- followed by 8 characters
+Frontend Testing:
+
+Test cart functionality with localStorage
+Validate checkout form fields
+Test order status lookup
+Test admin product management
+💡 Thymeleaf Integration Tips
+Products Page:
+
+Access products: \${products}
+Image URLs: /api/products/image/{id}
+Product properties: \${product.name}, \${product.price}, etc.
+Order Status Page:
+
+Order details: \${order}
+Order items: \${order.orderItems}
+Status: \${order.status}
+Admin Pages:
+
+CSRF token: \${\_csrf.token}
+Error messages: \${error}
+Success messages: \${success}
+Layout Templates:
+
+Base layout: base.html
+Admin layout: admin-base.html
+
+☕ Espressionist E-Commerce – Backend Requirements
+🔧 Technologies:
+Java 17 + Spring Boot
+
+MySQL/MariaDB (via Docker)
+
+Thymeleaf (for rendering views)
+
+Spring Security (admin login only)
+
+HTML, Tailwind CSS, JS (static pages only)
+
+✅ GENERAL GUIDELINES
+Focus on backend.
+
+Frontend only needs basic integration with Thymeleaf (static templates).
+
+Use archived = true instead of deleting records.
+
+Project runs in GitHub Codespaces.
+
+🛍️ USER SIDE (No Login Required)
+
+1. Product Listing
+   /products — Return all products where archived = false
+
+Includes: image, name, price, stock quantity
+
+2. Shopping Cart
+   Cart is handled in JavaScript only
+
+At checkout, cart data (productId + quantity) will be sent to backend
+
+3. Checkout
+   POST /checkout
+
+Required fields:
+
+Name
+
+Email
+
+Shipping Address
+
+Cart Items (product ID + quantity)
+
+Add 12% VAT to total
+
+Save order and items in database
+
+4. Payment
+   Only Cash on Delivery
+
+No payment gateway required
+
+5. Order Confirmation (No Email)
+   After checkout, show in-browser confirmation page with:
+
+* Order code (e.g. ESP-3A9KZT1D)
+* Item details
+* Shipping info
+* Total (with VAT)
+* Message: “Please save this code to track your order.”
+
+6. Order Status Tracking
+   /order-status/{orderCode}
+
+Display:
+
+Order date
+
+Item list
+
+Shipping info
+
+Status (Pending, Processing, etc.)
+
+🔐 ADMIN SIDE (Login Required)
+Login Credentials (Default):
+Username: ADMIN
+
+Password: Espressionist2025
+
+1. Authentication
+   Use Spring Security
+
+Protect /admin/\*\* routes
+
+Use BCrypt for password hashing
+
+Allow creation/deletion/update of other admins (prevent self-deletion)
+
+2. Product Management
+   Create, update, archive products
+
+Fields:
+
+Name
+
+Price (> 0)
+
+Quantity (≥ 1)
+
+Category
+
+Image (stored in DB as BLOB or saved to file)
+
+Deletion = set archived = true
+
+3. Order Management
+   View customer orders:
+
+Name, email, shipping address
+
+Items ordered
+
+Total with VAT
+
+Status
+
+Admin can manually update status (Pending → Shipped, etc.)
+
+Once marked as delivered, option to "complete" order (archives it)
+
+4. Admin Account Management
+   Admins can manage other admins
+
+Prevent self-deletion for safety
+
+🧱 DATABASE DESIGN
+Use JPA (Hibernate) annotations
+
+Entity: Product, Order, OrderItem, Admin
+
+Relationships:
+
+One Order → Many OrderItems
+
+Each OrderItem links to a Product
+
+Add archived: boolean to deletable records
