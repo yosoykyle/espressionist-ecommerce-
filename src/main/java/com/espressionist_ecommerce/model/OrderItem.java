@@ -3,6 +3,7 @@ package com.espressionist_ecommerce.model;
 import jakarta.persistence.*;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class OrderItem {
 
     @Id
@@ -62,5 +63,36 @@ public class OrderItem {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (product != null) {
+            // Capture current product price at order time
+            this.price = product.getPrice();
+
+            // Validate stock availability
+            if (product.getQuantity() < this.quantity) {
+                throw new IllegalStateException("Insufficient stock for product: " + product.getName());
+            }
+
+            // Reduce product stock
+            product.setQuantity(product.getQuantity() - this.quantity);
+        }
+    }
+
+    // Helper method to validate quantity
+    public void validateQuantity() {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+        if (product != null && quantity > product.getQuantity()) {
+            throw new IllegalArgumentException("Requested quantity exceeds available stock");
+        }
+    }
+
+    // Method to calculate subtotal
+    public double getSubtotal() {
+        return price * quantity;
     }
 }

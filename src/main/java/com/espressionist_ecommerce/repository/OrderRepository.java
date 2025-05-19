@@ -9,6 +9,9 @@ import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    Optional<Order> findByOrderCode(String orderCode); // Fetch order by unique order code
+    Optional<Order> findByOrderCode(String orderCode);
     List<Order> findByArchivedFalse();
+    List<Order> findByArchivedFalseOrderByOrderDateDesc();
+    List<Order> findAllByOrderByOrderDateDesc();
+    long countByArchivedFalse();
 }

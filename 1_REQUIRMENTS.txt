@@ -1,4 +1,4 @@
-☕ Espressionist E-Commerce – Backend Requirements
+A school project ☕ Espressionist E-Commerce – Backend Requirements
 🔧 Technologies:
 Java 17 + Spring Boot
 

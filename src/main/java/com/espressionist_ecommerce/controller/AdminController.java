@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -23,27 +24,45 @@ public class AdminController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createAdmin(@RequestBody Admin admin) {
-        if (admin.getUsername() == null || admin.getUsername().trim().isEmpty() ||
-            admin.getPassword() == null || admin.getPassword().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Username and password are required");
-        }
+    public ResponseEntity<?> createAdmin(@Valid @RequestBody AdminDTO adminDTO) {
         try {
+            // Check password validation
+            if (!adminDTO.isPasswordConfirmed()) {
+                throw new BusinessException("Password and confirmation do not match");
+            }
+
+            Admin admin = new Admin();
+            admin.setUsername(adminDTO.getUsername());
+            admin.setPassword(adminDTO.getPassword());
+            admin.setActive(true);
+
             Admin createdAdmin = adminService.createAdmin(admin);
             return ResponseEntity.ok(createdAdmin);
-        } catch (RuntimeException e) {
+        } catch (BusinessException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateAdmin(@PathVariable Long id, @RequestBody Admin admin, Authentication authentication) {
-        String currentUsername = authentication.getName();
+    public ResponseEntity<?> updateAdmin(
+            @PathVariable Long id,
+            @Valid @RequestBody AdminDTO adminDTO,
+            Authentication authentication) {
         try {
-            Admin updatedAdmin = adminService.updateAdmin(id, admin, currentUsername);
+            String currentUsername = authentication.getName();
+
+            // Check password validation if password is being updated
+            if (adminDTO.getPassword() != null && !adminDTO.getPassword().isEmpty()
+                    && !adminDTO.isPasswordConfirmed()) {
+                throw new BusinessException("Password and confirmation do not match");
+            }
+
+            Admin updatedAdmin = adminService.updateAdmin(id, adminDTO, currentUsername);
             return ResponseEntity.ok(updatedAdmin);
-        } catch (RuntimeException e) {
+        } catch (BusinessException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 

@@ -8,7 +8,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -18,11 +23,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()  // Disable CSRF for API endpoints
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/**")  // Disable CSRF for API endpoints only
+            )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/admin/**").authenticated()
-                .requestMatchers("/api/products/**").permitAll()  // Allow product API access
-                .requestMatchers("/orders/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/products/**", "/products/**").permitAll()
+                .requestMatchers("/orders/**", "/api/orders/**").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().permitAll()
             )
             .formLogin(form -> form
@@ -39,10 +48,25 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-            .withUser("ADMIN")
-            .password(passwordEncoder().encode("Espressionist2025"))
-            .roles("ADMIN");
+        auth.userDetailsService(userDetailsService)
+            .passwordEncoder(passwordEncoder());
+        
+        // Create default admin account if it doesn't exist
+        createDefaultAdminAccount();
+    }
+
+    @Autowired
+    private AdminRepository adminRepository;
+
+    private void createDefaultAdminAccount() {
+        if (!adminRepository.findByUsername("ADMIN").isPresent()) {
+            Admin admin = new Admin();
+            admin.setUsername("ADMIN");
+            admin.setPassword(passwordEncoder().encode("Espressionist2025"));
+            admin.setActive(true);
+            adminRepository.save(admin);
+        }
     }
 }

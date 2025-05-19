@@ -1,24 +1,27 @@
 package com.espressionist_ecommerce.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "orders") // Ensure table name is not a reserved keyword
+@EntityListeners(AuditingEntityListener.class)
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String customerName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
+    @Email(message = "Please provide a valid email address")
     private String customerEmail;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String shippingAddress;
 
     @Column(nullable = false, unique = true)
@@ -106,6 +109,14 @@ public class Order {
         this.orderItems = orderItems;
     }
 
+    public double getTotalWithVAT() {
+        return totalWithVAT;
+    }
+
+    public void setTotalWithVAT(double totalWithVAT) {
+        this.totalWithVAT = totalWithVAT;
+    }
+
     public boolean isArchived() {
         return archived;
     }
@@ -114,11 +125,22 @@ public class Order {
         this.archived = archived;
     }
 
-    public double getTotalWithVAT() {
-        return totalWithVAT;
+    @PrePersist
+    protected void onCreate() {
+        if (orderDate == null) {
+            orderDate = new Date();
+        }
+        if (status == null) {
+            status = OrderStatus.PENDING;
+        }
     }
 
-    public void setTotalWithVAT(double totalWithVAT) {
-        this.totalWithVAT = totalWithVAT;
+    // Helper method to add items and maintain bidirectional relationship
+    public void addOrderItem(OrderItem item) {
+        if (orderItems == null) {
+            orderItems = new ArrayList<>();
+        }
+        orderItems.add(item);
+        item.setOrder(this);
     }
 }

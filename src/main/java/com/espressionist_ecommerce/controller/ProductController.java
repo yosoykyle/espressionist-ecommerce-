@@ -29,14 +29,20 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody Product product) {
-        if (product.getPrice() <= 0) {
-            return ResponseEntity.badRequest().body("Price must be greater than 0");
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO) {
+        try {
+            Product product = new Product();
+            product.setName(productDTO.getName());
+            product.setPrice(productDTO.getPrice());
+            product.setQuantity(productDTO.getQuantity());
+            product.setCategory(productDTO.getCategory().toString());
+            product.setImage(productDTO.getImage());
+            
+            return ResponseEntity.ok(productService.createProduct(product));
+        } catch (Exception e) {
+            logger.error("Error creating product", e);
+            return ResponseEntity.badRequest().body("Error creating product");
         }
-        if (product.getQuantity() < 1) {
-            return ResponseEntity.badRequest().body("Quantity must be at least 1");
-        }
-        return ResponseEntity.ok(productService.createProduct(product));
     }
 
     @PutMapping("/{id}")
@@ -61,12 +67,24 @@ public class ProductController {
     }
 
     @PostMapping("/upload-image/{id}")
-    public ResponseEntity<Void> uploadProductImage(@PathVariable Long id, @RequestParam("image") MultipartFile image) {
+    public ResponseEntity<?> uploadProductImage(@PathVariable Long id, @RequestParam("image") MultipartFile image) {
+        if (image.isEmpty()) {
+            return ResponseEntity.badRequest().body("Please select an image file");
+        }
+        
+        String contentType = image.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            return ResponseEntity.badRequest().body("File must be an image");
+        }
+        
         try {
             productService.uploadImage(id, image);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().build();
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            logger.error("Error uploading image", e);
+            return ResponseEntity.internalServerError().body("Error uploading image");
         }
     }
 

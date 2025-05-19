@@ -8,5 +8,9 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByArchivedFalse(); // Fetch only non-archived products
+    List<Product> findByArchivedFalse();
+    List<Product> findByArchivedFalseAndCategoryOrderByNameAsc(String category);
+    List<Product> findByArchivedFalseAndQuantityLessThan(int quantity);
+    List<Product> findByArchivedFalseAndNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(
+        String name, String category);
 }

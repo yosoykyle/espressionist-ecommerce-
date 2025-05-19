@@ -10,17 +10,21 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
+    @NotBlank(message = "Product name is required")
     private String name;
 
     @Column(nullable = false)
+    @Min(value = 1, message = "Price must be greater than 0")
     private double price;
 
     @Column(nullable = false)
+    @Min(value = 0, message = "Quantity cannot be negative")
     private int quantity;
 
     @Column(nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private ProductCategory category;
 
     @Lob
     @JsonIgnore

@@ -63,4 +63,88 @@ public class ProductService {
             .map(Product::getImage)
             .orElse(null);
     }
+
+    public List<Product> getFeaturedProducts() {
+        return getAllActiveProducts().stream()
+            .limit(4)  // Return top 4 products
+            .toList();
+    }
+
+    public List<Product> getProductsByCategory(ProductCategory category) {
+        return getAllActiveProducts().stream()
+            .filter(p -> category.equals(ProductCategory.fromString(p.getCategory())))
+            .toList();
+    }
+
+    public List<Product> searchProducts(String query) {
+        String searchTerm = query.toLowerCase();
+        return getAllActiveProducts().stream()
+            .filter(p -> p.getName().toLowerCase().contains(searchTerm) ||
+                        p.getCategory().toLowerCase().contains(searchTerm))
+            .toList();
+    }
+
+    public List<Product> getLowStockProducts() {
+        return getAllActiveProducts().stream()
+            .filter(p -> p.getQuantity() < 5)  // Products with less than 5 items
+            .toList();
+    }
+
+    public long getActiveProductCount() {
+        return productRepository.findByArchivedFalse().size();
+    }
+
+    public boolean hasEnoughStock(Long productId, int requestedQuantity) {
+        return productRepository.findById(productId)
+            .map(p -> p.getQuantity() >= requestedQuantity)
+            .orElse(false);
+    }
+
+    @Transactional
+    public void updateStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            
+        int newQuantity = product.getQuantity() + quantity;
+        if (newQuantity < 0) {
+            throw new BusinessException("Cannot reduce stock below 0");
+        }
+        
+        product.setQuantity(newQuantity);
+        productRepository.save(product);
+    }
+    
+    @Transactional
+    public void reduceStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            
+        if (product.getQuantity() < quantity) {
+            throw new BusinessException("Insufficient stock for product: " + product.getName());
+        }
+        
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.save(product);
+    }
+    
+    public boolean checkStockAvailability(Long productId, int requestedQuantity) {
+        return productRepository.findById(productId)
+            .map(product -> !product.isArchived() && product.getQuantity() >= requestedQuantity)
+            .orElse(false);
+    }
+    
+    private void validateProduct(Product product) {
+        if (product.getName() == null || product.getName().trim().isEmpty()) {
+            throw new BusinessException("Product name is required");
+        }
+        if (product.getPrice() <= 0) {
+            throw new BusinessException("Price must be greater than 0");
+        }
+        if (product.getQuantity() < 0) {
+            throw new BusinessException("Quantity cannot be negative");
+        }
+        if (product.getCategory() == null) {
+            throw new BusinessException("Category is required");
+        }
+    }
 }
