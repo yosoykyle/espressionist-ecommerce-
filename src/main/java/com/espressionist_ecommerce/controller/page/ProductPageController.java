@@ -43,9 +43,4 @@ public class ProductPageController {
         model.addAttribute("searchTerm", search);
         return "products";
     }
-
-    @GetMapping("/cart")
-    public String cart() {
-        return "cart";
-    }
 }

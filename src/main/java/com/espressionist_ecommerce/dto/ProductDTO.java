@@ -1,6 +1,8 @@
 package com.espressionist_ecommerce.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import com.espressionist_ecommerce.model.ProductCategory;
 
 public class ProductDTO {
@@ -11,13 +13,13 @@ public class ProductDTO {
     @DecimalMin(value = "0.01", message = "Price must be greater than 0")
     private Double price;
 
-    @Min(value = 0, message = "Quantity cannot be negative")
+    @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 
     @NotNull(message = "Category is required")
     private ProductCategory category;
 
-    private String imageUrl;
+    private byte[] image;
 
     // Getters and Setters
     public String getName() {
@@ -52,11 +54,11 @@ public class ProductDTO {
         this.category = category;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public byte[] getImage() {
+        return image;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }

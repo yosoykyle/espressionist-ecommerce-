@@ -1,7 +1,12 @@
 package com.espressionist_ecommerce.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Entity
 public class Admin {
@@ -17,8 +22,14 @@ public class Admin {
     @NotBlank(message = "Password is required")
     private String password;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean archived = false;
+
+    @Column
+    private LocalDateTime lastLoginAt;
 
     // Getters and Setters
     public Long getId() {
@@ -45,11 +56,27 @@ public class Admin {
         this.password = password;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public boolean isArchived() {
         return archived;
     }
 
     public void setArchived(boolean archived) {
         this.archived = archived;
+    }
+
+    public LocalDateTime getLastLoginAt() {
+        return lastLoginAt;
+    }
+
+    public void setLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
     }
 }

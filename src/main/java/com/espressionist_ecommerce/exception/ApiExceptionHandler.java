@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -15,13 +17,27 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException ex) {
+        logger.error("Resource not found: {}", ex.getMessage());
         ApiError error = new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiError> handleBusinessException(BusinessException ex) {
+        logger.error("Business exception: {}", ex.getMessage());
         ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        logger.error("Validation error: {}", ex.getMessage());
+        String message = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .collect(Collectors.joining(", "));
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), message);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 

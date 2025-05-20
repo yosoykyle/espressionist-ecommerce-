@@ -3,29 +3,58 @@ package com.espressionist_ecommerce.service;
 import com.espressionist_ecommerce.exception.BusinessException;
 import com.espressionist_ecommerce.exception.ResourceNotFoundException;
 import com.espressionist_ecommerce.model.Product;
+import com.espressionist_ecommerce.model.ProductCategory;
 import com.espressionist_ecommerce.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
 @Service
+@Transactional
 public class ProductService {
+
+    // Add logger for educational purposes
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
     private ProductRepository productRepository;
 
     public List<Product> getAllActiveProducts() {
+        logger.info("Fetching all active products");
         return productRepository.findByArchivedFalse();
     }
 
+    public List<Product> getFeaturedProducts() {
+        logger.info("Fetching featured products");
+        return productRepository.findByArchivedFalse().stream()
+            .limit(8)
+            .collect(Collectors.toList());
+    }
+
+    public List<Product> getProductsByCategory(ProductCategory category) {
+        return productRepository.findByCategoryAndArchivedFalse(category);
+    }
+
+    public List<Product> searchProducts(String search) {
+        return productRepository.findByNameContainingIgnoreCaseAndArchivedFalse(search);
+    }
+
     public Product getProductById(Long id) {
+        logger.info("Fetching product with ID: {}", id);
         return productRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+            .orElseThrow(() -> {
+                logger.error("Product not found with ID: {}", id);
+                return new ResourceNotFoundException("Product not found");
+            });
     }
 
     public Product createProduct(Product product) {
+        logger.info("Creating new product: {}", product.getName());
         validateProduct(product);
         return productRepository.save(product);
     }
@@ -78,14 +107,25 @@ public class ProductService {
     }
 
     private void validateProduct(Product product) {
+        logger.debug("Validating product: {}", product.getName());
+        
         if (product.getPrice() <= 0) {
+            logger.error("Invalid price: {} for product: {}", product.getPrice(), product.getName());
             throw new BusinessException("Price must be greater than 0");
         }
-        if (product.getQuantity() < 0) {
-            throw new BusinessException("Quantity cannot be negative");
+        if (product.getQuantity() < 1) {
+            logger.error("Invalid quantity: {} for product: {}", product.getQuantity(), product.getName());
+            throw new BusinessException("Quantity must be at least 1");
         }
         if (product.getName() == null || product.getName().trim().isEmpty()) {
-            throw new BusinessException("Name is required");
+            logger.error("Product name is empty or null");
+            throw new BusinessException("Product name is required");
         }
+        if (product.getCategory() == null) {
+            logger.error("Product category is null for product: {}", product.getName());
+            throw new BusinessException("Product category is required");
+        }
+        
+        logger.debug("Product validation successful");
     }
 }

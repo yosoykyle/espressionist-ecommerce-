@@ -7,8 +7,8 @@ public class AdminDTO {
     private String username;
 
     private String password;
-
     private String passwordConfirmation;
+    private boolean active = true;
 
     public String getUsername() {
         return username;
@@ -32,6 +32,14 @@ public class AdminDTO {
 
     public void setPasswordConfirmation(String passwordConfirmation) {
         this.passwordConfirmation = passwordConfirmation;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public boolean isPasswordConfirmed() {

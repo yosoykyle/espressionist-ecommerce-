@@ -18,11 +18,13 @@ import java.util.Optional;
 @Transactional
 public class AdminService {
 
-    @Autowired
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    public AdminService(AdminRepository adminRepository, BCryptPasswordEncoder passwordEncoder) {
+        this.adminRepository = adminRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public List<Admin> getAllAdmins() {
         return adminRepository.findByArchivedFalse();
@@ -48,18 +50,26 @@ public class AdminService {
         Admin admin = adminRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
 
-        // Update username if provided and changed
+        // Prevent changing username if it already exists
         if (!admin.getUsername().equals(adminDTO.getUsername())) {
             validateUsername(adminDTO.getUsername());
             admin.setUsername(adminDTO.getUsername());
         }
 
-        // Update password if provided
+        // Only update password if provided
         if (adminDTO.getPassword() != null && !adminDTO.getPassword().isEmpty()) {
             if (!adminDTO.isPasswordConfirmed()) {
                 throw new BusinessException("Password and confirmation do not match");
             }
             admin.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
+        }
+
+        // Update active status
+        admin.setActive(adminDTO.isActive());
+
+        // Prevent deactivating the last active admin
+        if (!adminDTO.isActive() && admin.getUsername().equals(currentUsername) && isLastActiveAdmin(id)) {
+            throw new BusinessException("Cannot deactivate the last active admin");
         }
 
         return adminRepository.save(admin);
@@ -79,7 +89,7 @@ public class AdminService {
             throw new BusinessException("Cannot delete the last active admin");
         }
 
-        // Soft delete by setting archived flag
+        // Soft delete
         admin.setArchived(true);
         admin.setActive(false);
         adminRepository.save(admin);
@@ -87,18 +97,14 @@ public class AdminService {
 
     public void recordLogin(String username) {
         adminRepository.findByUsername(username).ifPresent(admin -> {
-            admin.recordLogin();
+            admin.setLastLoginAt(LocalDateTime.now());
             adminRepository.save(admin);
         });
     }
 
-    // public long countActiveAdmins() {
-    //     return adminRepository.countByActiveTrue();
-    // }
-
     @Transactional
-    public void updateLastLoginTime(String email) {
-        adminRepository.findByEmail(email).ifPresent(admin -> {
+    public void updateLastLoginTime(String username) {
+        adminRepository.findByUsername(username).ifPresent(admin -> {
             admin.setLastLoginAt(LocalDateTime.now());
             adminRepository.save(admin);
         });
