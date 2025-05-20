@@ -4,15 +4,13 @@ public enum OrderStatus {
     PENDING,
     PROCESSING,
     SHIPPED,
-    DELIVERED,
-    COMPLETED,
-    CANCELLED;
+    DELIVERED;
 
     public static OrderStatus fromString(String status) {
         try {
             return OrderStatus.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return PENDING;
+            throw new IllegalArgumentException("Invalid order status: " + status);
         }
     }
 }

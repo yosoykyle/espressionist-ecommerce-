@@ -4,23 +4,19 @@ import jakarta.validation.constraints.*;
 import java.util.List;
 
 public class OrderCreateDTO {
-    
-    @NotBlank(message = "Customer name is required")
-    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+    @NotBlank(message = "Name is required")
     private String customerName;
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Please provide a valid email address")
+    @Email(message = "Please provide a valid email")
     private String customerEmail;
 
     @NotBlank(message = "Shipping address is required")
-    @Size(min = 10, max = 255, message = "Address must be between 10 and 255 characters")
     private String shippingAddress;
 
-    @NotEmpty(message = "Order must contain at least one item")
+    @NotEmpty(message = "Cart cannot be empty")
     private List<OrderItemDTO> items;
 
-    // Static class for order items
     public static class OrderItemDTO {
         @NotNull(message = "Product ID is required")
         private Long productId;

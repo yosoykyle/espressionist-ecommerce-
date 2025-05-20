@@ -6,21 +6,18 @@ import com.espressionist_ecommerce.model.ProductCategory;
 public class ProductDTO {
     
     @NotBlank(message = "Product name is required")
-    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
     private String name;
 
-    @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.01", message = "Price must be at least 0.01")
+    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
     private Double price;
 
-    @NotNull(message = "Quantity is required")
     @Min(value = 0, message = "Quantity cannot be negative")
     private Integer quantity;
 
     @NotNull(message = "Category is required")
     private ProductCategory category;
 
-    private byte[] image;
+    private String imageUrl;
 
     // Getters and Setters
     public String getName() {
@@ -55,11 +52,11 @@ public class ProductDTO {
         this.category = category;
     }
 
-    public byte[] getImage() {
-        return image;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImage(byte[] image) {
-        this.image = image;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

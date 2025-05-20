@@ -1,7 +1,9 @@
 package com.espressionist_ecommerce.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.Length;
 
 @Entity
 public class Product {
@@ -10,18 +12,20 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
     @NotBlank(message = "Product name is required")
+    @Length(min = 2, max = 100, message = "Product name must be between 2 and 100 characters")
+    @Column(nullable = false, length = 100)
     private String name;
 
+    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
     @Column(nullable = false)
-    @Min(value = 1, message = "Price must be greater than 0")
     private double price;
 
-    @Column(nullable = false)
     @Min(value = 0, message = "Quantity cannot be negative")
+    @Column(nullable = false)
     private int quantity;
 
+    @NotNull(message = "Category is required")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductCategory category;
@@ -55,6 +59,9 @@ public class Product {
     }
 
     public void setPrice(double price) {
+        if (price <= 0) {
+            throw new IllegalArgumentException("Price must be greater than 0");
+        }
         this.price = price;
     }
 
@@ -63,14 +70,17 @@ public class Product {
     }
 
     public void setQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
         this.quantity = quantity;
     }
 
-    public String getCategory() {
+    public ProductCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ProductCategory category) {
         this.category = category;
     }
 
@@ -88,5 +98,23 @@ public class Product {
 
     public void setArchived(boolean archived) {
         this.archived = archived;
+    }
+
+    // Validation method
+    @PrePersist
+    @PreUpdate
+    public void validate() {
+        if (price <= 0) {
+            throw new IllegalArgumentException("Price must be greater than 0");
+        }
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Product name is required");
+        }
+        if (category == null) {
+            throw new IllegalArgumentException("Product category is required");
+        }
     }
 }

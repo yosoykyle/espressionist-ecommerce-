@@ -3,22 +3,13 @@ package com.espressionist_ecommerce.dto;
 import jakarta.validation.constraints.*;
 
 public class AdminDTO {
-
     @NotBlank(message = "Username is required")
-    @Pattern(regexp = "^[a-zA-Z0-9_-]{3,50}$", 
-             message = "Username must be 3-50 characters and can only contain letters, numbers, underscores, and hyphens")
     private String username;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",
-             message = "Password must contain at least one uppercase letter, one lowercase letter, and one number")
     private String password;
 
-    // For password confirmation during updates
-    private String confirmPassword;
+    private String passwordConfirmation;
 
-    // Getters and Setters
     public String getUsername() {
         return username;
     }
@@ -35,16 +26,18 @@ public class AdminDTO {
         this.password = password;
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
+    public String getPasswordConfirmation() {
+        return passwordConfirmation;
     }
 
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
+    public void setPasswordConfirmation(String passwordConfirmation) {
+        this.passwordConfirmation = passwordConfirmation;
     }
 
-    // Validate password confirmation
     public boolean isPasswordConfirmed() {
-        return password != null && password.equals(confirmPassword);
+        if (password == null && passwordConfirmation == null) {
+            return true;
+        }
+        return password != null && password.equals(passwordConfirmation);
     }
 }

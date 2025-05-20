@@ -1,43 +1,34 @@
 package com.espressionist_ecommerce.controller;
 
+import com.espressionist_ecommerce.dto.AdminDTO;
+import com.espressionist_ecommerce.exception.BusinessException;
 import com.espressionist_ecommerce.model.Admin;
 import com.espressionist_ecommerce.service.AdminService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 public class AdminController {
 
     @Autowired
     private AdminService adminService;
 
-    @GetMapping("/all")
+    @GetMapping("/list")
     public ResponseEntity<List<Admin>> getAllAdmins() {
-        List<Admin> admins = adminService.getAllAdmins();
-        return ResponseEntity.ok(admins);
+        return ResponseEntity.ok(adminService.getAllAdmins());
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> createAdmin(@Valid @RequestBody AdminDTO adminDTO) {
         try {
-            // Check password validation
-            if (!adminDTO.isPasswordConfirmed()) {
-                throw new BusinessException("Password and confirmation do not match");
-            }
-
-            Admin admin = new Admin();
-            admin.setUsername(adminDTO.getUsername());
-            admin.setPassword(adminDTO.getPassword());
-            admin.setActive(true);
-
-            Admin createdAdmin = adminService.createAdmin(admin);
-            return ResponseEntity.ok(createdAdmin);
+            Admin admin = adminService.createAdmin(adminDTO);
+            return ResponseEntity.ok(admin);
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -49,31 +40,27 @@ public class AdminController {
             @Valid @RequestBody AdminDTO adminDTO,
             Authentication authentication) {
         try {
-            String currentUsername = authentication.getName();
-
-            // Check password validation if password is being updated
-            if (adminDTO.getPassword() != null && !adminDTO.getPassword().isEmpty()
-                    && !adminDTO.isPasswordConfirmed()) {
-                throw new BusinessException("Password and confirmation do not match");
-            }
-
-            Admin updatedAdmin = adminService.updateAdmin(id, adminDTO, currentUsername);
-            return ResponseEntity.ok(updatedAdmin);
+            Admin admin = adminService.updateAdmin(id, adminDTO, authentication.getName());
+            return ResponseEntity.ok(admin);
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable Long id, Authentication authentication) {
-        String currentUsername = authentication.getName();
         try {
-            adminService.deleteAdmin(id, currentUsername);
+            adminService.deleteAdmin(id, authentication.getName());
             return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
+        } catch (BusinessException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/current")
+    public ResponseEntity<?> getCurrentAdmin(Authentication authentication) {
+        return adminService.getAdminByUsername(authentication.getName())
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 }
