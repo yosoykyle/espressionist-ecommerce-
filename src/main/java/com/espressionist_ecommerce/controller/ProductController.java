@@ -30,47 +30,32 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO) {
-        try {
-            Product product = new Product();
-            product.setName(productDTO.getName());
-            product.setPrice(productDTO.getPrice());
-            product.setQuantity(productDTO.getQuantity());
-            product.setCategory(productDTO.getCategory());
-            
-            return ResponseEntity.ok(productService.createProduct(product));
-        } catch (BusinessException e) {
-            logger.error("Business error creating product", e);
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            logger.error("Error creating product", e);
-            return ResponseEntity.badRequest().body("Failed to create product: " + e.getMessage());
-        }
+        // Removed try-catch for BusinessException and Exception
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setQuantity(productDTO.getQuantity());
+        product.setCategory(productDTO.getCategory());
+        
+        return ResponseEntity.ok(productService.createProduct(product));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO productDTO) {
-        try {
-            Product product = new Product();
-            product.setName(productDTO.getName());
-            product.setPrice(productDTO.getPrice());
-            product.setQuantity(productDTO.getQuantity());
-            product.setCategory(productDTO.getCategory());
-            
-            return ResponseEntity.ok(productService.updateProduct(id, product));
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        // Removed try-catch for BusinessException and RuntimeException
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setQuantity(productDTO.getQuantity());
+        product.setCategory(productDTO.getCategory());
+        
+        return ResponseEntity.ok(productService.updateProduct(id, product));
     }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> archiveProduct(@PathVariable Long id) {
-        try {
-            productService.archiveProduct(id);
-            return ResponseEntity.noContent().build();
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        // Removed try-catch for BusinessException
+        productService.archiveProduct(id);
+        return ResponseEntity.noContent().build();
     }
 }

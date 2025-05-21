@@ -2,60 +2,76 @@ package com.espressionist_ecommerce.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.context.request.WebRequest;
 
-/**
- * Global exception handler that provides student-friendly error messages
- * for common errors in the e-commerce application.
- */
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+// Ensuring these specific exception classes are imported if they are in the same package
+// import com.espressionist_ecommerce.exception.ResourceNotFoundException;
+// import com.espressionist_ecommerce.exception.BusinessException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<?> handleBusinessException(BusinessException e) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", e.getMessage());
-        response.put("type", "Business Rule Violation");
-        return ResponseEntity.badRequest().body(response);
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.NOT_FOUND.value());
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getDescription(false).substring(4)); // Removes "uri=" prefix
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException e) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", e.getMessage());
-        response.put("type", "Resource Not Found");
-        response.put("help", "Please check if the ID or code is correct");
-        return ResponseEntity.status(404).body(response);
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Object> handleBusinessException(BusinessException ex, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Bad Request");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getDescription(false).substring(4));
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException e) {
-        Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String message = error.getDefaultMessage();
-            errors.put(fieldName, message);
-        });
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("type", "Validation Error");
-        response.put("help", "Please check the following fields");
-        response.put("errors", errors);
-        
-        return ResponseEntity.badRequest().body(response);
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Validation Error");
+        List<String> errors = ex.getBindingResult()
+                                .getFieldErrors()
+                                .stream()
+                                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                                .collect(Collectors.toList());
+        body.put("messages", errors); // List of validation error messages
+        body.put("path", request.getDescription(false).substring(4));
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGenericException(Exception e) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", "An unexpected error occurred");
-        response.put("type", "System Error");
-        response.put("help", "Please check your input and try again");
-        return ResponseEntity.internalServerError().body(response);
+    public ResponseEntity<Object> handleGenericException(Exception ex, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("error", "Internal Server Error");
+        // It's generally good practice to avoid exposing raw exception messages to the client in production.
+        // For this exercise, including ex.getMessage() as per instruction.
+        String message = "An unexpected error occurred. Please contact support.";
+        if (ex.getMessage() != null && !ex.getMessage().isBlank()){
+             message = "An unexpected error occurred: " + ex.getMessage();
+        }
+        body.put("message", message);
+        body.put("path", request.getDescription(false).substring(4));
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

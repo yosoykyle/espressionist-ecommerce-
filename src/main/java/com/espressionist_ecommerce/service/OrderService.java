@@ -102,6 +102,7 @@ public class OrderService {
         return total * (1 + VAT_RATE);
     }
 
+    @Transactional(readOnly = true)
     public Optional<Order> getOrderByOrderCode(String orderCode) {
         return orderRepository.findByOrderCode(orderCode)
             .filter(order -> !order.isArchived());
@@ -148,10 +149,13 @@ public class OrderService {
         return "ESP-" + UUID.randomUUID().toString().substring(0, 7).toUpperCase();
     }
 
+    @Transactional(readOnly = true)
     public List<Order> getAllOrders() {
-        return orderRepository.findByArchivedFalse();
+        // return orderRepository.findByArchivedFalse(); // Old line
+        return orderRepository.findAllWithItemsAndProductsNotArchived(); // New line
     }
 
+    @Transactional(readOnly = true)
     public List<Order> getRecentOrders() {
         return orderRepository.findTop10ByOrderByOrderDateDesc();
     }
