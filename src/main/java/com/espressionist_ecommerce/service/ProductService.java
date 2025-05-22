@@ -1,21 +1,21 @@
 package com.espressionist_ecommerce.service;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile; // Ensure this import is added
-
 import com.espressionist_ecommerce.exception.BusinessException;
 import com.espressionist_ecommerce.exception.ResourceNotFoundException;
 import com.espressionist_ecommerce.model.Product;
 import com.espressionist_ecommerce.model.ProductCategory;
 import com.espressionist_ecommerce.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest; // Ensure this import is added
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional; // Added for new method
+import java.util.stream.Collectors; // This was present in the original file for the old logic, keeping it in case other methods use it.
 
 @Service
 @Transactional
@@ -97,8 +97,17 @@ public class ProductService {
         }
         
         Product product = getProductById(id);
+        product.setImageType(file.getContentType()); // Added line
         product.setImage(file.getBytes());
-        productRepository.save(product);
+        productRepository.save(product); // Ensured this is after setting both
+    }
+
+    // New method as per instructions (Option A)
+    @Transactional(readOnly = true) // Assuming this should also be read-only
+    public Optional<Product> getProductWithImageDetails(Long id) {
+        // This simply calls the existing findById which should fetch the entire Product entity,
+        // including the new imageType field once the transaction commits and session is flushed.
+        return productRepository.findById(id);
     }
 
     public void reduceStock(Long productId, int quantity) {
@@ -118,7 +127,8 @@ public class ProductService {
 
     private void validateProduct(Product product) {
         logger.debug("Validating product: {}", product.getName());
-        if (product.getPrice() < 0.01) {
+        
+        if (product.getPrice() <= 0) {
             logger.error("Invalid price: {} for product: {}", product.getPrice(), product.getName());
             throw new BusinessException("Price must be greater than 0");
         }
@@ -134,6 +144,7 @@ public class ProductService {
             logger.error("Product category is null for product: {}", product.getName());
             throw new BusinessException("Product category is required");
         }
+        
         logger.debug("Product validation successful");
     }
 }
