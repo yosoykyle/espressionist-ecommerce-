@@ -1,21 +1,22 @@
 package com.espressionist_ecommerce.service;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; // Ensure this import is added
+import org.springframework.web.multipart.MultipartFile;
+
 import com.espressionist_ecommerce.exception.BusinessException;
 import com.espressionist_ecommerce.exception.ResourceNotFoundException;
 import com.espressionist_ecommerce.model.Product;
 import com.espressionist_ecommerce.model.ProductCategory;
-import com.espressionist_ecommerce.repository.ProductRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest; // Ensure this import is added
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional; // Added for new method
-import java.util.stream.Collectors; // This was present in the original file for the old logic, keeping it in case other methods use it.
+import com.espressionist_ecommerce.repository.ProductRepository; // Added for new method
 
 @Service
 @Transactional
