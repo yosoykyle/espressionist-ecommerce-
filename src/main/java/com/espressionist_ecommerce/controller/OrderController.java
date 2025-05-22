@@ -24,19 +24,16 @@ public class OrderController {
 
     @PostMapping("/checkout")
     public ResponseEntity<?> createOrder(@Valid @RequestBody OrderCreateDTO orderDTO) {
-        try {
-            Order order = orderService.createOrder(orderDTO);
-            return ResponseEntity.ok(new OrderSummaryResponse(
-                order.getOrderCode(),
-                order.getCustomerName(),
-                order.getCustomerEmail(),
-                order.getShippingAddress(),
-                order.getTotalWithVAT(),
-                "Please save this code to track your order."
-            ));
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        // Removed try-catch for BusinessException
+        Order order = orderService.createOrder(orderDTO);
+        return ResponseEntity.ok(new OrderSummaryResponse(
+            order.getOrderCode(),
+            order.getCustomerName(),
+            order.getCustomerEmail(),
+            order.getShippingAddress(),
+            order.getTotalWithVAT(),
+            "Please save this code to track your order."
+        ));
     }
 
     @GetMapping("/order-status/{orderCode}")
@@ -51,12 +48,9 @@ public class OrderController {
     public ResponseEntity<?> updateOrderStatus(
             @PathVariable Long id,
             @RequestParam String status) {
-        try {
-            orderService.updateOrderStatus(id, status);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        // Removed try-catch for Exception
+        orderService.updateOrderStatus(id, status);
+        return ResponseEntity.ok().build();
     }
 
     private static class OrderSummaryResponse {

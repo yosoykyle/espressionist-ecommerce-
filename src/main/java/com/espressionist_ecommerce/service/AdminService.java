@@ -26,10 +26,12 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional(readOnly = true)
     public List<Admin> getAllAdmins() {
         return adminRepository.findByArchivedFalse();
     }
 
+    @Transactional(readOnly = true)
     public Optional<Admin> getAdminByUsername(String username) {
         return adminRepository.findByUsername(username);
     }
@@ -95,13 +97,6 @@ public class AdminService {
         adminRepository.save(admin);
     }
 
-    public void recordLogin(String username) {
-        adminRepository.findByUsername(username).ifPresent(admin -> {
-            admin.setLastLoginAt(LocalDateTime.now());
-            adminRepository.save(admin);
-        });
-    }
-
     @Transactional
     public void updateLastLoginTime(String username) {
         adminRepository.findByUsername(username).ifPresent(admin -> {
@@ -110,6 +105,7 @@ public class AdminService {
         });
     }
 
+    @Transactional(readOnly = true)
     public boolean isLastActiveAdmin(Long adminId) {
         return countActiveAdmins() == 1 && 
                adminRepository.findById(adminId)
