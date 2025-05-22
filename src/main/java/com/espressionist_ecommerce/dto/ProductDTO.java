@@ -1,9 +1,11 @@
 package com.espressionist_ecommerce.dto;
 
+import com.espressionist_ecommerce.model.ProductCategory;
+
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import com.espressionist_ecommerce.model.ProductCategory;
 
 public class ProductDTO {
     

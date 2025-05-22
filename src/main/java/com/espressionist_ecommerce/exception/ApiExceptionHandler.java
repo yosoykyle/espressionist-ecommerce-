@@ -1,14 +1,15 @@
 package com.espressionist_ecommerce.exception;
 
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -57,7 +58,7 @@ public class ApiExceptionHandler {
     }
 
     // API Error response class
-    private static class ApiError {
+    public static class ApiError {
         private final int status;
         private final String message;
         private final long timestamp;
