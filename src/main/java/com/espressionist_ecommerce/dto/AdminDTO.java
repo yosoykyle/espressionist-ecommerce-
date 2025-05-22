@@ -1,6 +1,6 @@
 package com.espressionist_ecommerce.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 
 public class AdminDTO {
     @NotBlank(message = "Username is required")
