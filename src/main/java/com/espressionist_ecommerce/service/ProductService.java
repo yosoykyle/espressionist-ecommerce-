@@ -8,11 +8,13 @@ import com.espressionist_ecommerce.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest; // Ensure this import is added
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors; // This was present in the original file for the old logic, keeping it in case other methods use it.
 
 @Service
 @Transactional
@@ -24,26 +26,32 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public List<Product> getAllActiveProducts() {
         logger.info("Fetching all active products");
         return productRepository.findByArchivedFalse();
     }
 
+    @Transactional(readOnly = true)
     public List<Product> getFeaturedProducts() {
         logger.info("Fetching featured products");
-        return productRepository.findByArchivedFalse().stream()
-            .limit(8)
-            .collect(Collectors.toList());
+        // return productRepository.findByArchivedFalse().stream()
+        //    .limit(8)
+        //    .collect(Collectors.toList()); // Old logic
+        return productRepository.findActiveProducts(PageRequest.of(0, 8)).getContent(); // New logic
     }
 
+    @Transactional(readOnly = true)
     public List<Product> getProductsByCategory(ProductCategory category) {
         return productRepository.findByCategoryAndArchivedFalse(category);
     }
 
+    @Transactional(readOnly = true)
     public List<Product> searchProducts(String search) {
         return productRepository.findByNameContainingIgnoreCaseAndArchivedFalse(search);
     }
 
+    @Transactional(readOnly = true)
     public Product getProductById(Long id) {
         logger.info("Fetching product with ID: {}", id);
         return productRepository.findById(id)
@@ -101,6 +109,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    @Transactional(readOnly = true)
     public boolean checkStockAvailability(Long productId, int quantity) {
         Product product = getProductById(productId);
         return !product.isArchived() && product.getQuantity() >= quantity;

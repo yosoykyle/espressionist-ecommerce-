@@ -1,5 +1,6 @@
 package com.espressionist_ecommerce.controller.page;
 
+import com.espressionist_ecommerce.exception.ResourceNotFoundException;
 import com.espressionist_ecommerce.model.Order;
 import com.espressionist_ecommerce.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class OrderPageController {
     @GetMapping("/order-status/{orderCode}")
     public String orderStatus(@PathVariable String orderCode, Model model) {
         Order order = orderService.getOrderByOrderCode(orderCode)
-            .orElseThrow(() -> new RuntimeException("Order not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + orderCode));
         model.addAttribute("order", order);
         return "order-status";
     }
