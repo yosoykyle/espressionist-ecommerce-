@@ -1,23 +1,9 @@
 package com.espressionist_ecommerce.model;
 
-import org.hibernate.validator.constraints.Length;
-
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
 
 @Entity
 public class Product {
@@ -35,7 +21,7 @@ public class Product {
     @Column(nullable = false)
     private double price;
 
-    @Min(value = 1, message = "Quantity must be at least 1")
+    @Min(value = 0, message = "Quantity cannot be negative")
     @Column(nullable = false)
     private int quantity;
 
@@ -47,6 +33,8 @@ public class Product {
     @Lob
     @JsonIgnore
     private byte[] image;
+
+    private String imageType; // New field
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean archived = false;
@@ -73,6 +61,9 @@ public class Product {
     }
 
     public void setPrice(double price) {
+        if (price <= 0) {
+            throw new IllegalArgumentException("Price must be greater than 0");
+        }
         this.price = price;
     }
 
@@ -81,6 +72,9 @@ public class Product {
     }
 
     public void setQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
         this.quantity = quantity;
     }
 
@@ -100,6 +94,14 @@ public class Product {
         this.image = image;
     }
 
+    public String getImageType() { // New getter
+        return imageType;
+    }
+
+    public void setImageType(String imageType) { // New setter
+        this.imageType = imageType;
+    }
+
     public boolean isArchived() {
         return archived;
     }
@@ -112,11 +114,11 @@ public class Product {
     @PrePersist
     @PreUpdate
     public void validate() {
-        if (price < 0.01) {
+        if (price <= 0) {
             throw new IllegalArgumentException("Price must be greater than 0");
         }
-        if (quantity < 1) {
-            throw new IllegalArgumentException("Quantity must be at least 1");
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
         }
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Product name is required");

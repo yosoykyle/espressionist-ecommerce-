@@ -8,7 +8,7 @@
 		<version>3.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.espressionist </groupId>
+	<groupId>com.espressionist</groupId>
 	<artifactId>espressionist-ecommerce</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>espressionist-ecommerce</name>
