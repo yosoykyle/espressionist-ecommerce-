@@ -1,5 +1,17 @@
 package com.espressionist_ecommerce.service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.espressionist_ecommerce.dto.OrderCreateDTO;
 import com.espressionist_ecommerce.exception.BusinessException;
 import com.espressionist_ecommerce.exception.ResourceNotFoundException;
@@ -8,17 +20,6 @@ import com.espressionist_ecommerce.model.OrderItem;
 import com.espressionist_ecommerce.model.OrderStatus;
 import com.espressionist_ecommerce.model.Product;
 import com.espressionist_ecommerce.repository.OrderRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Service class handling order-related business logic.
@@ -131,18 +132,13 @@ public class OrderService {
     }
 
     private boolean isValidStatusTransition(OrderStatus current, OrderStatus next) {
-        switch (current) {
-            case PENDING:
-                return next == OrderStatus.PROCESSING;
-            case PROCESSING:
-                return next == OrderStatus.SHIPPED;
-            case SHIPPED:
-                return next == OrderStatus.DELIVERED;
-            case DELIVERED:
-                return false; // No further transitions allowed
-            default:
-                return false;
-        }
+        return switch (current) {
+            case PENDING -> next == OrderStatus.PROCESSING;
+            case PROCESSING -> next == OrderStatus.SHIPPED;
+            case SHIPPED -> next == OrderStatus.DELIVERED;
+            case DELIVERED -> false; // No further transitions allowed
+            default -> false;
+        };
     }
 
     private String generateOrderCode() {
