@@ -19,8 +19,6 @@ public class ProductDTO {
     @NotNull(message = "Category is required")
     private ProductCategory category;
 
-    private byte[] image;
-
     // Getters and Setters
     public String getName() {
         return name;
@@ -52,13 +50,5 @@ public class ProductDTO {
 
     public void setCategory(ProductCategory category) {
         this.category = category;
-    }
-
-    public byte[] getImage() {
-        return image;
-    }
-
-    public void setImage(byte[] image) {
-        this.image = image;
     }
 }

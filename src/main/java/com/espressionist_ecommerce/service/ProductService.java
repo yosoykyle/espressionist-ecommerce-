@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional; // Added for new method
+// import java.util.Optional; // Removed as no longer needed
 import java.util.stream.Collectors; // This was present in the original file for the old logic, keeping it in case other methods use it.
 
 @Service
@@ -102,14 +102,6 @@ public class ProductService {
         productRepository.save(product); // Ensured this is after setting both
     }
 
-    // New method as per instructions (Option A)
-    @Transactional(readOnly = true) // Assuming this should also be read-only
-    public Optional<Product> getProductWithImageDetails(Long id) {
-        // This simply calls the existing findById which should fetch the entire Product entity,
-        // including the new imageType field once the transaction commits and session is flushed.
-        return productRepository.findById(id);
-    }
-
     public void reduceStock(Long productId, int quantity) {
         Product product = getProductById(productId);
         if (product.getQuantity() < quantity) {
@@ -119,10 +111,19 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    @Transactional(readOnly = true)
-    public boolean checkStockAvailability(Long productId, int quantity) {
-        Product product = getProductById(productId);
-        return !product.isArchived() && product.getQuantity() >= quantity;
+    @Transactional(readOnly = true) // Keep readOnly, as it doesn't modify state if successful
+    public void verifyStockAvailability(Long productId, int quantity) throws BusinessException {
+        Product product = getProductById(productId); // This already throws ResourceNotFoundException if not found
+        if (product.isArchived()) {
+            throw new BusinessException(String.format("Product '%s' is archived and cannot be ordered.", product.getName()));
+        }
+        if (product.getQuantity() < quantity) {
+            throw new BusinessException(
+                String.format("Insufficient stock for product '%s'. Available: %d, Requested: %d",
+                product.getName(), product.getQuantity(), quantity)
+            );
+        }
+        // If all checks pass, method completes normally
     }
 
     private void validateProduct(Product product) {
