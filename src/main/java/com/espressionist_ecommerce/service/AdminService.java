@@ -1,18 +1,18 @@
 package com.espressionist_ecommerce.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.espressionist_ecommerce.dto.AdminDTO;
 import com.espressionist_ecommerce.exception.BusinessException;
 import com.espressionist_ecommerce.exception.ResourceNotFoundException;
 import com.espressionist_ecommerce.model.Admin;
 import com.espressionist_ecommerce.repository.AdminRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -83,11 +83,17 @@ public class AdminService {
 
         // Prevent self-deletion
         if (admin.getUsername().equals(currentUsername)) {
-            throw new BusinessException("You cannot delete your own account.");
+            throw new BusinessException("Cannot delete your own account");
+        }
+
+        // Prevent deleting the last active admin
+        if (admin.isActive() && countActiveAdmins() <= 1) {
+            throw new BusinessException("Cannot delete the last active admin");
         }
 
         // Soft delete
         admin.setArchived(true);
+        admin.setActive(false);
         adminRepository.save(admin);
     }
 
