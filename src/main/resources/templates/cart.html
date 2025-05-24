@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:with="pageTitle='Your Shopping Cart'"> <!-- Setting pageTitle for main-layout -->
+<body>
+
+    <!-- Replace the content placeholder in main-layout.html -->
+    <div th:replace="~{layout/main-layout :: content}">
+        <th:block>
+            <section class="py-8">
+                <h1 class="text-3xl font-semibold text-center mb-8">Your Shopping Cart</h1>
+
+                <div id="cart-container" class="container mx-auto px-4">
+                    <!-- Cart items will be rendered here by JavaScript -->
+                </div>
+
+                <div id="cart-summary" class="container mx-auto px-4 mt-8 text-right">
+                    <p class="text-xl font-semibold">Total: $<span id="cart-total">0.00</span></p>
+                    <div class="mt-4">
+                        <button id="clear-cart-btn" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 mr-2">Clear Cart</button>
+                        <a th:href="@{/checkout}" id="checkout-btn" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Proceed to Checkout</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- JavaScript for rendering and interacting with the cart -->
+            <script th:inline="javascript">
+            /*<![CDATA[*/
+                document.addEventListener('DOMContentLoaded', function() {
+                    const cartContainer = document.getElementById('cart-container');
+                    const cartTotalEl = document.getElementById('cart-total');
+                    const clearCartBtn = document.getElementById('clear-cart-btn');
+                    const checkoutBtn = document.getElementById('checkout-btn');
+
+                    function renderCart() {
+                        const cart = getCart(); // from cart.js
+                        cartContainer.innerHTML = ''; // Clear previous items
+
+                        if (cart.length === 0) {
+                            cartContainer.innerHTML = '<p class="text-center text-gray-500">Your cart is empty.</p>';
+                            cartTotalEl.textContent = '0.00';
+                            checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            checkoutBtn.href = '#'; // Prevent navigation if cart is empty
+                            return;
+                        }
+                        checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        checkoutBtn.href = /*[[@{/checkout}]]*/ '/checkout';
+
+
+                        const table = document.createElement('table');
+                        table.className = 'min-w-full divide-y divide-gray-200';
+                        table.innerHTML = `
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-items-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Items will be appended here -->
+                            </tbody>
+                        `;
+                        cartContainer.appendChild(table);
+                        const cartItemsBody = document.getElementById('cart-items-body');
+
+                        cart.forEach(item => {
+                            const row = cartItemsBody.insertRow();
+                            row.innerHTML = `
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-16 w-16">
+                                            <img class="h-16 w-16 rounded-md object-cover" src="${item.imageUrl}" alt="${item.name}">
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">${item.name}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">$${item.price.toFixed(2)}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <button class="quantity-change-btn p-1 border rounded-l" data-product-id="${item.id}" data-change="-1">-</button>
+                                        <input type="number" value="${item.quantity}" min="1" class="quantity-input w-12 text-center border-t border-b" data-product-id="${item.id}" readonly />
+                                        <button class="quantity-change-btn p-1 border rounded-r" data-product-id="${item.id}" data-change="1">+</button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">$${(item.price * item.quantity).toFixed(2)}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="remove-item-btn text-red-600 hover:text-red-900" data-product-id="${item.id}">Remove</button>
+                                </td>
+                            `;
+                        });
+
+                        cartTotalEl.textContent = getCartTotal().toFixed(2);
+                        attachEventListeners();
+                    }
+
+                    function attachEventListeners() {
+                        // Quantity change buttons (+ / -)
+                        document.querySelectorAll('.quantity-change-btn').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const productId = this.dataset.productId;
+                                const change = parseInt(this.dataset.change);
+                                const cart = getCart();
+                                const item = cart.find(ci => ci.id === productId);
+                                if (item) {
+                                    updateItemQuantity(productId, item.quantity + change);
+                                }
+                            });
+                        });
+                        
+                        // Direct quantity input (if we want to allow typing - currently readonly, so this is for future)
+                        // For now, the input is readonly, so this part is less critical.
+                        // document.querySelectorAll('.quantity-input').forEach(input => {
+                        //     input.addEventListener('change', function() { // Or 'blur'
+                        //         const productId = this.dataset.productId;
+                        //         const newQuantity = parseInt(this.value);
+                        //         if (newQuantity >= 0) { // Allow 0 to remove via input
+                        //            updateItemQuantity(productId, newQuantity);
+                        //         } else {
+                        //             renderCart(); // Re-render to reset if invalid
+                        //         }
+                        //     });
+                        // });
+
+                        // Remove item buttons
+                        document.querySelectorAll('.remove-item-btn').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const productId = this.dataset.productId;
+                                if (confirm('Are you sure you want to remove this item from the cart?')) {
+                                    removeItemFromCart(productId);
+                                }
+                            });
+                        });
+                    }
+
+                    if (clearCartBtn) {
+                        clearCartBtn.addEventListener('click', function() {
+                            if (confirm('Are you sure you want to clear your entire cart?')) {
+                                clearCart(); // from cart.js
+                            }
+                        });
+                    }
+                    
+                    // Listen for custom cartUpdated event to re-render
+                    document.addEventListener('cartUpdated', renderCart);
+
+                    // Initial render
+                    renderCart();
+                });
+            /*]]>*/
+            </script>
+        </th:block>
+    </div>
+
+</body>
+</html>
