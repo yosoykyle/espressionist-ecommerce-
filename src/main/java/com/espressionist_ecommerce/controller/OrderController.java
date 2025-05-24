@@ -1,8 +1,10 @@
 package com.espressionist_ecommerce.controller;
 
 import com.espressionist_ecommerce.dto.OrderCreateDTO;
+import com.espressionist_ecommerce.dto.OrderTrackingDTO;
 import com.espressionist_ecommerce.exception.BusinessException;
 import com.espressionist_ecommerce.model.Order;
+import com.espressionist_ecommerce.model.OrderItem;
 import com.espressionist_ecommerce.model.OrderStatus;
 import com.espressionist_ecommerce.service.OrderService;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -39,7 +41,27 @@ public class OrderController {
     @GetMapping("/order-status/{orderCode}")
     public ResponseEntity<?> getOrderStatus(@PathVariable String orderCode) {
         return orderService.getOrderByOrderCode(orderCode)
-            .map(OrderTrackingResponse::new)
+            .map(order -> {
+                OrderTrackingDTO dto = new OrderTrackingDTO();
+                dto.setOrderCode(order.getOrderCode());
+                dto.setOrderDate(order.getOrderDate());
+                dto.setCustomerName(order.getCustomerName());
+                dto.setShippingAddress(order.getShippingAddress());
+                dto.setStatus(order.getStatus());
+                dto.setTotalWithVAT(order.getTotalWithVAT());
+                List<OrderTrackingDTO.OrderItemDTO> itemDTOs = order.getOrderItems().stream()
+                    .map(item -> { // item is of type com.espressionist_ecommerce.model.OrderItem
+                        OrderTrackingDTO.OrderItemDTO orderItemDTO = new OrderTrackingDTO.OrderItemDTO();
+                        orderItemDTO.setProductName(item.getProduct().getName());
+                        orderItemDTO.setQuantity(item.getQuantity());
+                        orderItemDTO.setPrice(item.getPrice());
+                        orderItemDTO.setSubtotal(item.getPrice() * item.getQuantity());
+                        return orderItemDTO;
+                    })
+                    .collect(Collectors.toList());
+                dto.setItems(itemDTOs);
+                return dto;
+            })
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
@@ -79,69 +101,5 @@ public class OrderController {
         }
 
         public String getOrderCode() { return orderCode; }
-    }
-
-    private static class OrderItemResponse {
-        @JsonProperty
-        private final String productName;
-        @JsonProperty
-        private final int quantity;
-        @JsonProperty
-        private final double price;
-        @JsonProperty
-        private final double subtotal;
-
-        public OrderItemResponse(String productName, int quantity, double price, double subtotal) {
-            this.productName = productName;
-            this.quantity = quantity;
-            this.price = price;
-            this.subtotal = subtotal;
-        }
-
-        public String getProductName() { return productName; }
-        public int getQuantity() { return quantity; }
-        public double getPrice() { return price; }
-        public double getSubtotal() { return subtotal; }
-    }
-
-    private static class OrderTrackingResponse {
-        @JsonProperty
-        private final String orderCode;
-        @JsonProperty
-        private final Date orderDate;
-        @JsonProperty
-        private final String customerName;
-        @JsonProperty
-        private final String shippingAddress;
-        @JsonProperty
-        private final OrderStatus status;
-        @JsonProperty
-        private final List<OrderItemResponse> items;
-        @JsonProperty
-        private final double totalWithVAT;
-
-        public OrderTrackingResponse(Order order) {
-            this.orderCode = order.getOrderCode();
-            this.orderDate = order.getOrderDate();
-            this.customerName = order.getCustomerName();
-            this.shippingAddress = order.getShippingAddress();
-            this.status = order.getStatus();
-            this.totalWithVAT = order.getTotalWithVAT();
-            this.items = order.getOrderItems().stream()
-                .map(item -> new OrderItemResponse(
-                    item.getProduct().getName(),
-                    item.getQuantity(),
-                    item.getPrice(),
-                    item.getPrice() * item.getQuantity()))
-                .collect(Collectors.toList());
-        }
-
-        public String getOrderCode() { return orderCode; }
-        public Date getOrderDate() { return orderDate; }
-        public String getCustomerName() { return customerName; }
-        public String getShippingAddress() { return shippingAddress; }
-        public OrderStatus getStatus() { return status; }
-        public List<OrderItemResponse> getItems() { return items; }
-        public double getTotalWithVAT() { return totalWithVAT; }
     }
 }
