@@ -70,13 +70,7 @@ public class OrderService {
 
     private void validateStock(OrderCreateDTO orderDTO) {
         for (OrderCreateDTO.OrderItemDTO item : orderDTO.getItems()) {
-            if (!productService.checkStockAvailability(item.getProductId(), item.getQuantity())) {
-                Product product = productService.getProductById(item.getProductId());
-                throw new BusinessException(
-                    String.format("Insufficient stock for product '%s'. Available: %d, Requested: %d",
-                    product.getName(), product.getQuantity(), item.getQuantity())
-                );
-            }
+            productService.verifyStockAvailability(item.getProductId(), item.getQuantity());
         }
     }
 
