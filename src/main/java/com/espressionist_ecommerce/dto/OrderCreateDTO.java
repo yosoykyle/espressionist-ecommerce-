@@ -8,9 +8,7 @@ public class OrderCreateDTO {
     private String customerName;
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Please provide a valid email")
     @Email(message = "Please provide a valid email address")
-    @NotBlank(message = "Email is required")
     private String customerEmail;
 
     @NotBlank(message = "Shipping address is required")
