@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:with="pageTitle='Checkout'"> <!-- Setting pageTitle for main-layout -->
+<body>
+
+    <!-- Replace the content placeholder in main-layout.html -->
+    <div th:replace="~{layout/main-layout :: content}">
+        <th:block>
+            <section class="py-8">
+                <h1 class="text-3xl font-semibold text-center mb-8">Checkout</h1>
+
+                <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Shipping Details Form -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-semibold mb-6">Shipping Details</h2>
+                        <form id="checkout-form">
+                            <div class="mb-4">
+                                <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                <input type="text" id="customerName" name="customerName" class="w-full p-2 border border-gray-300 rounded-md" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                <input type="email" id="customerEmail" name="customerEmail" class="w-full p-2 border border-gray-300 rounded-md" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="shippingAddress" class="block text-sm font-medium text-gray-700 mb-1">Shipping Address</label>
+                                <textarea id="shippingAddress" name="shippingAddress" rows="3" class="w-full p-2 border border-gray-300 rounded-md" required></textarea>
+                            </div>
+                            <!-- Placeholder for error messages -->
+                            <div id="checkout-error-message" class="text-red-500 text-sm mb-4"></div>
+                             <button type="submit" id="place-order-btn" class="w-full bg-green-500 text-white font-bold py-3 px-6 rounded hover:bg-green-600">
+                                Place Order
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-semibold mb-6">Your Order</h2>
+                        <div id="order-summary-items">
+                            <!-- Items will be rendered here by JavaScript -->
+                            <p class="text-gray-500">Loading order summary...</p>
+                        </div>
+                        <hr class="my-4">
+                        <p class="text-xl font-semibold text-right">Total: $<span id="order-summary-total">0.00</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- JavaScript for rendering order summary and handling checkout submission -->
+            <script th:inline="javascript">
+            /*<![CDATA[*/
+                document.addEventListener('DOMContentLoaded', function() {
+                    const orderSummaryItemsEl = document.getElementById('order-summary-items');
+                    const orderSummaryTotalEl = document.getElementById('order-summary-total');
+                    const checkoutForm = document.getElementById('checkout-form');
+                    const placeOrderBtn = document.getElementById('place-order-btn');
+                    const checkoutErrorMessageEl = document.getElementById('checkout-error-message');
+
+                    function renderOrderSummary() {
+                        const cart = getCart(); // from cart.js
+                        orderSummaryItemsEl.innerHTML = ''; // Clear previous items
+
+                        if (cart.length === 0) {
+                            orderSummaryItemsEl.innerHTML = '<p class="text-center text-gray-500">Your cart is empty. Please add items to your cart before checking out.</p>';
+                            orderSummaryTotalEl.textContent = '0.00';
+                            placeOrderBtn.disabled = true;
+                            placeOrderBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            return;
+                        }
+                        placeOrderBtn.disabled = false;
+                        placeOrderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                        cart.forEach(item => {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = 'flex justify-between items-center py-2 border-b';
+                            itemDiv.innerHTML = `
+                                <div>
+                                    <p class="font-medium">${item.name} (x${item.quantity})</p>
+                                    <p class="text-sm text-gray-600">$${item.price.toFixed(2)} each</p>
+                                </div>
+                                <p class="text-gray-800">$${(item.price * item.quantity).toFixed(2)}</p>
+                            `;
+                            orderSummaryItemsEl.appendChild(itemDiv);
+                        });
+                        orderSummaryTotalEl.textContent = getCartTotal().toFixed(2);
+                    }
+
+                    checkoutForm.addEventListener('submit', function(event) {
+                        event.preventDefault(); // Prevent default form submission
+                        checkoutErrorMessageEl.textContent = ''; // Clear previous errors
+                        placeOrderBtn.disabled = true;
+                        placeOrderBtn.textContent = 'Placing Order...';
+
+
+                        const cartItems = getCart().map(item => ({
+                            productId: item.id, // Ensure this matches OrderCreateDTO.OrderItemDTO
+                            quantity: item.quantity
+                        }));
+
+                        if (cartItems.length === 0) {
+                            checkoutErrorMessageEl.textContent = 'Your cart is empty. Cannot place order.';
+                            placeOrderBtn.disabled = false;
+                            placeOrderBtn.textContent = 'Place Order';
+                            return;
+                        }
+
+                        const formData = new FormData(checkoutForm);
+                        const orderData = {
+                            customerName: formData.get('customerName'),
+                            customerEmail: formData.get('customerEmail'),
+                            shippingAddress: formData.get('shippingAddress'),
+                            items: cartItems // Renamed from cartItems to items to match DTO
+                        };
+
+                        fetch(/*[[@{/api/checkout}]]*/ '/api/checkout', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(orderData)
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                // Try to parse error message from backend if available
+                                return response.json().then(errData => {
+                                   throw new Error(errData.message || `Order placement failed with status: ${response.status}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Assuming backend returns { orderCode: "...", ... }
+                            if (data.orderCode) {
+                                clearCart(); // from cart.js
+                                // Redirect to order success page
+                                window.location.href = /*[[@{/order-success}]]*/ '/order-success' + '?orderCode=' + data.orderCode;
+                            } else {
+                                // Should not happen if response.ok was true and orderCode is expected
+                                throw new Error('Order code not received from server.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Checkout error:', error);
+                            checkoutErrorMessageEl.textContent = 'Error: ' + error.message;
+                            placeOrderBtn.disabled = false;
+                            placeOrderBtn.textContent = 'Place Order';
+                        });
+                    });
+                    
+                    // Listen for cart changes to update summary (e.g., if user navigates back and forth)
+                    document.addEventListener('cartUpdated', renderOrderSummary);
+
+                    // Initial render of order summary
+                    renderOrderSummary();
+                });
+            /*]]>*/
+            </script>
+        </th:block>
+    </div>
+
+</body>
+</html>

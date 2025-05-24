@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:with="pageTitle='Welcome to Espressionist'"> <!-- Setting pageTitle for main-layout -->
+<body>
+
+    <!-- Replace the content placeholder in main-layout.html -->
+    <div th:replace="~{layout/main-layout :: content}">
+        <!-- This specific content will be inserted into main-layout's content placeholder -->
+        <th:block>
+            <!-- Welcome Banner Section -->
+            <section class="text-center py-12 bg-gray-100">
+                <h1 class="text-4xl font-bold text-gray-800">Welcome to Espressionist!</h1>
+                <p class="text-xl text-gray-600 mt-2">coffee. canvas. culture.</p>
+                <!-- CTA buttons - non-functional for now as per 'functionality first' -->
+                <div class="mt-6">
+                    <a href="#" class="bg-orange-500 text-white font-bold py-3 px-6 rounded hover:bg-orange-600 mx-2">Shop Products</a>
+                    <a href="#" class="bg-gray-500 text-white font-bold py-3 px-6 rounded hover:bg-gray-600 mx-2">Learn More</a>
+                </div>
+            </section>
+
+            <!-- Featured Products Section -->
+            <section class="py-12">
+                <h2 class="text-3xl font-semibold text-center mb-8">Featured Products</h2>
+                <div th:if="${featuredProducts != null && !featuredProducts.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-4">
+                    <!-- Loop through featured products -->
+                    <div th:each="product : ${featuredProducts}" class="border rounded-lg p-4 shadow-lg">
+                        <img th:if="${product.id != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="w-full h-48 object-cover rounded-md mb-4"/>
+                        <div th:if="${product.id == null}" class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-md mb-4">
+                            <span class="text-gray-500">No Image</span>
+                        </div>
+                        <h3 th:text="${product.name}" class="text-xl font-semibold mb-2">Product Name</h3>
+                        <p th:text="'Price: $' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}" class="text-gray-700 mb-4">Price: $0.00</p>
+                        <!-- Stock can be added later if needed: <p th:text="'Stock: ' + ${product.quantity}" class="text-sm text-gray-500">Stock: 0</p> -->
+                        <button th:attr="data-product-id=${product.id},
+                                         data-product-name=${product.name},
+                                         data-product-price=${product.price},
+                                         data-product-image-url=@{'/api/products/' + ${product.id} + '/image'}"
+                                class="add-to-cart-btn mt-auto bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+                <div th:if="${featuredProducts == null || featuredProducts.isEmpty()}" class="text-center text-gray-500">
+                    <p>No featured products to display at the moment.</p>
+                </div>
+            </section>
+
+            <script th:inline="javascript">
+            /*<![CDATA[*/
+                document.addEventListener('DOMContentLoaded', function() {
+                    const cartButtons = document.querySelectorAll('.add-to-cart-btn');
+                    cartButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            const productId = this.dataset.productId;
+                            const productName = this.dataset.productName;
+                            const productPrice = parseFloat(this.dataset.productPrice);
+                            const productImageUrl = this.dataset.productImageUrl; // Will be used on cart page
+
+                            // Assuming default quantity of 1 when adding from product listings
+                            const item = {
+                                id: productId,
+                                name: productName,
+                                price: productPrice,
+                                imageUrl: productImageUrl, // Store for cart page display
+                                quantity: 1
+                            };
+                            addItemToCart(item);
+                            alert(productName + ' added to cart!'); // Simple feedback
+                        });
+                    });
+                });
+            /*]]>*/
+            </script>
+        </th:block>
+    </div>
+
+</body>
+</html>
