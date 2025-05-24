@@ -1,13 +1,14 @@
 package com.espressionist_ecommerce.security;
+
+import com.espressionist_ecommerce.model.Admin;
+import com.espressionist_ecommerce.service.AdminService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.espressionist_ecommerce.model.Admin;
-import com.espressionist_ecommerce.service.AdminService;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

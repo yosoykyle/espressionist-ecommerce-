@@ -1,6 +1,6 @@
 package com.espressionist_ecommerce.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 
 public class AdminDTO {
     @NotBlank(message = "Username is required")
@@ -43,7 +43,7 @@ public class AdminDTO {
     }
 
     public boolean isPasswordConfirmed() {
-        if ((password == null || password.isBlank()) && (passwordConfirmation == null || passwordConfirmation.isBlank())) {
+        if (password == null && passwordConfirmation == null) {
             return true;
         }
         return password != null && password.equals(passwordConfirmation);
