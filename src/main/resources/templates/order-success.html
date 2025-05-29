@@ -1,59 +1,192 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Order Confirmation'"> <!-- Setting pageTitle for main-layout -->
+      th:with="pageTitle='Order Confirmation'">
 <body>
 
-    <!-- Replace the content placeholder in main-layout.html -->
     <div th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <section class="py-12 text-center">
-                <div th:if="${order != null}" class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <h1 class="text-3xl font-semibold text-green-600 mb-4">Thank You! Your Order is Confirmed!</h1>
-                    
-                    <p class="text-gray-700 mb-2">
-                        Your Order Code is: <strong th:text="${order.orderCode}" class="text-lg">ESP-XXXXXXX</strong>
-                    </p>
-                    <p class="text-gray-600 mb-6">
-                        Please save this code to track your order.
-                    </p>
+            <section class="py-12 bg-[#F5F5DC]">
+                <div class="container mx-auto px-4 text-center">
 
-                    <div class="text-left border-t pt-6">
-                        <h2 class="text-xl font-semibold mb-3">Order Summary</h2>
-                        <p class="mb-1"><strong class="font-medium">Customer:</strong> <span th:text="${order.customerName}">Customer Name</span></p>
-                        <p class="mb-1"><strong class="font-medium">Email:</strong> <span th:text="${order.customerEmail}">customer@example.com</span></p>
-                        <p class="mb-3"><strong class="font-medium">Shipping Address:</strong> <span th:text="${order.shippingAddress}">123 Shipping St, City</span></p>
-
-                        <h3 class="text-lg font-semibold mt-4 mb-2">Items Ordered:</h3>
-                        <ul th:if="${order.orderItems != null && !order.orderItems.isEmpty()}" class="list-disc list-inside mb-4 pl-4">
-                            <li th:each="item : ${order.orderItems}" class="mb-1">
-                                <span th:text="${item.product.name}">Product Name</span> - 
-                                <span th:text="${item.quantity}">1</span> x 
-                                <span th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
-                            </li>
-                        </ul>
-                        <div th:if="${order.orderItems == null || order.orderItems.isEmpty()}" class="text-gray-500 mb-4">
-                            <p>No items listed for this order (this might be an issue if items were expected).</p>
-                        </div>
-
-                        <p class="text-xl font-bold text-right mt-4 mb-6">
-                            Total (incl. VAT): <span th:text="'$' + ${#numbers.formatDecimal(order.totalWithVAT, 1, 'COMMA', 2, 'POINT')}">$0.00</span>
-                        </p>
+                    <!-- Loading Indicator -->
+                    <div id="loadingIndicator" class="my-10" style="display: none;">
+                        <svg class="animate-spin h-10 w-10 text-[#F56401] mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="mt-3 text-lg text-gray-600">Loading order details...</p>
                     </div>
 
-                    <a th:href="@{/order-status}" class="bg-blue-500 text-white font-bold py-3 px-6 rounded hover:bg-blue-600">
-                        Track Your Order
-                    </a>
-                </div>
+                    <!-- Error Message Area -->
+                    <div id="errorMessage" class="my-10 p-6 bg-red-100 border border-red-400 text-red-700 rounded-lg max-w-lg mx-auto" style="display: none;">
+                        <p class="font-semibold">Oops! Something went wrong.</p>
+                        <p id="errorMessageText">Could not retrieve order details.</p>
+                        <a th:href="@{/}" class="mt-4 inline-block bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Go to Homepage</a>
+                    </div>
+                    
+                    <!-- Order Details Container -->
+                    <div id="orderDetailsContainer" class="bg-white p-8 rounded-xl shadow-xl max-w-3xl mx-auto" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 text-green-500 mx-auto mb-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h1 class="text-3xl sm:text-4xl font-bold text-green-600 mb-4">Thank You! Your Order is Confirmed!</h1>
+                        
+                        <p class="text-gray-700 mb-2 text-lg">
+                            Your Order Code is: <strong id="orderCodeDisplay" class="text-xl text-[#F56401] font-logo">ESP-XXXXXXX</strong>
+                        </p>
+                        <p class="text-gray-600 mb-8 text-md">
+                            Please save this code to track your order.
+                        </p>
 
-                <div th:if="${order == null}" class="text-center text-red-500 p-8">
-                    <h1 class="text-2xl font-semibold">Order Not Found</h1>
-                    <p>We could not retrieve your order details. Please check your order code or contact support.</p>
-                    <a th:href="@{/}" class="mt-4 inline-block bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Go to Homepage</a>
+                        <div class="text-left border-t border-gray-200 pt-8">
+                            <h2 class="text-2xl font-semibold mb-5 text-gray-700">Order Summary</h2>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6 text-sm">
+                                <div>
+                                    <strong class="font-medium text-gray-600 block mb-1">Customer:</strong>
+                                    <span id="customerNameDisplay" class="text-gray-800">N/A</span>
+                                </div>
+                                <div>
+                                    <strong class="font-medium text-gray-600 block mb-1">Email:</strong>
+                                    <span id="customerEmailDisplay" class="text-gray-800">N/A</span>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <strong class="font-medium text-gray-600 block mb-1">Shipping Address:</strong>
+                                    <span id="shippingAddressDisplay" class="text-gray-800">N/A</span>
+                                </div>
+                                <div class="md:col-span-2" id="orderDateContainer" style="display:none;">
+                                    <strong class="font-medium text-gray-600 block mb-1">Order Date:</strong>
+                                    <span id="orderDateDisplay" class="text-gray-800">N/A</span>
+                                </div>
+                            </div>
+
+                            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-700">Items Ordered:</h3>
+                            <div id="orderItemsContainer" class="space-y-3 mb-6 border rounded-lg p-4 bg-gray-50 max-h-72 overflow-y-auto">
+                                <!-- Items will be rendered here -->
+                                <p class="text-gray-500">No items found for this order.</p>
+                            </div>
+
+                            <div class="text-xl font-bold text-gray-800 text-right mt-6 mb-8">
+                                Total (incl. VAT): <span id="orderTotalDisplay" class="text-[#F56401]">$0.00</span>
+                            </div>
+                        </div>
+
+                        <a id="trackOrderBtn" href="#"
+                           class="inline-block w-full sm:w-auto bg-[#F56401] text-white font-semibold py-3 px-10 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out text-lg">
+                            Track Your Order
+                        </a>
+                    </div>
                 </div>
             </section>
+
+            <script th:inline="javascript">
+            /*<![CDATA[*/
+                document.addEventListener('DOMContentLoaded', function() {
+                    const loadingIndicatorEl = document.getElementById('loadingIndicator');
+                    const errorMessageEl = document.getElementById('errorMessage');
+                    const errorMessageTextEl = document.getElementById('errorMessageText');
+                    const orderDetailsContainerEl = document.getElementById('orderDetailsContainer');
+
+                    const orderCodeDisplayEl = document.getElementById('orderCodeDisplay');
+                    const customerNameDisplayEl = document.getElementById('customerNameDisplay');
+                    const customerEmailDisplayEl = document.getElementById('customerEmailDisplay');
+                    const shippingAddressDisplayEl = document.getElementById('shippingAddressDisplay');
+                    const orderDateContainerEl = document.getElementById('orderDateContainer');
+                    const orderDateDisplayEl = document.getElementById('orderDateDisplay');
+                    const orderItemsContainerEl = document.getElementById('orderItemsContainer');
+                    const orderTotalDisplayEl = document.getElementById('orderTotalDisplay');
+                    const trackOrderBtnEl = document.getElementById('trackOrderBtn');
+
+                    function displayError(message) {
+                        loadingIndicatorEl.style.display = 'none';
+                        orderDetailsContainerEl.style.display = 'none';
+                        errorMessageTextEl.textContent = message || 'An unexpected error occurred.';
+                        errorMessageEl.style.display = 'block';
+                    }
+
+                    function renderOrderDetails(order) {
+                        customerNameDisplayEl.textContent = order.customerName || 'N/A';
+                        customerEmailDisplayEl.textContent = order.customerEmail || 'N/A'; // Assuming 'customerEmail' from backend
+                        shippingAddressDisplayEl.textContent = order.shippingAddress || 'N/A';
+                        
+                        if(order.orderDate) {
+                            orderDateDisplayEl.textContent = new Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                            orderDateContainerEl.style.display = 'block';
+                        }
+
+                        orderItemsContainerEl.innerHTML = ''; // Clear
+                        if (order.items && order.items.length > 0) {
+                            order.items.forEach(item => {
+                                const itemEl = document.createElement('div');
+                                itemEl.className = 'py-2 px-1 flex justify-between items-center text-sm border-b border-gray-100 last:border-b-0';
+                                // Assuming item structure: { product: { name: "..." }, quantity: X, price: Y } or { name: "...", quantity: X, price: Y }
+                                // Adjust based on actual backend response for items
+                                const itemName = item.product ? item.product.name : (item.name || 'Unknown Product');
+                                const itemPrice = item.price || 0; // Price per unit at the time of order
+                                const itemQuantity = item.quantity || 0;
+                                
+                                itemEl.innerHTML = `
+                                    <div class="flex-grow">
+                                        <p class="font-medium text-gray-700">${itemName}</p>
+                                        <p class="text-xs text-gray-500">${itemQuantity} x $${itemPrice.toFixed(2)}</p>
+                                    </div>
+                                    <p class="text-gray-600 font-medium w-20 text-right">$${(itemPrice * itemQuantity).toFixed(2)}</p>
+                                `;
+                                orderItemsContainerEl.appendChild(itemEl);
+                            });
+                        } else {
+                            orderItemsContainerEl.innerHTML = '<p class="text-gray-500">No items found for this order.</p>';
+                        }
+                        orderTotalDisplayEl.textContent = '$' + (order.totalWithVAT || 0).toFixed(2);
+                        
+                        loadingIndicatorEl.style.display = 'none';
+                        errorMessageEl.style.display = 'none';
+                        orderDetailsContainerEl.style.display = 'block';
+                    }
+
+                    const params = new URLSearchParams(window.location.search);
+                    const orderCode = params.get('orderCode');
+
+                    if (!orderCode) {
+                        displayError('Order code missing from URL. Please check the link or contact support.');
+                        trackOrderBtnEl.classList.add('hidden'); // Hide track order button
+                        return;
+                    }
+
+                    orderCodeDisplayEl.textContent = orderCode; // Show order code immediately
+                    trackOrderBtnEl.href = /*[[@{/order-status}]]*/ '/order-status' + '?orderCode=' + orderCode;
+                    loadingIndicatorEl.style.display = 'block';
+
+                    fetch(/*[[@{/api/orders/}]]*/ '/api/orders/' + orderCode)
+                        .then(response => {
+                            if (!response.ok) {
+                                if (response.status === 404) {
+                                    throw new Error('Order not found. Please verify your order code.');
+                                }
+                                // Try to parse error from backend for other statuses
+                                return response.json().then(errData => {
+                                    throw new Error(errData.message || `Failed to fetch order details. Status: ${response.status}`);
+                                }).catch(() => { // If response.json() fails or no specific message
+                                     throw new Error(`Failed to fetch order details. Status: ${response.status} ${response.statusText}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Adjusting for expected structure from previous Thymeleaf: order.orderItems
+                            // If backend sends 'orderItems' instead of 'items', map it here
+                            if (data.orderItems && !data.items) {
+                                data.items = data.orderItems;
+                            }
+                            renderOrderDetails(data);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching order details:', error);
+                            displayError(error.message);
+                        });
+                });
+            /*]]>*/
+            </script>
         </th:block>
     </div>
 
