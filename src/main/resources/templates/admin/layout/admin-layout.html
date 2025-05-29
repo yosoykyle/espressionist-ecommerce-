@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - Admin' : 'Espressionist Admin'}">Admin Panel</title>
+    <!-- Using Tailwind CSS from CDN, similar to main user-facing layout -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Basic wrapper for sticky footer */
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        .content-wrapper { flex: 1; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <header class="bg-gray-800 text-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-semibold">Espressionist Admin Panel</h1>
+            <nav>
+                <span class="mr-4" th:if="${#authentication.name != null}">
+                    Welcome, <strong sec:authentication="name">User</strong>
+                </span>
+                <a th:href="@{/admin/logout}" class="text-gray-300 hover:text-white underline">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="content-wrapper flex">
+        <aside class="w-64 bg-gray-700 text-gray-200 p-4 space-y-2">
+            <h2 class="text-lg font-semibold mb-3">Navigation</h2>
+            <a th:href="@{/admin/dashboard}" class="block py-2 px-3 rounded hover:bg-gray-600">Dashboard</a>
+            <a th:href="@{/admin/products}" class="block py-2 px-3 rounded hover:bg-gray-600">Products</a>
+            <a th:href="@{/admin/orders}" class="block py-2 px-3 rounded hover:bg-gray-600">Orders</a>
+            <a th:href="@{/admin/admins}" class="block py-2 px-3 rounded hover:bg-gray-600">Admins</a>
+        </aside>
+
+        <main class="flex-1 p-6">
+            <!-- Page specific title can be shown here if desired -->
+            <!-- <h1 th:if="${pageTitle}" th:text="${pageTitle}" class="text-2xl font-bold mb-5">Page Title</h1> -->
+            
+            <!-- Content will be replaced here by specific admin pages -->
+            <div th:fragment="content">
+                <p>This is default content. It should be replaced by the specific admin page.</p>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-gray-800 text-white text-center p-3 mt-auto">
+        <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> Espressionist Admin</p>
+    </footer>
+
+</body>
+</html>

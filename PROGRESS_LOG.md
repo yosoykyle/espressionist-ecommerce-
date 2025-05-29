@@ -305,6 +305,45 @@ Note: The core requirements of the e-commerce system have been implemented and t
 
 ---
 
+### **May 17, 2025**
+
+#### **Backend Review, Enhancements, and Status Update**
+
+Following a detailed review and refactoring session, the backend has been updated with several improvements and its current status is assessed as follows:
+
+**1. Core Functionality Implemented:**
+    - User-facing features: Product listing, checkout (with VAT and stock reduction), order status tracking.
+    - Admin features: Product CRUD (including image uploads via API), order management (status updates, auto-archiving), admin user CRUD (with security considerations like self-deletion prevention).
+    - Database: JPA/Hibernate with soft deletes, relevant entities and relationships are in place.
+
+**2. Recent Enhancements & Fixes:**
+    - **Security:** Critical product modification API endpoints (`POST /api/products`, `PUT /api/products/**`, `DELETE /api/products/**`, `POST /api/products/**/image`) are now explicitly secured and require ADMIN role.
+    - **DTO Refactoring:**
+        - Cleaned duplicate validation annotations in `OrderCreateDTO`.
+        - Standardized `OrderController` to use `OrderTrackingDTO` (from `dto` package), removing an internal helper class.
+        - Removed the unused `image: byte[]` field from `ProductDTO` as image uploads are handled by a dedicated `MultipartFile` endpoint.
+    - **Service Layer Optimizations:**
+        - `OrderService.validateStock()` optimized to prevent a redundant database call.
+        - Removed unused `ProductService.getProductWithImageDetails()` method.
+    - **Configuration Cleanup (`application.properties`):**
+        - Removed a duplicate comment.
+        - Removed unused default Spring Security user properties (`spring.security.user.*`).
+        - The property `spring.jpa.properties.hibernate.enable_lazy_load_no_trans=true` was reviewed and retained for pragmatic reasons in the context of the current project phase.
+
+**3. Backend "Doneness" Assessment (College Final Project Context):**
+    - The backend is assessed to be **85-90% complete**.
+    - It is functionally robust and meets the explicit requirements outlined in `1_REQUIREMENTS.txt` and `2_REQUIREMENTS.txt`.
+    - **Primary remaining gap for an ideal submission:** Comprehensive automated testing (unit tests for services, integration tests for key flows) has not yet been implemented. This was a conscious decision to prioritize feature completion and backend stability first.
+    - **Minor potential further enhancements (optional):** More detailed admin dashboard statistics.
+
+**4. Current Codebase State:**
+    - Code is modular (controllers, services, repositories).
+    - Error handling is centralized via `GlobalExceptionHandler`.
+    - RESTful principles are generally followed.
+
+This log entry summarizes the recent work and current standing of the backend.
+---
+
 ## Project Status
 - Backend: Core functionality complete
 - Frontend: Templates and integration complete
