@@ -117,27 +117,26 @@
                                     })
                                     .then(response => {
                                         if (!response.ok) {
-                                            return response.json().then(errData => {
-                                                throw new Error(errData.message || `Failed to update status. Status: ${response.status}`);
-                                            }).catch(() => new Error(`Failed to update status. Status: ${response.status} ${response.statusText}`));
+                                            return response.json()
+                                                .then(errorData => {
+                                                    throw new Error(errorData.message || `Server error: ${response.status} ${response.statusText || 'Failed to update status'}`.trim());
+                                                })
+                                                .catch(() => {
+                                                    throw new Error(`Request failed: ${response.status} ${response.statusText || 'Failed to update status'}`.trim());
+                                                });
                                         }
-                                        return response.json(); // Assuming backend returns updated order or success message
+                                        return response.json(); 
                                     })
                                     .then(data => {
                                         showToast(`Order ${orderCode} status updated to ${newStatus}!`, 'success');
-                                        setTimeout(() => window.location.reload(), 1000); // Reload to see changes
+                                        setTimeout(() => window.location.reload(), 1000); 
                                     })
                                     .catch(error => {
                                         console.error('Status update error:', error);
-                                        showToast('Error updating status: ' + error.message, 'error');
-                                        dropdown.disabled = false; // Re-enable dropdown
-                                        // Optionally reset dropdown to original value if backend has old status
-                                        // For now, relies on page reload to show consistent state.
+                                        showToast(error.message || 'An unexpected error occurred. Please try again.', 'error');
+                                        dropdown.disabled = false; 
                                     });
                                 }
-                                // onCancel: re-enable dropdown if needed, or simply do nothing to keep new selection for retry.
-                                // For simplicity, if user cancels, the dropdown remains on the new (unconfirmed) selection.
-                                // A better UX might revert it, but that requires storing original value.
                             );
                         });
                     });
@@ -146,35 +145,35 @@
                     archiveButtons.forEach(button => {
                         button.addEventListener('click', function () {
                             const orderId = this.dataset.orderId;
-                            const orderCode = this.dataset.orderCode; // For display in modal
+                            const orderCode = this.dataset.orderCode; 
 
                             showModal(
                                 'Confirm Archive Order',
                                 `Are you sure you want to archive order ${orderCode}? This action may not be easily reversible.`,
-                                function() { // onConfirm
+                                function() { 
                                     button.disabled = true;
                                     button.innerHTML = 'Archiving... <svg class="animate-spin inline h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
 
                                     fetch(`/admin/orders/${orderId}/archive`, {
                                         method: 'POST',
                                         headers: {
-                                            // Spring Security CSRF token might be needed
                                             // 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
                                         }
                                     })
                                     .then(response => {
                                         if (!response.ok) {
-                                             return response.json().then(errData => {
-                                                throw new Error(errData.message || `Failed to archive order. Status: ${response.status}`);
-                                            }).catch(() => new Error(`Failed to archive order. Status: ${response.status} ${response.statusText}`));
+                                             return response.json()
+                                                .then(errorData => {
+                                                    throw new Error(errorData.message || `Server error: ${response.status} ${response.statusText || 'Failed to archive'}`.trim());
+                                                })
+                                                .catch(() => {
+                                                    throw new Error(`Request failed: ${response.status} ${response.statusText || 'Failed to archive'}`.trim());
+                                                });
                                         }
-                                        // Check if response has content before parsing as JSON
-                                        const contentType = response.headers.get("content-type");
-                                        if (contentType && contentType.indexOf("application/json") !== -1) {
-                                            return response.json();
-                                        } else {
-                                            return {}; // Or handle as simple success if no JSON body
+                                        if (response.status === 200 || response.status === 204 || (response.headers.get("content-length") === "0" && response.ok) ) {
+                                           return null; 
                                         }
+                                        return response.json();
                                     })
                                     .then(data => {
                                         showToast(`Order ${orderCode} archived successfully!`, 'success');
@@ -182,12 +181,11 @@
                                     })
                                     .catch(error => {
                                         console.error('Archive error:', error);
-                                        showToast('Error archiving order: ' + error.message, 'error');
+                                        showToast(error.message || 'An unexpected error occurred. Please try again.', 'error');
                                         button.disabled = false;
                                         button.textContent = 'Archive';
                                     });
                                 }
-                                // onCancel: do nothing, button remains enabled.
                             );
                         });
                     });

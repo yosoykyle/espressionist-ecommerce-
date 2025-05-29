@@ -96,30 +96,32 @@
                                     })
                                     .then(response => {
                                         if (!response.ok) {
-                                            return response.text().then(text => { // Try to get text error from backend
-                                                throw new Error(text || `Failed to delete admin user. Status: ${response.status}`);
-                                            });
+                                            return response.json() // Attempt to parse JSON
+                                                .then(errorData => {
+                                                    throw new Error(errorData.message || `Server error: ${response.status} ${response.statusText || 'Failed to delete'}`.trim());
+                                                })
+                                                .catch(() => { // If response wasn't JSON or other parsing error
+                                                    throw new Error(`Request failed: ${response.status} ${response.statusText || 'Failed to delete'}`.trim());
+                                                });
                                         }
-                                        // Check content type before parsing as JSON
-                                        const contentType = response.headers.get("content-type");
-                                        if (contentType && contentType.indexOf("application/json") !== -1) {
-                                            return response.json();
-                                        } else {
-                                            return {}; // Or response.text() if plain text success is expected
+                                        // For POST expecting no content or just status, check explicitly
+                                        if (response.status === 200 || response.status === 204 || (response.headers.get("content-length") === "0" && response.ok) ) {
+                                           return null; // Success, no content to parse
                                         }
+                                        return response.json(); // Or response.text() if backend sends plain text on success
                                     })
-                                    .then(data => {
+                                    .then(data => { // data might be null here if 204
                                         showToast(`Admin user "${username}" deleted successfully!`, 'success');
                                         setTimeout(() => window.location.reload(), 1000); // Reload to reflect changes
                                     })
                                     .catch(error => {
                                         console.error('Delete admin error:', error);
-                                        showToast('Error deleting admin user: ' + error.message, 'error');
+                                        showToast(error.message || 'Error deleting admin user. Please try again.', 'error');
                                         button.disabled = false; // Re-enable button on error
                                         button.textContent = 'Delete';
                                     });
                                 }
-                                // onCancel can be omitted
+                                // onCancel: button remains enabled by default if no action in onCancel
                             );
                         });
                     });

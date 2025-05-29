@@ -24,7 +24,7 @@ function addItemToCart(item) {
         if (newProposedQuantity <= cart[existingItemIndex].originalStock) {
             cart[existingItemIndex].quantity = newProposedQuantity;
         } else {
-            alert('Cannot add more. Not enough stock available! Max stock: ' + cart[existingItemIndex].originalStock);
+            showToast('Cannot add more. Not enough stock available! Max stock: ' + cart[existingItemIndex].originalStock, 'error');
             return; // Do not save or dispatch event if quantity didn't change
         }
     } else {
@@ -33,7 +33,7 @@ function addItemToCart(item) {
             if (item.quantity <= item.originalStock) {
                 cart.push(item); // item already has id, name, price, imageUrl, quantity, originalStock
             } else {
-                alert('Cannot add item. Requested quantity ('+ item.quantity +') exceeds stock! Stock: ' + item.originalStock);
+                showToast('Cannot add item. Requested quantity ('+ item.quantity +') exceeds stock! Stock: ' + item.originalStock, 'error');
                 return;
             }
         } else {
@@ -42,6 +42,7 @@ function addItemToCart(item) {
     }
     saveCart(cart);
     console.log('Item added/updated in cart:', item, 'Current cart:', getCart());
+    showToast(`'${item.name}' added to cart!`, 'success');
     document.dispatchEvent(new CustomEvent('cartUpdated'));
 }
 
@@ -57,7 +58,7 @@ function updateItemQuantity(productId, newQuantity) {
                 if (newQuantity <= cart[itemIndex].originalStock) {
                     cart[itemIndex].quantity = newQuantity;
                 } else {
-                    alert('Cannot increase quantity further. Not enough stock available! Max stock: ' + cart[itemIndex].originalStock);
+                    showToast('Cannot increase quantity further. Not enough stock available! Max stock: ' + cart[itemIndex].originalStock, 'error');
                     return; // Do not save or dispatch event if quantity didn't change
                 }
             } else { // Decreasing quantity or setting to same is always fine (down to 1)
@@ -66,6 +67,9 @@ function updateItemQuantity(productId, newQuantity) {
         } else {
             // If quantity is 0 or less, remove the item
             cart.splice(itemIndex, 1);
+            showToast('Item removed from cart.', 'info'); // Specific toast for removal
+        } else {
+            showToast('Cart updated!', 'success'); // General success for quantity change
         }
         saveCart(cart);
         console.log('Item quantity updated for product:', productId, 'New quantity:', newQuantity, 'Current cart:', getCart());

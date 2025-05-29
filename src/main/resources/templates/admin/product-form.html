@@ -70,13 +70,20 @@
                         <label for="imageFile" class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
                         <input type="file" id="imageFile" name="imageFile" accept="image/png, image/jpeg, image/gif"
                                class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#F56401] file:text-white hover:file:bg-orange-600">
-                        <p class="text-xs text-gray-500 mt-1">Upload a new image. If editing, leaving this empty will keep the current image.</p>
                         <p id="imageFileError" class="text-red-500 text-xs mt-1"></p>
-                         <!-- Display current image if editing and image exists -->
-                        <div th:if="${product.id != null && product.image != null}" class="mt-4">
-                             <p class="text-sm font-medium text-gray-700 mb-1">Current Image:</p>
-                             <img th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Current Product Image" class="h-32 w-32 object-cover rounded-md shadow"/>
+                        
+                        <div class="mt-4">
+                            <p id="imagePreviewText" class="text-sm font-medium text-gray-700 mb-1"
+                               th:text="${product.id != null && product.image != null ? 'Current Image Preview:' : 'Image Preview:'}">Image Preview:</p>
+                            <img id="imagePreview" 
+                                 th:src="${product.id != null && product.image != null ? @{'/api/products/' + ${product.id} + '/image'} : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" 
+                                 alt="Image Preview" 
+                                 class="h-40 w-40 object-cover rounded-md shadow border"
+                                 th:classappend="${product.id == null || product.image == null ? 'border-dashed border-gray-300 p-2 flex items-center justify-center text-gray-400 text-xs' : ''}"
+                                 th:alt="${product.id == null || product.image == null ? 'No image selected or available' : 'Product Image Preview'}"/>
                         </div>
+                         <p th:if="${product.id != null && product.image != null}" class="text-xs text-gray-500 mt-1">Uploading a new image will replace the current one.</p>
+                         <p th:if="${product.id == null || product.image == null}" class="text-xs text-gray-500 mt-1">Select an image to preview.</p>
                     </div>
 
                     <!-- Buttons -->
@@ -101,7 +108,67 @@
                     const priceInput = document.getElementById('price');
                     const quantityInput = document.getElementById('quantity');
                     const categoryInput = document.getElementById('category');
-                    const imageFileInput = document.getElementById('imageFile'); // For image validation if needed
+                    const imageFileInput = document.getElementById('imageFile');
+                    const imagePreview = document.getElementById('imagePreview');
+                    const imagePreviewText = document.getElementById('imagePreviewText');
+                    
+                    // Store original image source if editing an existing product
+                    const originalImageSrc = /*[[${(product.id != null && product.image != null) ? @{'/api/products/' + product.id + '/image'} : null}]]*/ null;
+                    const placeholderImageSrc = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // Transparent 1x1 GIF
+
+                    if (originalImageSrc) {
+                        imagePreview.src = originalImageSrc;
+                    } else {
+                        imagePreview.src = placeholderImageSrc;
+                        imagePreview.alt = 'No image selected or available';
+                        // Add some styling to indicate it's a placeholder for empty image
+                        imagePreview.classList.add('border-dashed', 'border-gray-300', 'p-2', 'flex', 'items-center', 'justify-center', 'text-gray-400', 'text-xs');
+                         imagePreviewText.textContent = 'Image Preview: (No current image)';
+                    }
+
+
+                    imageFileInput.addEventListener('change', function(event) {
+                        const file = event.target.files[0];
+                        const imageFileError = document.getElementById('imageFileError');
+                        imageFileError.textContent = ''; // Clear previous error
+
+                        if (file) {
+                            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                            if (!validTypes.includes(file.type)) {
+                                showToast('Invalid file type. Please select a JPG, PNG, or GIF image.', 'error');
+                                imageFileInput.value = ''; // Clear the file input
+                                // Revert to original image if it exists, otherwise to placeholder
+                                imagePreview.src = originalImageSrc || placeholderImageSrc;
+                                imagePreview.alt = originalImageSrc ? 'Current Product Image' : 'No image selected or available';
+                                imagePreviewText.textContent = originalImageSrc ? 'Current Image Preview:' : 'Image Preview: (No current image)';
+                                if (!originalImageSrc) {
+                                    imagePreview.classList.add('border-dashed', 'border-gray-300', 'p-2', 'flex', 'items-center', 'justify-center', 'text-gray-400', 'text-xs');
+                                } else {
+                                     imagePreview.classList.remove('border-dashed', 'border-gray-300', 'p-2', 'flex', 'items-center', 'justify-center', 'text-gray-400', 'text-xs');
+                                }
+                                return;
+                            }
+
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                imagePreview.src = e.target.result;
+                                imagePreview.alt = 'New image preview';
+                                imagePreviewText.textContent = 'New Image Preview:';
+                                imagePreview.classList.remove('border-dashed', 'border-gray-300', 'p-2', 'flex', 'items-center', 'justify-center', 'text-gray-400', 'text-xs');
+                            }
+                            reader.readAsDataURL(file);
+                        } else {
+                            // No file selected (e.g., user cleared input) - revert to original or placeholder
+                            imagePreview.src = originalImageSrc || placeholderImageSrc;
+                            imagePreview.alt = originalImageSrc ? 'Current Product Image' : 'No image selected or available';
+                            imagePreviewText.textContent = originalImageSrc ? 'Current Image Preview:' : 'Image Preview: (No current image)';
+                             if (!originalImageSrc) {
+                                imagePreview.classList.add('border-dashed', 'border-gray-300', 'p-2', 'flex', 'items-center', 'justify-center', 'text-gray-400', 'text-xs');
+                            } else {
+                                imagePreview.classList.remove('border-dashed', 'border-gray-300', 'p-2', 'flex', 'items-center', 'justify-center', 'text-gray-400', 'text-xs');
+                            }
+                        }
+                    });
 
                     productForm.addEventListener('submit', function (event) {
                         let isValid = true;
