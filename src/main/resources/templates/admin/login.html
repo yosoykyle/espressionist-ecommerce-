@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>espressionist Admin Login</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Fallback font if Seagull Serial is not available */
+        .font-logo {
+            font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback */
+        }
+         /* Fallback font for general text if needed */
+        .font-sans {
+             font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback */
+        }
+    </style>
+</head>
+<body class="bg-[#F5F5DC] flex flex-col items-center justify-center min-h-screen font-sans antialiased">
+
+    <div class="bg-white p-8 sm:p-10 rounded-xl shadow-2xl max-w-md w-full transform transition-all hover:scale-105 duration-300">
+        <h1 class="text-4xl font-bold text-center text-[#F56401] font-logo mb-8">
+            espressionist Admin
+        </h1>
+
+        <div th:if="${param.error}" role="alert"
+             class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6 shadow-md">
+            <p class="font-bold">Login Error</p>
+            <p>Invalid username or password. Please try again.</p>
+        </div>
+
+        <div th:if="${param.logout}" role="alert"
+             class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-6 shadow-md">
+            <p class="font-bold">Logged Out</p>
+            <p>You have been successfully logged out.</p>
+        </div>
+
+        <form th:action="@{/admin/login}" method="post" class="space-y-6">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <input type="text" id="username" name="username" required autofocus
+                       class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#F56401] focus:border-transparent transition duration-150 ease-in-out"
+                       placeholder="Enter your username">
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" id="password" name="password" required
+                       class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#F56401] focus:border-transparent transition duration-150 ease-in-out"
+                       placeholder="Enter your password">
+            </div>
+            <div>
+                <button type="submit"
+                        class="w-full bg-[#F56401] text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-0.5">
+                    Login
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <p class="text-center text-sm text-gray-600 mt-8">
+        &copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> espressionist Admin. All rights reserved.
+    </p>
+
+</body>
+</html>

@@ -6,153 +6,229 @@
     <!-- Replace the content placeholder in main-layout.html -->
     <div th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <section class="py-8">
-                <h1 class="text-3xl font-semibold text-center mb-8">Checkout</h1>
+            <section class="py-10 bg-[#F5F5DC]"> <!-- Beige background -->
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">Checkout</h1>
 
-                <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Shipping Details Form -->
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h2 class="text-2xl font-semibold mb-6">Shipping Details</h2>
-                        <form id="checkout-form">
-                            <div class="mb-4">
-                                <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input type="text" id="customerName" name="customerName" class="w-full p-2 border border-gray-300 rounded-md" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                                <input type="email" id="customerEmail" name="customerEmail" class="w-full p-2 border border-gray-300 rounded-md" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="shippingAddress" class="block text-sm font-medium text-gray-700 mb-1">Shipping Address</label>
-                                <textarea id="shippingAddress" name="shippingAddress" rows="3" class="w-full p-2 border border-gray-300 rounded-md" required></textarea>
-                            </div>
-                            <!-- Placeholder for error messages -->
-                            <div id="checkout-error-message" class="text-red-500 text-sm mb-4"></div>
-                             <button type="submit" id="place-order-btn" class="w-full bg-green-500 text-white font-bold py-3 px-6 rounded hover:bg-green-600">
-                                Place Order
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Order Summary -->
-                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
-                        <h2 class="text-2xl font-semibold mb-6">Your Order</h2>
-                        <div id="order-summary-items">
-                            <!-- Items will be rendered here by JavaScript -->
-                            <p class="text-gray-500">Loading order summary...</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Shipping Details Form -->
+                        <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-xl">
+                            <h2 class="text-2xl font-semibold mb-6 text-gray-700">Shipping Details</h2>
+                            <form id="checkout-form" novalidate>
+                                <div class="mb-5">
+                                    <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <input type="text" id="customerName" name="customerName" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" required>
+                                    <span id="customerNameError" class="text-red-500 text-xs mt-1"></span>
+                                </div>
+                                <div class="mb-5">
+                                    <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                    <input type="email" id="customerEmail" name="customerEmail" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" required>
+                                    <span id="customerEmailError" class="text-red-500 text-xs mt-1"></span>
+                                </div>
+                                <div class="mb-6">
+                                    <label for="shippingAddress" class="block text-sm font-medium text-gray-700 mb-1">Shipping Address</label>
+                                    <textarea id="shippingAddress" name="shippingAddress" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" required></textarea>
+                                    <span id="shippingAddressError" class="text-red-500 text-xs mt-1"></span>
+                                </div>
+                                 <button type="submit" id="place-order-btn"
+                                         class="w-full bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out flex items-center justify-center">
+                                    <span id="place-order-btn-text">Place Order</span>
+                                    <svg id="loading-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
-                        <hr class="my-4">
-                        <p class="text-xl font-semibold text-right">Total: $<span id="order-summary-total">0.00</span></p>
+
+                        <!-- Order Summary -->
+                        <div class="lg:col-span-1 bg-white p-8 rounded-xl shadow-xl h-fit">
+                            <h2 class="text-2xl font-semibold mb-6 text-gray-700">Your Order</h2>
+                            <div id="order-summary-items" class="space-y-3 mb-6 max-h-60 overflow-y-auto">
+                                <!-- Items will be rendered here by JavaScript -->
+                                <p class="text-gray-500">Loading order summary...</p>
+                            </div>
+                            <hr class="my-5 border-gray-200">
+                            <div class="space-y-2 text-sm text-gray-600">
+                                <div class="flex justify-between">
+                                    <span>Subtotal:</span>
+                                    <span id="order-summary-subtotal">$0.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>VAT (12%):</span>
+                                    <span id="order-summary-vat">$0.00</span>
+                                </div>
+                            </div>
+                            <hr class="my-5 border-gray-200">
+                            <div class="flex justify-between text-xl font-semibold text-gray-800">
+                                <span>Total:</span>
+                                <span id="order-summary-final-total">$0.00</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- JavaScript for rendering order summary and handling checkout submission -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
                     const orderSummaryItemsEl = document.getElementById('order-summary-items');
-                    const orderSummaryTotalEl = document.getElementById('order-summary-total');
+                    const orderSummarySubtotalEl = document.getElementById('order-summary-subtotal');
+                    const orderSummaryVatEl = document.getElementById('order-summary-vat');
+                    const orderSummaryFinalTotalEl = document.getElementById('order-summary-final-total');
+                    
                     const checkoutForm = document.getElementById('checkout-form');
                     const placeOrderBtn = document.getElementById('place-order-btn');
-                    const checkoutErrorMessageEl = document.getElementById('checkout-error-message');
+                    const placeOrderBtnText = document.getElementById('place-order-btn-text');
+                    const loadingSpinner = document.getElementById('loading-spinner');
 
-                    function renderOrderSummary() {
-                        const cart = getCart(); // from cart.js
-                        orderSummaryItemsEl.innerHTML = ''; // Clear previous items
+                    const customerNameInput = document.getElementById('customerName');
+                    const customerEmailInput = document.getElementById('customerEmail');
+                    const shippingAddressInput = document.getElementById('shippingAddress');
 
+                    const customerNameError = document.getElementById('customerNameError');
+                    const customerEmailError = document.getElementById('customerEmailError');
+                    const shippingAddressError = document.getElementById('shippingAddressError');
+
+                    function renderCheckoutCartSummary() {
+                        const cart = getCart(); 
                         if (cart.length === 0) {
-                            orderSummaryItemsEl.innerHTML = '<p class="text-center text-gray-500">Your cart is empty. Please add items to your cart before checking out.</p>';
-                            orderSummaryTotalEl.textContent = '0.00';
-                            placeOrderBtn.disabled = true;
-                            placeOrderBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                            return;
+                            // Redirect to cart page if cart is empty, as checkout is not possible
+                            window.location.href = /*[[@{/cart}]]*/ '/cart';
+                            return; 
                         }
-                        placeOrderBtn.disabled = false;
-                        placeOrderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        
+                        orderSummaryItemsEl.innerHTML = ''; // Clear previous items
+                        let subtotal = 0;
 
                         cart.forEach(item => {
                             const itemDiv = document.createElement('div');
-                            itemDiv.className = 'flex justify-between items-center py-2 border-b';
+                            itemDiv.className = 'flex justify-between items-start py-2 text-sm';
                             itemDiv.innerHTML = `
-                                <div>
-                                    <p class="font-medium">${item.name} (x${item.quantity})</p>
-                                    <p class="text-sm text-gray-600">$${item.price.toFixed(2)} each</p>
+                                <div class="flex-grow">
+                                    <p class="font-medium text-gray-800">${item.name} <span class="text-gray-500 font-normal">x ${item.quantity}</span></p>
+                                    <p class="text-xs text-gray-500">$${item.price.toFixed(2)} each</p>
                                 </div>
-                                <p class="text-gray-800">$${(item.price * item.quantity).toFixed(2)}</p>
+                                <p class="text-gray-700 font-medium w-20 text-right">$${(item.price * item.quantity).toFixed(2)}</p>
                             `;
                             orderSummaryItemsEl.appendChild(itemDiv);
+                            subtotal += item.price * item.quantity;
                         });
-                        orderSummaryTotalEl.textContent = getCartTotal().toFixed(2);
+
+                        const vat = subtotal * 0.12;
+                        const finalTotal = subtotal + vat;
+
+                        orderSummarySubtotalEl.textContent = '$' + subtotal.toFixed(2);
+                        orderSummaryVatEl.textContent = '$' + vat.toFixed(2);
+                        orderSummaryFinalTotalEl.textContent = '$' + finalTotal.toFixed(2);
+                    }
+
+                    function validateForm() {
+                        let isValid = true;
+                        // Clear previous errors
+                        customerNameError.textContent = '';
+                        customerEmailError.textContent = '';
+                        shippingAddressError.textContent = '';
+                        customerNameInput.classList.remove('border-red-500');
+                        customerEmailInput.classList.remove('border-red-500');
+                        shippingAddressInput.classList.remove('border-red-500');
+
+
+                        if (customerNameInput.value.trim() === '') {
+                            customerNameError.textContent = 'Full Name is required.';
+                            customerNameInput.classList.add('border-red-500');
+                            isValid = false;
+                        }
+                        if (customerEmailInput.value.trim() === '') {
+                            customerEmailError.textContent = 'Email Address is required.';
+                            customerEmailInput.classList.add('border-red-500');
+                            isValid = false;
+                        } else {
+                            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (!emailPattern.test(customerEmailInput.value.trim())) {
+                                customerEmailError.textContent = 'Please enter a valid email address.';
+                                customerEmailInput.classList.add('border-red-500');
+                                isValid = false;
+                            }
+                        }
+                        if (shippingAddressInput.value.trim() === '') {
+                            shippingAddressError.textContent = 'Shipping Address is required.';
+                            shippingAddressInput.classList.add('border-red-500');
+                            isValid = false;
+                        }
+                        return isValid;
                     }
 
                     checkoutForm.addEventListener('submit', function(event) {
-                        event.preventDefault(); // Prevent default form submission
-                        checkoutErrorMessageEl.textContent = ''; // Clear previous errors
-                        placeOrderBtn.disabled = true;
-                        placeOrderBtn.textContent = 'Placing Order...';
-
-
-                        const cartItems = getCart().map(item => ({
-                            productId: item.id, // Ensure this matches OrderCreateDTO.OrderItemDTO
-                            quantity: item.quantity
-                        }));
-
-                        if (cartItems.length === 0) {
-                            checkoutErrorMessageEl.textContent = 'Your cart is empty. Cannot place order.';
-                            placeOrderBtn.disabled = false;
-                            placeOrderBtn.textContent = 'Place Order';
+                        event.preventDefault(); 
+                        if (!validateForm()) {
+                            showToast('Please correct the errors in the form.', 'error');
                             return;
                         }
 
-                        const formData = new FormData(checkoutForm);
+                        placeOrderBtn.disabled = true;
+                        placeOrderBtnText.textContent = 'Processing...';
+                        loadingSpinner.classList.remove('hidden');
+
+                        const cartItems = getCart().map(item => ({
+                            productId: item.id, 
+                            quantity: item.quantity
+                        }));
+
+                        if (cartItems.length === 0) { // Should be caught by renderCheckoutCartSummary redirect, but as a safeguard
+                            showToast('Your cart is empty. Cannot place order.', 'error');
+                            placeOrderBtn.disabled = false;
+                            placeOrderBtnText.textContent = 'Place Order';
+                            loadingSpinner.classList.add('hidden');
+                            window.location.href = /*[[@{/cart}]]*/ '/cart';
+                            return;
+                        }
+
                         const orderData = {
-                            customerName: formData.get('customerName'),
-                            customerEmail: formData.get('customerEmail'),
-                            shippingAddress: formData.get('shippingAddress'),
-                            items: cartItems // Renamed from cartItems to items to match DTO
+                            customerName: customerNameInput.value.trim(),
+                            customerEmail: customerEmailInput.value.trim(),
+                            shippingAddress: shippingAddressInput.value.trim(),
+                            items: cartItems
                         };
 
-                        fetch(/*[[@{/api/checkout}]]*/ '/api/checkout', {
+                        fetch(/*[[@{/api/checkout}]]*/ '/api/checkout', { // Endpoint from original file
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
+                                // CSRF token might be needed if Spring Security CSRF is enabled for POST
+                                // 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content') // Example
                             },
                             body: JSON.stringify(orderData)
                         })
                         .then(response => {
                             if (!response.ok) {
-                                // Try to parse error message from backend if available
                                 return response.json().then(errData => {
-                                   throw new Error(errData.message || `Order placement failed with status: ${response.status}`);
+                                   throw new Error(errData.message || `Order placement failed: ${response.statusText}`);
+                                }).catch(() => { // If response.json() fails or no message
+                                    throw new Error(`Order placement failed: ${response.statusText} (${response.status})`);
                                 });
                             }
                             return response.json();
                         })
                         .then(data => {
-                            // Assuming backend returns { orderCode: "...", ... }
                             if (data.orderCode) {
-                                clearCart(); // from cart.js
-                                // Redirect to order success page
+                                clearCart(); 
                                 window.location.href = /*[[@{/order-success}]]*/ '/order-success' + '?orderCode=' + data.orderCode;
                             } else {
-                                // Should not happen if response.ok was true and orderCode is expected
-                                throw new Error('Order code not received from server.');
+                                throw new Error('Order processed, but order code not received.');
                             }
                         })
                         .catch(error => {
                             console.error('Checkout error:', error);
-                            checkoutErrorMessageEl.textContent = 'Error: ' + error.message;
+                            showToast('Error: ' + error.message, 'error');
                             placeOrderBtn.disabled = false;
-                            placeOrderBtn.textContent = 'Place Order';
+                            placeOrderBtnText.textContent = 'Place Order';
+                            loadingSpinner.classList.add('hidden');
                         });
                     });
                     
-                    // Listen for cart changes to update summary (e.g., if user navigates back and forth)
-                    document.addEventListener('cartUpdated', renderOrderSummary);
-
-                    // Initial render of order summary
-                    renderOrderSummary();
+                    document.addEventListener('cartUpdated', renderCheckoutCartSummary);
+                    renderCheckoutCartSummary(); // Initial render
                 });
             /*]]>*/
             </script>

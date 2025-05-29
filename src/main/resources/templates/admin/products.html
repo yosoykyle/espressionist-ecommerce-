@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:with="pageTitle='Manage Products'"> <!-- Setting pageTitle for admin-layout -->
+<body>
+
+    <!-- Replace the content placeholder in admin-layout.html -->
+    <div th:replace="~{admin/layout/admin-layout :: content}">
+        <!-- This specific content will be inserted into admin-layout's content placeholder -->
+        <th:block>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800" th:text="${pageTitle}">Manage Products</h1>
+                <a th:href="@{/admin/products/new}"
+                   class="bg-[#F56401] text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">
+                    Add New Product
+                </a>
+            </div>
+
+            <div class="bg-white shadow-xl rounded-lg overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Image</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Category</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Price</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Stock</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:if="${products == null || products.isEmpty()}">
+                            <td colspan="6" class="px-6 py-10 whitespace-nowrap text-sm text-gray-500 text-center">
+                                <div class="flex flex-col items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                    </svg>
+                                    No products found.
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:each="product : ${products}" class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <img th:if="${product.id != null && product.image != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="h-16 w-16 object-cover rounded-md shadow"/>
+                                <div th:if="${product.id == null || product.image == null}" class="h-16 w-16 bg-gray-200 flex items-center justify-center rounded-md text-xs text-gray-400 shadow">No Image</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900" th:text="${product.name}">Product Name</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                      th:text="${product.category != null ? product.category.toString().replace('_', ' ') : 'N/A'}"
+                                      th:classappend="${product.category?.toString() == 'COFFEE_AND_TEA' ? 'bg-green-100 text-green-800' : 
+                                                       product.category?.toString() == 'ART_AND_MERCH' ? 'bg-blue-100 text-blue-800' : 
+                                                       product.category?.toString() == 'GIFT_SET' ? 'bg-purple-100 text-purple-800' : 
+                                                       product.category?.toString() == 'VOUCHER' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}">
+                                    Category
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-800" th:text="'$' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}">$0.00</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="text-sm" 
+                                     th:text="${product.quantity}"
+                                     th:classappend="${product.quantity < 10 ? 'text-red-600 font-semibold' : 'text-gray-800'}">0</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
+                                <a th:href="@{/admin/products/edit/{productId}(productId=${product.id})}" class="text-indigo-600 hover:text-indigo-800 font-medium">Edit</a>
+                                <button type="button" 
+                                        class="archive-product-btn text-red-600 hover:text-red-800 font-medium"
+                                        th:attr="data-archive-url=@{/admin/products/archive/{productId}(productId=${product.id})}">
+                                    Archive
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <script th:inline="javascript">
+            /*<![CDATA[*/
+                document.addEventListener('DOMContentLoaded', function () {
+                    const archiveButtons = document.querySelectorAll('.archive-product-btn');
+                    archiveButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            const archiveUrl = this.dataset.archiveUrl;
+                            showModal(
+                                'Confirm Archive', 
+                                'Are you sure you want to archive this product? This action might be irreversible depending on system setup.',
+                                function() { // onConfirm
+                                    // Show some loading state on the button or globally if possible
+                                    button.disabled = true;
+                                    button.textContent = 'Archiving...';
+
+                                    fetch(archiveUrl, {
+                                        method: 'POST',
+                                        // Spring Security CSRF token might be needed if enabled
+                                        // headers: {
+                                        //     'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content') // Example
+                                        // }
+                                    })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            return response.json() // Attempt to parse JSON
+                                                .then(errorData => {
+                                                    throw new Error(errorData.message || `Server error: ${response.status} ${response.statusText || 'Failed to archive'}`.trim());
+                                                })
+                                                .catch(() => { // If response wasn't JSON or other parsing error
+                                                    throw new Error(`Request failed: ${response.status} ${response.statusText || 'Failed to archive'}`.trim());
+                                                });
+                                        }
+                                        // For POST expecting no content or just status, check explicitly
+                                        if (response.status === 200 || response.status === 204 || (response.headers.get("content-length") === "0" && response.ok) ) {
+                                           return null; // Success, no content to parse
+                                        }
+                                        return response.json(); // Or response.text() if backend sends plain text on success
+                                    })
+                                    .then(data => { // data might be null here if 204
+                                        showToast('Product archived successfully!', 'success'); 
+                                        window.location.reload(); // Reload to reflect changes
+                                    })
+                                    .catch(error => {
+                                        console.error('Archive error:', error);
+                                        showToast(error.message || 'Error archiving product. Please try again.', 'error');
+                                        button.disabled = false; // Re-enable button on error
+                                        button.textContent = 'Archive';
+                                    });
+                                }
+                                // onCancel: button remains enabled by default if no action in onCancel
+                            );
+                        });
+                    });
+                });
+            /*]]>*/
+            </script>
+        </th:block>
+    </div>
+
+</body>
+</html>
