@@ -1,43 +1,60 @@
+<!-- /*
+    admin-layout.html
+    This is the main layout template for the admin panel pages of the Espressionist e-commerce site.
+    It defines the overall page structure including the admin-specific header, main content area, and footer.
+    Specific admin page content is injected into the 'content' placeholder.
+    It uses Spring Security extras for potential security-related information (though not actively used in current nav).
+*/ -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- /* Dynamically sets the page title for admin pages. Defaults to 'espressionist Admin'. */ -->
     <title th:text="${pageTitle != null ? pageTitle : 'espressionist Admin'}">espressionist Admin</title>
-    <!-- Tailwind CSS CDN -->
+    
+    <!-- Tailwind CSS CDN for styling -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- /* Custom font fallbacks, similar to the main user-facing layout. */ -->
     <style>
-        /* Fallback font if Seagull Serial is not available */
         .font-logo {
-            font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback */
+            font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback for 'Seagull Serial' */
         }
-        /* Fallback font if Pruno Deck Medium is not available */
         .font-tagline {
-            font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback */
+            font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback for 'Pruno Deck Medium' */
         }
     </style>
 </head>
+<!-- /* Body ensures footer sticks to the bottom, similar to the main layout. */ -->
 <body class="flex flex-col min-h-screen bg-white text-gray-800 font-sans">
 
-    <!-- Header -->
+    <!-- Admin Header Section -->
+    <!-- /* 
+        Thymeleaf fragment 'header' for the admin panel.
+        Contains the admin site logo/title and admin navigation links.
+        Styled with the primary brand color.
+    */ -->
     <header th:fragment="header" class="bg-[#F56401] text-white shadow-md">
         <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <!-- /* Admin panel title/logo linking to the admin dashboard. */ -->
             <a th:href="@{/admin/dashboard}" class="text-2xl font-logo font-bold">espressionist Admin</a>
+            <!-- /* Desktop navigation links for admin sections. Hidden on smaller screens. */ -->
             <div class="hidden md:flex space-x-4">
                 <a th:href="@{/admin/dashboard}" class="hover:text-gray-200">Dashboard</a>
                 <a th:href="@{/admin/products}" class="hover:text-gray-200">Products</a>
                 <a th:href="@{/admin/orders}" class="hover:text-gray-200">Orders</a>
                 <a th:href="@{/admin/users}" class="hover:text-gray-200">Admins</a>
-                <a th:href="@{/logout}" class="hover:text-gray-200">Logout</a>
+                <a th:href="@{/logout}" class="hover:text-gray-200">Logout</a> <!-- /* Standard Spring Security logout URL */ -->
             </div>
-            <!-- Mobile Menu Button -->
+            <!-- /* Mobile Menu Button for admin panel: Visible only on medium screens and below. */ -->
             <div class="md:hidden">
-                <button id="mobile-menu-button-admin" class="text-white focus:outline-none">
+                <button id="mobile-menu-button-admin" class="text-white focus:outline-none" aria-label="Open admin mobile menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
         </nav>
-        <!-- Mobile Menu -->
+        <!-- /* Mobile Menu for admin panel: Hidden by default, toggled by JavaScript. Uses unique IDs to avoid conflict with user-facing mobile menu. */ -->
         <div id="mobile-menu-admin" class="md:hidden hidden bg-[#F56401] px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <a th:href="@{/admin/dashboard}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white">Dashboard</a>
             <a th:href="@{/admin/products}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white">Products</a>
@@ -47,22 +64,36 @@
         </div>
     </header>
 
-    <!-- Main Content Placeholder -->
-    <main class="flex-grow container mx-auto p-4 bg-[#F5F5DC]"> <!-- Beige background for content area -->
+    <!-- Admin Main Content Placeholder -->
+    <!-- /* 
+        This 'main' element is where specific admin page content will be injected.
+        'bg-[#F5F5DC]' sets a beige background for the primary content area of admin pages.
+    */ -->
+    <main class="flex-grow container mx-auto p-4 bg-[#F5F5DC]"> 
+        <!-- /* 
+            Thymeleaf's th:replace attribute inserts the content from the specific admin page template.
+            This works similarly to the main user-facing layout.
+        */ -->
         <div th:replace="${content}">
-            <!-- Content will be replaced here -->
+            <!-- Fallback content if the replacement fails. -->
             <p>Loading admin content...</p>
         </div>
     </main>
 
-    <!-- Footer -->
+    <!-- Admin Footer Section -->
+    <!-- /* 
+        Thymeleaf fragment 'footer' for the admin panel.
+        Similar structure to the user-facing footer but with "espressionist Admin" branding and admin-specific quick links.
+    */ -->
     <footer th:fragment="footer" class="bg-gray-800 text-white py-8 px-4">
         <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+            <!-- Footer Column 1: Admin Brand and Copyright -->
             <div>
                 <h3 class="text-lg font-semibold text-[#F56401] mb-2 font-logo">espressionist Admin</h3>
                 <p class="font-tagline">coffee. canvas. culture.</p>
                 <p class="mt-4">&copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> espressionist Admin. All rights reserved.</p>
             </div>
+            <!-- Footer Column 2: Admin Quick Links -->
             <div>
                 <h3 class="text-lg font-semibold text-[#F56401] mb-2">Quick Links</h3>
                 <ul>
@@ -73,6 +104,7 @@
                     <li><a th:href="@{/logout}" class="hover:text-gray-300">Logout</a></li>
                 </ul>
             </div>
+            <!-- Footer Column 3: Contact and Social Media (same as main layout) -->
             <div>
                 <h3 class="text-lg font-semibold text-[#F56401] mb-2">Contact Us</h3>
                 <p>109 Rizal Blvd, Santa Rosa, Philippines</p>
@@ -88,21 +120,26 @@
         </div>
     </footer>
 
-    <!-- Include ui.js, ensure cart.js is not included if not needed for admin -->
+    <!-- /* Global JavaScript for admin UI functionalities. cart.js is typically not needed for admin pages. */ -->
     <script th:src="@{/js/ui.js}"></script>
 
-    <!-- Toast Container for ui.js -->
+    <!-- Toast Container for ui.js (same as in main-layout) -->
+    <!-- /* 
+        This div is the designated container where toast notifications (created by ui.js) will be appended
+        for admin pages.
+    */ -->
     <div id="toast-container" class="fixed top-5 right-5 space-y-3 z-[100] w-auto max-w-sm">
         <!-- Toasts will be appended here by ui.js -->
     </div>
 
+    <!-- /* Inline script for admin-specific UI interactions, like the admin mobile menu toggle. */ -->
     <script>
-        // Basic mobile menu toggle for admin
+        // Basic mobile menu toggle for admin panel (uses different IDs to avoid conflicts)
         const menuButtonAdmin = document.getElementById('mobile-menu-button-admin');
         const mobileMenuAdmin = document.getElementById('mobile-menu-admin');
         if (menuButtonAdmin && mobileMenuAdmin) {
             menuButtonAdmin.addEventListener('click', function() {
-                mobileMenuAdmin.classList.toggle('hidden');
+                mobileMenuAdmin.classList.toggle('hidden'); // Toggles visibility of the admin mobile menu
             });
         }
     </script>

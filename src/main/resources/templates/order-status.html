@@ -1,15 +1,23 @@
+<!-- /*
+    order-status.html
+    Allows users to check the status of their order by entering an order code.
+    If an order code is provided in the URL query parameter, it fetches and displays the status automatically.
+    Uses main-layout.html as its base.
+*/ -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Track Your Order'">
+      th:with="pageTitle='Track Your Order'"> <!-- /* Sets page title for the layout. */ -->
 <body>
 
+    <!-- /* Injects content into main-layout.html. */ -->
     <div th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <section class="py-12 bg-[#F5F5DC]">
+            <section class="py-12 bg-[#F5F5DC]"> <!-- /* Main section with beige background. */ -->
                 <div class="container mx-auto px-4">
                     <h1 class="text-4xl font-bold text-center mb-10 text-gray-800">Track Your Order</h1>
 
                     <!-- Order Code Input Form -->
+                    <!-- /* Form for users to manually enter their order code. */ -->
                     <form id="orderStatusForm" class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-xl mb-12">
                         <label for="orderCodeInput" class="block text-sm font-medium text-gray-700 mb-2">Enter Your Order Code:</label>
                         <div class="flex space-x-3">
@@ -21,10 +29,10 @@
                                 Track
                             </button>
                         </div>
-                        <p id="formErrorMessage" class="text-red-500 text-xs mt-2"></p>
+                        <p id="formErrorMessage" class="text-red-500 text-xs mt-2"></p> <!-- For empty input error -->
                     </form>
 
-                    <!-- Loading Indicator -->
+                    <!-- Loading Indicator: Shown while fetching order status. -->
                     <div id="loadingIndicatorOrderStatus" class="my-10 text-center" style="display: none;">
                         <svg class="animate-spin h-8 w-8 text-[#F56401] mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -33,15 +41,16 @@
                         <p class="mt-2 text-lg text-gray-600">Fetching order status...</p>
                     </div>
                     
-                    <!-- API Error Message Area -->
+                    <!-- API Error Message Area: Shown if API call fails. -->
                     <div id="apiErrorMessage" class="my-10 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg max-w-lg mx-auto text-center" style="display: none;">
                         <p id="apiErrorMessageText">Could not retrieve order details.</p>
                     </div>
 
-                    <!-- Order Details Display Area -->
+                    <!-- Order Details Display Area: Shown after successful data fetch. -->
                     <div id="orderDetailsDisplayArea" class="bg-white p-8 rounded-xl shadow-xl max-w-2xl mx-auto" style="display: none;">
                         <h2 class="text-2xl font-semibold mb-6 text-gray-700 text-center">Order Status</h2>
                         
+                        <!-- Order Code and Date -->
                         <div class="mb-4">
                             <strong class="font-medium text-gray-600">Order Code:</strong>
                             <span id="displayOrderCode" class="text-gray-800 font-mono ml-2">N/A</span>
@@ -50,6 +59,7 @@
                             <strong class="font-medium text-gray-600">Order Date:</strong>
                             <span id="displayOrderDate" class="text-gray-800 ml-2">N/A</span>
                         </div>
+                        <!-- Order Status Badge: Dynamically styled based on status value. -->
                         <div class="mb-6 p-3 rounded-lg text-center" id="statusBadge">
                             <strong class="font-medium text-gray-600">Status:</strong>
                             <span id="displayOrderStatus" class="text-lg font-semibold ml-2">N/A</span>
@@ -57,6 +67,7 @@
 
                         <hr class="my-6">
 
+                        <!-- Shipping Information Section -->
                         <h3 class="text-xl font-semibold mb-3 text-gray-700">Shipping Information</h3>
                         <div class="text-sm space-y-1 mb-6">
                             <p><strong class="font-medium text-gray-600">Name:</strong> <span id="displayCustomerName" class="text-gray-800">N/A</span></p>
@@ -66,12 +77,14 @@
 
                         <hr class="my-6">
 
+                        <!-- Items Ordered Section -->
                         <h3 class="text-xl font-semibold mb-3 text-gray-700">Items Ordered</h3>
                         <div id="displayOrderItems" class="space-y-2 text-sm max-h-60 overflow-y-auto border rounded-md p-3 bg-gray-50">
-                            <!-- Items will be rendered here -->
-                            <p class="text-gray-500">No items found.</p>
+                            <!-- Items will be rendered here by JavaScript -->
+                            <p class="text-gray-500">No items found.</p> <!-- Fallback if items array is empty -->
                         </div>
                         
+                        <!-- Order Total (conditionally displayed if available) -->
                         <div id="displayOrderTotalContainer" class="text-right mt-4" style="display: none;">
                              <strong class="font-medium text-gray-600">Total Paid:</strong>
                              <span id="displayOrderTotal" class="text-lg text-gray-800 font-semibold ml-2">N/A</span>
@@ -81,22 +94,24 @@
                 </div>
             </section>
 
+            <!-- /* Inline JavaScript for order status page functionalities. */ -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
+                    // DOM element references for form and messages
                     const orderStatusForm = document.getElementById('orderStatusForm');
                     const orderCodeInput = document.getElementById('orderCodeInput');
-                    const formErrorMessage = document.getElementById('formErrorMessage');
+                    const formErrorMessage = document.getElementById('formErrorMessage'); // For form validation errors
                     
                     const loadingIndicator = document.getElementById('loadingIndicatorOrderStatus');
-                    const apiErrorMessage = document.getElementById('apiErrorMessage');
+                    const apiErrorMessage = document.getElementById('apiErrorMessage'); // For API errors
                     const apiErrorMessageText = document.getElementById('apiErrorMessageText');
                     const orderDetailsDisplayArea = document.getElementById('orderDetailsDisplayArea');
 
-                    // Display elements
+                    // DOM element references for displaying order details
                     const displayOrderCode = document.getElementById('displayOrderCode');
                     const displayOrderDate = document.getElementById('displayOrderDate');
-                    const statusBadge = document.getElementById('statusBadge');
+                    const statusBadge = document.getElementById('statusBadge'); // Container for status text and badge styling
                     const displayOrderStatus = document.getElementById('displayOrderStatus');
                     const displayCustomerName = document.getElementById('displayCustomerName');
                     const displayCustomerEmail = document.getElementById('displayCustomerEmail');
@@ -105,32 +120,48 @@
                     const displayOrderTotalContainer = document.getElementById('displayOrderTotalContainer');
                     const displayOrderTotal = document.getElementById('displayOrderTotal');
 
+                    /**
+                     * Returns Tailwind CSS classes for styling the status badge based on the status string.
+                     * @param {string} status - The order status string (e.g., 'pending', 'delivered').
+                     * @returns {string} Tailwind CSS class string for background and text color.
+                     */
                     function getStatusColorClasses(status) {
-                        status = status ? status.toLowerCase() : '';
+                        status = status ? status.toLowerCase() : ''; // Normalize to lowercase
                         switch (status) {
                             case 'pending': return 'bg-yellow-100 text-yellow-700';
                             case 'processing': return 'bg-blue-100 text-blue-700';
                             case 'shipped': return 'bg-indigo-100 text-indigo-700';
                             case 'delivered': return 'bg-green-100 text-green-700';
                             case 'cancelled': return 'bg-red-100 text-red-700';
-                            default: return 'bg-gray-100 text-gray-700';
+                            default: return 'bg-gray-100 text-gray-700'; // Fallback for unknown statuses
                         }
                     }
 
+                    /**
+                     * Renders the fetched order status details into the DOM.
+                     * @param {Object} order - The order data object from the API.
+                     * Expected structure: { orderCode, orderDate, status, customerName, customerEmail, 
+                     *                       shippingAddress, items: [{ product:{name}, name, quantity, price }], totalWithVAT (optional) }
+                     */
                     function renderOrderStatusDetails(order) {
+                        // Populate basic order info
                         displayOrderCode.textContent = order.orderCode || 'N/A';
-                        displayOrderDate.textContent = order.orderDate ? new Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
+                        displayOrderDate.textContent = order.orderDate 
+                            ? new Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+                            : 'N/A';
                         
+                        // Display and style the order status
                         const status = order.status || 'N/A';
-                        displayOrderStatus.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-                        statusBadge.className = 'mb-6 p-3 rounded-lg text-center ' + getStatusColorClasses(status);
+                        displayOrderStatus.textContent = status.charAt(0).toUpperCase() + status.slice(1); // Capitalize first letter
+                        statusBadge.className = 'mb-6 p-3 rounded-lg text-center ' + getStatusColorClasses(status); // Apply dynamic styling
 
-                        // Assuming shippingInfo is an object or directly accessible fields
-                        const shippingInfo = order.shippingInfo || order; // Adapt if structure is different
+                        // Populate shipping information (adapts if structure varies slightly, e.g. order.name vs order.customerName)
+                        const shippingInfo = order.shippingInfo || order; 
                         displayCustomerName.textContent = shippingInfo.customerName || shippingInfo.name || 'N/A';
                         displayCustomerEmail.textContent = shippingInfo.customerEmail || shippingInfo.email || 'N/A';
                         displayShippingAddress.textContent = shippingInfo.shippingAddress || shippingInfo.address || 'N/A';
 
+                        // Populate ordered items list
                         displayOrderItems.innerHTML = ''; // Clear previous items
                         if (order.items && order.items.length > 0) {
                             order.items.forEach(item => {
@@ -149,6 +180,7 @@
                             displayOrderItems.innerHTML = '<p class="text-gray-500">No items found for this order.</p>';
                         }
                         
+                        // Display total amount if available
                         if (order.totalWithVAT != null) {
                             displayOrderTotal.textContent = '$' + order.totalWithVAT.toFixed(2);
                             displayOrderTotalContainer.style.display = 'block';
@@ -156,59 +188,72 @@
                             displayOrderTotalContainer.style.display = 'none';
                         }
 
+                        // Show the populated details area
                         orderDetailsDisplayArea.style.display = 'block';
                     }
 
+                    /**
+                     * Fetches order status details from the API for a given order code.
+                     * Handles UI updates for loading, success, and error states.
+                     * @param {string} code - The order code to fetch status for.
+                     */
                     function fetchOrderStatus(code) {
+                        // Validate input
                         if (!code) {
                             formErrorMessage.textContent = 'Please enter an order code.';
                             orderCodeInput.focus();
                             return;
                         }
+                        // Reset UI states
                         formErrorMessage.textContent = '';
                         loadingIndicator.style.display = 'block';
                         apiErrorMessage.style.display = 'none';
                         orderDetailsDisplayArea.style.display = 'none';
 
-                        // Update URL without reloading
+                        // Update browser URL with the order code for shareability/bookmarking, without page reload.
                         const url = new URL(window.location);
                         url.searchParams.set('orderCode', code);
-                        history.pushState({}, '', url);
+                        history.pushState({}, '', url); // Modifies browser history
 
+                        // API call
                         fetch(`/api/order-status/${code}`)
                             .then(response => {
+                                // Handle non-OK responses (errors) using the standardized pattern
                                 if (!response.ok) {
                                     return response.json().then(errData => {
                                         throw new Error(errData.message || `Order not found or error fetching status (${response.status})`);
-                                    }).catch(() => { // If .json() fails or no message
+                                    }).catch(() => { // Fallback if response.json() fails or no specific message
                                         throw new Error(`Order not found or error fetching status (${response.status} ${response.statusText})`);
                                     });
                                 }
-                                return response.json();
+                                return response.json(); // Success: parse JSON response
                             })
                             .then(data => {
-                                loadingIndicator.style.display = 'none';
-                                // Assuming backend sends 'orderItems' if 'items' is not present (like in order-success)
+                                loadingIndicator.style.display = 'none'; // Hide loading indicator
+                                // Data mapping: Handle if backend sends 'orderItems' instead of 'items'
                                 if (data.orderItems && !data.items) {
                                     data.items = data.orderItems;
                                 }
-                                renderOrderStatusDetails(data);
+                                renderOrderStatusDetails(data); // Render the fetched data
                             })
                             .catch(error => {
+                                // Handle any errors from fetch or thrown exceptions
                                 console.error('Error fetching order status:', error);
-                                loadingIndicator.style.display = 'none';
-                                apiErrorMessageText.textContent = error.message || 'An unexpected error occurred.';
-                                apiErrorMessage.style.display = 'block';
+                                loadingIndicator.style.display = 'none'; // Hide loading indicator
+                                apiErrorMessageText.textContent = error.message || 'An unexpected error occurred.'; // Display error message
+                                apiErrorMessage.style.display = 'block'; // Show API error area
                             });
                     }
 
+                    // Event listener for the order status form submission.
                     orderStatusForm.addEventListener('submit', function(event) {
-                        event.preventDefault();
+                        event.preventDefault(); // Prevent default form submission
                         const code = orderCodeInput.value.trim();
                         fetchOrderStatus(code);
                     });
 
-                    // Check URL for orderCode on page load
+                    // On page load, check if 'orderCode' is present in the URL query parameters.
+                    // If so, populate the input field and automatically fetch the status.
                     const params = new URLSearchParams(window.location.search);
                     const urlOrderCode = params.get('orderCode');
                     if (urlOrderCode) {
