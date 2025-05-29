@@ -1,14 +1,21 @@
+<!-- /*
+    order-success.html
+    Displays a confirmation message after a customer successfully places an order.
+    It fetches and shows order details based on an 'orderCode' from the URL query parameter.
+    Uses main-layout.html as its base.
+*/ -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Order Confirmation'">
+      th:with="pageTitle='Order Confirmation'"> <!-- /* Sets page title for the layout. */ -->
 <body>
 
+    <!-- /* Injects content into main-layout.html. */ -->
     <div th:replace="~{layout/main-layout :: content}">
         <th:block>
             <section class="py-12 bg-[#F5F5DC]">
                 <div class="container mx-auto px-4 text-center">
 
-                    <!-- Loading Indicator -->
+                    <!-- Loading Indicator: Shown while fetching order details. -->
                     <div id="loadingIndicator" class="my-10" style="display: none;">
                         <svg class="animate-spin h-10 w-10 text-[#F56401] mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -17,20 +24,22 @@
                         <p class="mt-3 text-lg text-gray-600">Loading order details...</p>
                     </div>
 
-                    <!-- Error Message Area -->
+                    <!-- Error Message Area: Shown if fetching fails or orderCode is missing. -->
                     <div id="errorMessage" class="my-10 p-6 bg-red-100 border border-red-400 text-red-700 rounded-lg max-w-lg mx-auto" style="display: none;">
                         <p class="font-semibold">Oops! Something went wrong.</p>
                         <p id="errorMessageText">Could not retrieve order details.</p>
                         <a th:href="@{/}" class="mt-4 inline-block bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Go to Homepage</a>
                     </div>
                     
-                    <!-- Order Details Container -->
+                    <!-- Order Details Container: Main content area, shown after successful data fetch. -->
                     <div id="orderDetailsContainer" class="bg-white p-8 rounded-xl shadow-xl max-w-3xl mx-auto" style="display: none;">
+                        <!-- Success Icon and Message -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 text-green-500 mx-auto mb-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <h1 class="text-3xl sm:text-4xl font-bold text-green-600 mb-4">Thank You! Your Order is Confirmed!</h1>
                         
+                        <!-- Order Code Display -->
                         <p class="text-gray-700 mb-2 text-lg">
                             Your Order Code is: <strong id="orderCodeDisplay" class="text-xl text-[#F56401] font-logo">ESP-XXXXXXX</strong>
                         </p>
@@ -38,9 +47,11 @@
                             Please save this code to track your order.
                         </p>
 
+                        <!-- Order Summary Section -->
                         <div class="text-left border-t border-gray-200 pt-8">
                             <h2 class="text-2xl font-semibold mb-5 text-gray-700">Order Summary</h2>
                             
+                            <!-- Customer and Shipping Information -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6 text-sm">
                                 <div>
                                     <strong class="font-medium text-gray-600 block mb-1">Customer:</strong>
@@ -54,23 +65,27 @@
                                     <strong class="font-medium text-gray-600 block mb-1">Shipping Address:</strong>
                                     <span id="shippingAddressDisplay" class="text-gray-800">N/A</span>
                                 </div>
+                                <!-- Order Date (conditionally displayed by JS if available) -->
                                 <div class="md:col-span-2" id="orderDateContainer" style="display:none;">
                                     <strong class="font-medium text-gray-600 block mb-1">Order Date:</strong>
                                     <span id="orderDateDisplay" class="text-gray-800">N/A</span>
                                 </div>
                             </div>
 
+                            <!-- Items Ordered List -->
                             <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-700">Items Ordered:</h3>
                             <div id="orderItemsContainer" class="space-y-3 mb-6 border rounded-lg p-4 bg-gray-50 max-h-72 overflow-y-auto">
-                                <!-- Items will be rendered here -->
-                                <p class="text-gray-500">No items found for this order.</p>
+                                <!-- Items will be rendered here by JavaScript -->
+                                <p class="text-gray-500">No items found for this order.</p> <!-- Fallback if items array is empty -->
                             </div>
 
+                            <!-- Total Amount Paid -->
                             <div class="text-xl font-bold text-gray-800 text-right mt-6 mb-8">
                                 Total (incl. VAT): <span id="orderTotalDisplay" class="text-[#F56401]">$0.00</span>
                             </div>
                         </div>
 
+                        <!-- Button to Track Order page -->
                         <a id="trackOrderBtn" href="#"
                            class="inline-block w-full sm:w-auto bg-[#F56401] text-white font-semibold py-3 px-10 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out text-lg">
                             Track Your Order
@@ -79,9 +94,11 @@
                 </div>
             </section>
 
+            <!-- /* Inline JavaScript for fetching and displaying order details. */ -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
+                    // DOM element references
                     const loadingIndicatorEl = document.getElementById('loadingIndicator');
                     const errorMessageEl = document.getElementById('errorMessage');
                     const errorMessageTextEl = document.getElementById('errorMessageText');
@@ -97,30 +114,42 @@
                     const orderTotalDisplayEl = document.getElementById('orderTotalDisplay');
                     const trackOrderBtnEl = document.getElementById('trackOrderBtn');
 
+                    /**
+                     * Displays an error message on the page.
+                     * @param {string} message - The error message to display.
+                     */
                     function displayError(message) {
-                        loadingIndicatorEl.style.display = 'none';
-                        orderDetailsContainerEl.style.display = 'none';
-                        errorMessageTextEl.textContent = message || 'An unexpected error occurred.';
-                        errorMessageEl.style.display = 'block';
+                        loadingIndicatorEl.style.display = 'none'; // Hide loading indicator
+                        orderDetailsContainerEl.style.display = 'none'; // Hide order details
+                        errorMessageTextEl.textContent = message || 'An unexpected error occurred.'; // Set error text
+                        errorMessageEl.style.display = 'block'; // Show error message area
                     }
 
+                    /**
+                     * Renders the fetched order details into the respective DOM elements.
+                     * @param {Object} order - The order data object fetched from the API.
+                     * Expected order object structure: { customerName, customerEmail, shippingAddress, orderDate (optional), 
+                     *                                   items: [{ product: { name }, name (fallback), quantity, price }], totalWithVAT }
+                     */
                     function renderOrderDetails(order) {
+                        // Populate customer and shipping details
                         customerNameDisplayEl.textContent = order.customerName || 'N/A';
-                        customerEmailDisplayEl.textContent = order.customerEmail || 'N/A'; // Assuming 'customerEmail' from backend
+                        customerEmailDisplayEl.textContent = order.customerEmail || 'N/A';
                         shippingAddressDisplayEl.textContent = order.shippingAddress || 'N/A';
                         
+                        // Format and display order date if available
                         if(order.orderDate) {
                             orderDateDisplayEl.textContent = new Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                             orderDateContainerEl.style.display = 'block';
                         }
 
-                        orderItemsContainerEl.innerHTML = ''; // Clear
+                        // Populate items ordered
+                        orderItemsContainerEl.innerHTML = ''; // Clear previous items/fallback message
                         if (order.items && order.items.length > 0) {
                             order.items.forEach(item => {
                                 const itemEl = document.createElement('div');
                                 itemEl.className = 'py-2 px-1 flex justify-between items-center text-sm border-b border-gray-100 last:border-b-0';
-                                // Assuming item structure: { product: { name: "..." }, quantity: X, price: Y } or { name: "...", quantity: X, price: Y }
-                                // Adjust based on actual backend response for items
+                                // Determine item name: prefer item.product.name, fallback to item.name, then 'Unknown Product'.
                                 const itemName = item.product ? item.product.name : (item.name || 'Unknown Product');
                                 const itemPrice = item.price || 0; // Price per unit at the time of order
                                 const itemQuantity = item.quantity || 0;
@@ -137,50 +166,58 @@
                         } else {
                             orderItemsContainerEl.innerHTML = '<p class="text-gray-500">No items found for this order.</p>';
                         }
+                        // Display total amount paid
                         orderTotalDisplayEl.textContent = '$' + (order.totalWithVAT || 0).toFixed(2);
                         
+                        // Hide loading/error messages and show the populated order details container.
                         loadingIndicatorEl.style.display = 'none';
                         errorMessageEl.style.display = 'none';
                         orderDetailsContainerEl.style.display = 'block';
                     }
 
+                    // Get 'orderCode' from URL query parameters.
                     const params = new URLSearchParams(window.location.search);
                     const orderCode = params.get('orderCode');
 
+                    // If no orderCode is found in the URL, display an error and stop.
                     if (!orderCode) {
                         displayError('Order code missing from URL. Please check the link or contact support.');
-                        trackOrderBtnEl.classList.add('hidden'); // Hide track order button
+                        trackOrderBtnEl.classList.add('hidden'); // Hide the "Track Order" button
                         return;
                     }
 
-                    orderCodeDisplayEl.textContent = orderCode; // Show order code immediately
+                    // Display the order code immediately and set up the "Track Order" button link.
+                    orderCodeDisplayEl.textContent = orderCode; 
                     trackOrderBtnEl.href = /*[[@{/order-status}]]*/ '/order-status' + '?orderCode=' + orderCode;
-                    loadingIndicatorEl.style.display = 'block';
+                    loadingIndicatorEl.style.display = 'block'; // Show loading indicator
 
+                    // Fetch order details from the API using the orderCode.
                     fetch(/*[[@{/api/orders/}]]*/ '/api/orders/' + orderCode)
                         .then(response => {
+                            // Handle non-OK responses (errors)
                             if (!response.ok) {
-                                if (response.status === 404) {
+                                if (response.status === 404) { // Specific error for Order Not Found
                                     throw new Error('Order not found. Please verify your order code.');
                                 }
-                                // Try to parse error from backend for other statuses
+                                // Attempt to parse JSON error message from backend for other errors
                                 return response.json().then(errData => {
                                     throw new Error(errData.message || `Failed to fetch order details. Status: ${response.status}`);
-                                }).catch(() => { // If response.json() fails or no specific message
+                                }).catch(() => { // Fallback if JSON parsing fails or no specific message
                                      throw new Error(`Failed to fetch order details. Status: ${response.status} ${response.statusText}`);
                                 });
                             }
-                            return response.json();
+                            return response.json(); // Success: parse JSON response
                         })
                         .then(data => {
-                            // Adjusting for expected structure from previous Thymeleaf: order.orderItems
-                            // If backend sends 'orderItems' instead of 'items', map it here
+                            // Data mapping: If backend sends 'orderItems' instead of 'items' (as used in renderOrderDetails),
+                            // map it for consistency. This handles potential variations in API response structure.
                             if (data.orderItems && !data.items) {
                                 data.items = data.orderItems;
                             }
-                            renderOrderDetails(data);
+                            renderOrderDetails(data); // Render the fetched data
                         })
                         .catch(error => {
+                            // Catch any errors from fetch or thrown exceptions and display them.
                             console.error('Error fetching order details:', error);
                             displayError(error.message);
                         });
