@@ -1,20 +1,28 @@
+<!-- /*
+    admin/products.html
+    Admin page for managing products (listing, adding, editing, archiving).
+    Uses admin-layout.html as its base.
+    Data for 'products' is provided by the backend model.
+*/ -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Manage Products'"> <!-- Setting pageTitle for admin-layout -->
+      th:with="pageTitle='Manage Products'"> <!-- /* Sets the page title for the admin layout. */ -->
 <body>
 
-    <!-- Replace the content placeholder in admin-layout.html -->
+    <!-- /* Injects content into the 'content' placeholder of admin-layout.html. */ -->
     <div th:replace="~{admin/layout/admin-layout :: content}">
-        <!-- This specific content will be inserted into admin-layout's content placeholder -->
         <th:block>
+            <!-- /* Page header with title and "Add New Product" button. */ -->
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-3xl font-bold text-gray-800" th:text="${pageTitle}">Manage Products</h1>
+                <!-- /* Button to navigate to the new product form page. */ -->
                 <a th:href="@{/admin/products/new}"
                    class="bg-[#F56401] text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">
                     Add New Product
                 </a>
             </div>
 
+            <!-- /* Container for the products table, styled as a white card with shadow. 'overflow-x-auto' for responsiveness. */ -->
             <div class="bg-white shadow-xl rounded-lg overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-100">
@@ -28,9 +36,11 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
+                        <!-- /* Conditional row displayed if the 'products' list is null or empty. */ -->
                         <tr th:if="${products == null || products.isEmpty()}">
                             <td colspan="6" class="px-6 py-10 whitespace-nowrap text-sm text-gray-500 text-center">
                                 <div class="flex flex-col items-center">
+                                    <!-- /* SVG icon indicating emptiness. */ -->
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
                                     </svg>
@@ -38,15 +48,21 @@
                                 </div>
                             </td>
                         </tr>
+                        <!-- /* Thymeleaf loop to iterate over each 'product' in the list. */ -->
                         <tr th:each="product : ${products}" class="hover:bg-gray-50 transition-colors">
+                            <!-- Product Image Cell -->
                             <td class="px-6 py-4 whitespace-nowrap">
+                                <!-- /* Dynamically loads product image if available, otherwise shows a placeholder. */ -->
                                 <img th:if="${product.id != null && product.image != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="h-16 w-16 object-cover rounded-md shadow"/>
                                 <div th:if="${product.id == null || product.image == null}" class="h-16 w-16 bg-gray-200 flex items-center justify-center rounded-md text-xs text-gray-400 shadow">No Image</div>
                             </td>
+                            <!-- Product Name Cell -->
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900" th:text="${product.name}">Product Name</div>
                             </td>
+                            <!-- Product Category Cell -->
                             <td class="px-6 py-4 whitespace-nowrap">
+                                <!-- /* Displays category as a styled badge. Colors vary by category. */ -->
                                 <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
                                       th:text="${product.category != null ? product.category.toString().replace('_', ' ') : 'N/A'}"
                                       th:classappend="${product.category?.toString() == 'COFFEE_AND_TEA' ? 'bg-green-100 text-green-800' : 
@@ -56,16 +72,25 @@
                                     Category
                                 </span>
                             </td>
+                            <!-- Product Price Cell -->
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-800" th:text="'$' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}">$0.00</div>
                             </td>
+                            <!-- Product Stock Cell -->
                             <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <!-- /* Stock quantity, styled red and bold if less than 10. */ -->
                                 <div class="text-sm" 
                                      th:text="${product.quantity}"
                                      th:classappend="${product.quantity < 10 ? 'text-red-600 font-semibold' : 'text-gray-800'}">0</div>
                             </td>
+                            <!-- Actions Cell (Edit, Archive) -->
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
+                                <!-- /* Link to edit product page. */ -->
                                 <a th:href="@{/admin/products/edit/{productId}(productId=${product.id})}" class="text-indigo-600 hover:text-indigo-800 font-medium">Edit</a>
+                                <!-- /* 
+                                    Button to archive the product. Uses JavaScript for confirmation and submission.
+                                    'data-archive-url' holds the endpoint for the archive action.
+                                */ -->
                                 <button type="button" 
                                         class="archive-product-btn text-red-600 hover:text-red-800 font-medium"
                                         th:attr="data-archive-url=@{/admin/products/archive/{productId}(productId=${product.id})}">
@@ -77,56 +102,65 @@
                 </table>
             </div>
 
+            <!-- /* Inline JavaScript for handling the archive product functionality. */ -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function () {
+                    // Select all buttons with the class 'archive-product-btn'.
                     const archiveButtons = document.querySelectorAll('.archive-product-btn');
+                    
                     archiveButtons.forEach(button => {
                         button.addEventListener('click', function () {
-                            const archiveUrl = this.dataset.archiveUrl;
+                            const archiveUrl = this.dataset.archiveUrl; // Get the archive URL from data attribute.
+                            
+                            // Use the custom modal (from ui.js) to confirm the archive action.
                             showModal(
                                 'Confirm Archive', 
                                 'Are you sure you want to archive this product? This action might be irreversible depending on system setup.',
-                                function() { // onConfirm
-                                    // Show some loading state on the button or globally if possible
+                                function() { // onConfirm callback: This function is executed if the user confirms.
+                                    // Update button state to indicate processing.
                                     button.disabled = true;
                                     button.textContent = 'Archiving...';
 
+                                    // Perform the archive action using a POST request via Fetch API.
                                     fetch(archiveUrl, {
                                         method: 'POST',
-                                        // Spring Security CSRF token might be needed if enabled
-                                        // headers: {
-                                        //     'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content') // Example
+                                        // headers: { // Uncomment and configure if CSRF protection is enabled for POST requests.
+                                        //     'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content') 
                                         // }
                                     })
                                     .then(response => {
+                                        // Handle non-OK responses (errors) using the standardized error pattern.
                                         if (!response.ok) {
-                                            return response.json() // Attempt to parse JSON
+                                            return response.json() 
                                                 .then(errorData => {
                                                     throw new Error(errorData.message || `Server error: ${response.status} ${response.statusText || 'Failed to archive'}`.trim());
                                                 })
-                                                .catch(() => { // If response wasn't JSON or other parsing error
+                                                .catch(() => { 
                                                     throw new Error(`Request failed: ${response.status} ${response.statusText || 'Failed to archive'}`.trim());
                                                 });
                                         }
-                                        // For POST expecting no content or just status, check explicitly
+                                        // Handle successful responses that might not have a JSON body (e.g., 204 No Content).
                                         if (response.status === 200 || response.status === 204 || (response.headers.get("content-length") === "0" && response.ok) ) {
-                                           return null; // Success, no content to parse
+                                           return null; // Success, no content to parse.
                                         }
-                                        return response.json(); // Or response.text() if backend sends plain text on success
+                                        return response.json(); // Or response.text() if backend sends plain text on success.
                                     })
-                                    .then(data => { // data might be null here if 204
-                                        showToast('Product archived successfully!', 'success'); 
-                                        window.location.reload(); // Reload to reflect changes
+                                    .then(data => { // data might be null here if response was 204.
+                                        showToast('Product archived successfully!', 'success'); // Show success toast.
+                                        window.location.reload(); // Reload the page to reflect changes in the product list.
                                     })
                                     .catch(error => {
+                                        // Handle any errors from fetch or thrown exceptions.
                                         console.error('Archive error:', error);
                                         showToast(error.message || 'Error archiving product. Please try again.', 'error');
-                                        button.disabled = false; // Re-enable button on error
+                                        // Reset button state on error.
+                                        button.disabled = false; 
                                         button.textContent = 'Archive';
                                     });
                                 }
-                                // onCancel: button remains enabled by default if no action in onCancel
+                                // onCancel callback (optional): Executed if the user cancels the modal.
+                                // Button remains enabled by default if no specific action is taken here.
                             );
                         });
                     });

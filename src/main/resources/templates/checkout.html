@@ -1,38 +1,52 @@
+<!-- /*
+    checkout.html
+    Handles the checkout process for the customer.
+    It includes a form for shipping details and a summary of the order.
+    Client-side JavaScript handles form validation, cart summary rendering (including VAT),
+    and submitting the order via a fetch request.
+*/ -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Checkout'"> <!-- Setting pageTitle for main-layout -->
+      th:with="pageTitle='Checkout'"> <!-- /* Sets page title for the layout. */ -->
 <body>
 
-    <!-- Replace the content placeholder in main-layout.html -->
+    <!-- /* Injects content into main-layout.html. */ -->
     <div th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <section class="py-10 bg-[#F5F5DC]"> <!-- Beige background -->
+            <section class="py-10 bg-[#F5F5DC]"> <!-- /* Main section with beige background. */ -->
                 <div class="container mx-auto px-4">
                     <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">Checkout</h1>
 
+                    <!-- /* Responsive grid for form and order summary. Stacks on smaller screens. */ -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <!-- Shipping Details Form -->
                         <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-xl">
                             <h2 class="text-2xl font-semibold mb-6 text-gray-700">Shipping Details</h2>
+                            <!-- /* novalidate attribute disables default browser validation, relying on custom JS validation. */ -->
                             <form id="checkout-form" novalidate>
+                                <!-- Full Name Field -->
                                 <div class="mb-5">
                                     <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                                     <input type="text" id="customerName" name="customerName" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" required>
-                                    <span id="customerNameError" class="text-red-500 text-xs mt-1"></span>
+                                    <span id="customerNameError" class="text-red-500 text-xs mt-1"></span> <!-- Error message placeholder -->
                                 </div>
+                                <!-- Email Address Field -->
                                 <div class="mb-5">
                                     <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                                     <input type="email" id="customerEmail" name="customerEmail" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" required>
-                                    <span id="customerEmailError" class="text-red-500 text-xs mt-1"></span>
+                                    <span id="customerEmailError" class="text-red-500 text-xs mt-1"></span> <!-- Error message placeholder -->
                                 </div>
+                                <!-- Shipping Address Field -->
                                 <div class="mb-6">
                                     <label for="shippingAddress" class="block text-sm font-medium text-gray-700 mb-1">Shipping Address</label>
                                     <textarea id="shippingAddress" name="shippingAddress" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" required></textarea>
-                                    <span id="shippingAddressError" class="text-red-500 text-xs mt-1"></span>
+                                    <span id="shippingAddressError" class="text-red-500 text-xs mt-1"></span> <!-- Error message placeholder -->
                                 </div>
+                                 <!-- Place Order Button with Loading Spinner -->
                                  <button type="submit" id="place-order-btn"
                                          class="w-full bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out flex items-center justify-center">
                                     <span id="place-order-btn-text">Place Order</span>
+                                    <!-- /* SVG spinner for loading state, initially hidden. */ -->
                                     <svg id="loading-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -41,14 +55,16 @@
                             </form>
                         </div>
 
-                        <!-- Order Summary -->
+                        <!-- Order Summary Section -->
+                        <!-- /* Displays a summary of items in the cart, subtotal, VAT, and final total. 'h-fit' ensures it doesn't stretch unnecessarily. */ -->
                         <div class="lg:col-span-1 bg-white p-8 rounded-xl shadow-xl h-fit">
                             <h2 class="text-2xl font-semibold mb-6 text-gray-700">Your Order</h2>
+                            <!-- /* Container for itemized list, populated by JavaScript. 'max-h-60 overflow-y-auto' for scrollability if many items. */ -->
                             <div id="order-summary-items" class="space-y-3 mb-6 max-h-60 overflow-y-auto">
-                                <!-- Items will be rendered here by JavaScript -->
-                                <p class="text-gray-500">Loading order summary...</p>
+                                <p class="text-gray-500">Loading order summary...</p> <!-- Initial message -->
                             </div>
                             <hr class="my-5 border-gray-200">
+                            <!-- Subtotal and VAT Display -->
                             <div class="space-y-2 text-sm text-gray-600">
                                 <div class="flex justify-between">
                                     <span>Subtotal:</span>
@@ -60,6 +76,7 @@
                                 </div>
                             </div>
                             <hr class="my-5 border-gray-200">
+                            <!-- Final Total Display -->
                             <div class="flex justify-between text-xl font-semibold text-gray-800">
                                 <span>Total:</span>
                                 <span id="order-summary-final-total">$0.00</span>
@@ -69,38 +86,49 @@
                 </div>
             </section>
 
+            <!-- /* Inline JavaScript for checkout page functionalities. */ -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
+                    // DOM element references for order summary
                     const orderSummaryItemsEl = document.getElementById('order-summary-items');
                     const orderSummarySubtotalEl = document.getElementById('order-summary-subtotal');
                     const orderSummaryVatEl = document.getElementById('order-summary-vat');
                     const orderSummaryFinalTotalEl = document.getElementById('order-summary-final-total');
                     
+                    // DOM element references for the form and its components
                     const checkoutForm = document.getElementById('checkout-form');
                     const placeOrderBtn = document.getElementById('place-order-btn');
                     const placeOrderBtnText = document.getElementById('place-order-btn-text');
                     const loadingSpinner = document.getElementById('loading-spinner');
 
+                    // Input field references
                     const customerNameInput = document.getElementById('customerName');
                     const customerEmailInput = document.getElementById('customerEmail');
                     const shippingAddressInput = document.getElementById('shippingAddress');
 
+                    // Error message span references
                     const customerNameError = document.getElementById('customerNameError');
                     const customerEmailError = document.getElementById('customerEmailError');
                     const shippingAddressError = document.getElementById('shippingAddressError');
 
+                    /**
+                     * Renders the cart summary on the checkout page.
+                     * Calculates subtotal, VAT (12%), and final total.
+                     * Redirects to /cart if the cart is empty.
+                     */
                     function renderCheckoutCartSummary() {
-                        const cart = getCart(); 
+                        const cart = getCart(); // Fetch cart from cart.js
                         if (cart.length === 0) {
-                            // Redirect to cart page if cart is empty, as checkout is not possible
+                            // If cart is empty, redirect to the cart page as checkout is not possible.
                             window.location.href = /*[[@{/cart}]]*/ '/cart';
                             return; 
                         }
                         
-                        orderSummaryItemsEl.innerHTML = ''; // Clear previous items
+                        orderSummaryItemsEl.innerHTML = ''; // Clear previous summary items
                         let subtotal = 0;
 
+                        // Populate item list and calculate subtotal
                         cart.forEach(item => {
                             const itemDiv = document.createElement('div');
                             itemDiv.className = 'flex justify-between items-start py-2 text-sm';
@@ -115,17 +143,24 @@
                             subtotal += item.price * item.quantity;
                         });
 
-                        const vat = subtotal * 0.12;
+                        // Calculate VAT and final total
+                        const vat = subtotal * 0.12; // Standard 12% VAT
                         const finalTotal = subtotal + vat;
 
+                        // Update DOM elements with calculated values
                         orderSummarySubtotalEl.textContent = '$' + subtotal.toFixed(2);
                         orderSummaryVatEl.textContent = '$' + vat.toFixed(2);
                         orderSummaryFinalTotalEl.textContent = '$' + finalTotal.toFixed(2);
                     }
 
+                    /**
+                     * Validates the checkout form fields.
+                     * Displays error messages next to invalid fields.
+                     * @returns {boolean} True if the form is valid, false otherwise.
+                     */
                     function validateForm() {
                         let isValid = true;
-                        // Clear previous errors
+                        // Clear previous error messages and styles
                         customerNameError.textContent = '';
                         customerEmailError.textContent = '';
                         shippingAddressError.textContent = '';
@@ -133,24 +168,26 @@
                         customerEmailInput.classList.remove('border-red-500');
                         shippingAddressInput.classList.remove('border-red-500');
 
-
+                        // Validate Full Name
                         if (customerNameInput.value.trim() === '') {
                             customerNameError.textContent = 'Full Name is required.';
-                            customerNameInput.classList.add('border-red-500');
+                            customerNameInput.classList.add('border-red-500'); // Add error style
                             isValid = false;
                         }
+                        // Validate Email Address
                         if (customerEmailInput.value.trim() === '') {
                             customerEmailError.textContent = 'Email Address is required.';
                             customerEmailInput.classList.add('border-red-500');
                             isValid = false;
                         } else {
-                            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
                             if (!emailPattern.test(customerEmailInput.value.trim())) {
                                 customerEmailError.textContent = 'Please enter a valid email address.';
                                 customerEmailInput.classList.add('border-red-500');
                                 isValid = false;
                             }
                         }
+                        // Validate Shipping Address
                         if (shippingAddressInput.value.trim() === '') {
                             shippingAddressError.textContent = 'Shipping Address is required.';
                             shippingAddressInput.classList.add('border-red-500');
@@ -159,31 +196,36 @@
                         return isValid;
                     }
 
+                    // Event listener for form submission
                     checkoutForm.addEventListener('submit', function(event) {
-                        event.preventDefault(); 
+                        event.preventDefault(); // Prevent default HTML form submission
                         if (!validateForm()) {
-                            showToast('Please correct the errors in the form.', 'error');
+                            showToast('Please correct the errors in the form.', 'error'); // Use ui.js toast for general form error
                             return;
                         }
 
+                        // Update button to show loading state
                         placeOrderBtn.disabled = true;
                         placeOrderBtnText.textContent = 'Processing...';
                         loadingSpinner.classList.remove('hidden');
 
+                        // Prepare cart items for the payload
                         const cartItems = getCart().map(item => ({
                             productId: item.id, 
                             quantity: item.quantity
                         }));
 
-                        if (cartItems.length === 0) { // Should be caught by renderCheckoutCartSummary redirect, but as a safeguard
+                        // Safeguard: If cart somehow became empty after page load but before submit
+                        if (cartItems.length === 0) { 
                             showToast('Your cart is empty. Cannot place order.', 'error');
                             placeOrderBtn.disabled = false;
                             placeOrderBtnText.textContent = 'Place Order';
                             loadingSpinner.classList.add('hidden');
-                            window.location.href = /*[[@{/cart}]]*/ '/cart';
+                            window.location.href = /*[[@{/cart}]]*/ '/cart'; // Redirect to cart
                             return;
                         }
 
+                        // Prepare order data for submission
                         const orderData = {
                             customerName: customerNameInput.value.trim(),
                             customerEmail: customerEmailInput.value.trim(),
@@ -191,44 +233,56 @@
                             items: cartItems
                         };
 
-                        fetch(/*[[@{/api/checkout}]]*/ '/api/checkout', { // Endpoint from original file
+                        // API call to submit the order
+                        fetch(/*[[@{/api/checkout}]]*/ '/api/checkout', { 
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                // CSRF token might be needed if Spring Security CSRF is enabled for POST
-                                // 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content') // Example
+                                // Example: 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content') // If CSRF is enabled
                             },
                             body: JSON.stringify(orderData)
                         })
                         .then(response => {
+                            // Handle non-OK responses (errors)
                             if (!response.ok) {
-                                return response.json().then(errData => {
-                                   throw new Error(errData.message || `Order placement failed: ${response.statusText}`);
-                                }).catch(() => { // If response.json() fails or no message
-                                    throw new Error(`Order placement failed: ${response.statusText} (${response.status})`);
-                                });
+                                return response.json() // Attempt to parse error response as JSON
+                                    .then(errData => {
+                                       // Use error message from backend if available, otherwise a generic one
+                                       throw new Error(errData.message || `Order placement failed: ${response.statusText}`);
+                                    }).catch(() => { // If response.json() fails or no specific message from backend
+                                        throw new Error(`Order placement failed: ${response.statusText} (${response.status})`);
+                                    });
                             }
-                            return response.json();
+                            return response.json(); // Success: parse JSON response
                         })
                         .then(data => {
+                            // On successful order creation, expect an orderCode in the response
                             if (data.orderCode) {
-                                clearCart(); 
+                                clearCart(); // Clear the cart from localStorage (from cart.js)
+                                // Redirect to order success page with the order code
                                 window.location.href = /*[[@{/order-success}]]*/ '/order-success' + '?orderCode=' + data.orderCode;
                             } else {
+                                // Should not happen if backend guarantees orderCode on success
                                 throw new Error('Order processed, but order code not received.');
                             }
                         })
                         .catch(error => {
+                            // Handle any errors from fetch or thrown exceptions
                             console.error('Checkout error:', error);
-                            showToast('Error: ' + error.message, 'error');
+                            showToast('Error: ' + error.message, 'error'); // Display error using ui.js toast
+                            // Reset button state
                             placeOrderBtn.disabled = false;
                             placeOrderBtnText.textContent = 'Place Order';
                             loadingSpinner.classList.add('hidden');
                         });
                     });
                     
+                    // Listen for 'cartUpdated' event (e.g., if cart is modified in another tab, though less likely here)
+                    // to keep the summary fresh if the user navigates back and forth or stays on page.
                     document.addEventListener('cartUpdated', renderCheckoutCartSummary);
-                    renderCheckoutCartSummary(); // Initial render
+                    
+                    // Initial rendering of the cart summary on page load.
+                    renderCheckoutCartSummary(); 
                 });
             /*]]>*/
             </script>
