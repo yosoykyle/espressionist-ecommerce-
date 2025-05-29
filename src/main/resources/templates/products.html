@@ -7,74 +7,180 @@
     <div th:replace="~{layout/main-layout :: content}">
         <!-- This specific content will be inserted into main-layout's content placeholder -->
         <th:block>
-            <section class="py-8">
-                <h1 class="text-3xl font-semibold text-center mb-8">Our Products</h1>
+            <section class="py-8 bg-[#F5F5DC]"> <!-- Beige background for the whole products section -->
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-center mb-10 text-gray-800">Our Products</h1>
 
-                <!-- Filters Section -->
-                <div class="mb-8 p-4 bg-gray-100 rounded-lg shadow">
-                    <div class="flex flex-wrap justify-center items-center gap-4">
-                        <!-- Category Filter Form -->
-                        <form th:action="@{/products}" method="get" class="flex items-center gap-2">
-                            <label for="category" class="font-medium">Category:</label>
-                            <select name="category" id="category" class="p-2 border rounded-md">
-                                <option value="" th:selected="${selectedCategory == null || selectedCategory == ''}">All</option>
-                                <option th:each="cat : ${categories}"
-                                        th:value="${cat}"
-                                        th:text="${cat.toString().replace('_', ' ')}"
-                                        th:selected="${cat.toString() == selectedCategory}">
-                                    Category Name
-                                </option>
-                            </select>
-                            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Filter</button>
-                        </form>
+                    <!-- Filters Section - Client Side -->
+                    <div class="mb-10 p-6 bg-white rounded-xl shadow-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                            <!-- Search Input -->
+                            <div class="md:col-span-1">
+                                <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-1">Search by Name:</label>
+                                <input type="text" id="searchInput" placeholder="Enter product name..."
+                                       class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401] transition">
+                            </div>
 
-                        <!-- Search Form -->
-                        <form th:action="@{/products}" method="get" class="flex items-center gap-2">
-                            <label for="search" class="font-medium">Search:</label>
-                            <input type="text" name="search" id="search" th:value="${searchTerm}" placeholder="Product name..." class="p-2 border rounded-md"/>
-                            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Search</button>
-                        </form>
-                         <a th:href="@{/products}" class="text-sm text-gray-600 hover:text-blue-500 underline">Clear Filters/Search</a>
-                    </div>
-                </div>
-
-                <!-- Products Grid -->
-                <div th:if="${products != null && !products.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-4">
-                    <!-- Loop through products -->
-                    <div th:each="product : ${products}" class="border rounded-lg p-4 shadow-lg flex flex-col" 
-                         th:classappend="${product.quantity == 0 ? 'opacity-75 bg-gray-50' : ''}">
-                        <img th:if="${product.id != null && product.image != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="w-full h-48 object-cover rounded-md mb-4"/>
-                        <div th:if="${product.id == null || product.image == null}" class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-md mb-4 text-gray-500">
-                            <span>No Image</span>
-                        </div>
-                        <h3 th:text="${product.name}" class="text-xl font-semibold mb-2">Product Name</h3>
-                        <p th:text="'Price: $' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}" class="text-gray-700 mb-2">Price: $0.00</p>
-                        <p class="text-sm text-gray-600 mb-1">Stock: <span th:text="${product.quantity}">0</span></p>
-                        
-                        <div th:if="${product.quantity > 0}" class="mt-auto"> <!-- Ensure button is at the bottom -->
-                            <button th:attr="data-product-id=${product.id},
-                                             data-product-name=${product.name},
-                                             data-product-price=${product.price},
-                                             data-product-stock=${product.quantity},
-                                             data-product-image-url=@{'/api/products/' + ${product.id} + '/image'}"
-                                    class="add-to-cart-btn bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full">
-                                Add to Cart
-                            </button>
-                        </div>
-                        <div th:if="${product.quantity == 0}" class="mt-auto"> <!-- Ensure button is at the bottom -->
-                            <button class="bg-gray-400 text-white py-2 px-4 rounded w-full cursor-not-allowed" disabled>
-                                Out of Stock
-                            </button>
+                            <!-- Category Filters -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Category:</label>
+                                <div id="categoryFilters" class="flex flex-wrap gap-3">
+                                    <button data-category="All" class="category-btn bg-[#F56401] text-white py-2 px-5 rounded-lg shadow hover:bg-orange-600 transition">All</button>
+                                    <button data-category="Coffee & Tea" class="category-btn bg-gray-200 text-gray-700 py-2 px-5 rounded-lg shadow hover:bg-gray-300 transition">Coffee & Tea</button>
+                                    <button data-category="Art & Merch" class="category-btn bg-gray-200 text-gray-700 py-2 px-5 rounded-lg shadow hover:bg-gray-300 transition">Art & Merch</button>
+                                    <button data-category="Gift Set" class="category-btn bg-gray-200 text-gray-700 py-2 px-5 rounded-lg shadow hover:bg-gray-300 transition">Gift Set</button>
+                                    <button data-category="Voucher" class="category-btn bg-gray-200 text-gray-700 py-2 px-5 rounded-lg shadow hover:bg-gray-300 transition">Voucher</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div th:if="${products == null || products.isEmpty()}" class="text-center text-gray-500 py-10">
-                    <p th:if="${selectedCategory != null || searchTerm != null}">No products found matching your criteria.</p>
-                    <p th:unless="${selectedCategory != null || searchTerm != null}">No products available at the moment.</p>
+
+                    <!-- Products Grid -->
+                    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        <!-- Loop through products (Thymeleaf) -->
+                        <div th:each="product : ${products}" 
+                             th:attr="data-category=${product.category.toString().replace('_', ' ')}, data-name=${product.name}"
+                             class="product-card bg-white border border-gray-200 rounded-lg p-5 shadow-lg flex flex-col transition-transform transform hover:scale-105"
+                             th:classappend="${product.quantity == 0 ? 'opacity-70 bg-gray-100' : ''}">
+                            
+                            <img th:if="${product.id != null && product.image != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="w-full h-56 object-cover rounded-md mb-4"/>
+                            <div th:if="${product.id == null || product.image == null}" class="w-full h-56 bg-gray-200 flex items-center justify-center rounded-md mb-4 text-gray-400">
+                                <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            
+                            <h3 th:text="${product.name}" class="text-xl font-semibold text-gray-800 mb-2 truncate" th:title="${product.name}">Product Name</h3>
+                            <p th:text="'Price: $' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}" class="text-gray-700 mb-3">Price: $0.00</p>
+                            <p class="text-sm text-gray-600 mb-3">Stock: <span th:text="${product.quantity}">0</span></p>
+                            
+                            <div th:if="${product.quantity > 0}" class="mt-auto"> <!-- Ensure button is at the bottom -->
+                                <button th:attr="data-product-id=${product.id},
+                                                 data-product-name=${product.name},
+                                                 data-product-price=${product.price},
+                                                 data-product-stock=${product.quantity},
+                                                 data-product-image-url=( ${product.id != null && product.image != null} ? @{'/api/products/' + ${product.id} + '/image'} : '' )"
+                                        class="add-to-cart-btn bg-[#F56401] text-white py-2 px-4 rounded-lg hover:bg-orange-600 w-full transition duration-300 ease-in-out">
+                                    Add to Cart
+                                </button>
+                            </div>
+                            <div th:if="${product.quantity == 0}" class="mt-auto"> <!-- Ensure button is at the bottom -->
+                                <button class="bg-gray-400 text-white py-2 px-4 rounded-lg w-full cursor-not-allowed" disabled>
+                                    Out of Stock
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- No Products Message -->
+                    <div id="noProductsMessage" class="text-center text-gray-500 py-10" style="display: none;">
+                        <p>No products found matching your criteria.</p>
+                    </div>
+                    <div th:if="${products == null || products.isEmpty()}" id="initialNoProductsMessage" class="text-center text-gray-500 py-10">
+                        <p>No products available at the moment.</p>
+                    </div>
                 </div>
             </section>
 
             <script th:inline="javascript">
+            /*<![CDATA[*/
+                // Cart button functionality (already present and should work with new buttons)
+                document.addEventListener('DOMContentLoaded', function() {
+                    const cartButtons = document.querySelectorAll('.add-to-cart-btn');
+                    cartButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            const productId = this.dataset.productId;
+                            const productName = this.dataset.productName;
+                            const productPrice = parseFloat(this.dataset.productPrice);
+                            const productImageUrl = this.dataset.productImageUrl;
+                            const productStock = parseInt(this.dataset.productStock);
+
+                            const item = {
+                                id: productId,
+                                name: productName,
+                                price: productPrice,
+                                imageUrl: productImageUrl,
+                                quantity: 1,
+                                originalStock: productStock
+                            };
+                            addItemToCart(item); // Function from cart.js
+                        });
+                    });
+
+                    // Client-side filtering
+                    const searchInput = document.getElementById('searchInput');
+                    const categoryButtons = document.querySelectorAll('.category-btn');
+                    const productGrid = document.getElementById('productGrid');
+                    const productCards = Array.from(productGrid.querySelectorAll('.product-card'));
+                    const noProductsMessage = document.getElementById('noProductsMessage');
+                    const initialNoProductsMessage = document.getElementById('initialNoProductsMessage');
+
+                    let currentCategory = 'All';
+                    let currentSearchTerm = '';
+
+                    function filterProducts() {
+                        let hasVisibleProducts = false;
+                        productCards.forEach(card => {
+                            const productName = card.dataset.name.toLowerCase();
+                            const productCategory = card.dataset.category;
+                            
+                            const categoryMatch = (currentCategory === 'All' || productCategory === currentCategory);
+                            const searchMatch = (currentSearchTerm === '' || productName.includes(currentSearchTerm));
+
+                            if (categoryMatch && searchMatch) {
+                                card.style.display = '';
+                                hasVisibleProducts = true;
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+
+                        if (initialNoProductsMessage && productCards.length > 0) {
+                             initialNoProductsMessage.style.display = 'none'; // Hide initial if products were loaded
+                        }
+                        
+                        if (!hasVisibleProducts && productCards.length > 0) {
+                            noProductsMessage.style.display = 'block';
+                        } else {
+                            noProductsMessage.style.display = 'none';
+                        }
+                         // If there were no products loaded initially, let that message persist
+                        if (productCards.length === 0 && initialNoProductsMessage) {
+                            initialNoProductsMessage.style.display = 'block';
+                            noProductsMessage.style.display = 'none';
+                        }
+                    }
+
+                    searchInput.addEventListener('input', function() {
+                        currentSearchTerm = this.value.toLowerCase();
+                        filterProducts();
+                    });
+
+                    categoryButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            currentCategory = this.dataset.category;
+                            // Update active button style
+                            categoryButtons.forEach(btn => {
+                                btn.classList.remove('bg-[#F56401]', 'text-white');
+                                btn.classList.add('bg-gray-200', 'text-gray-700');
+                            });
+                            this.classList.add('bg-[#F56401]', 'text-white');
+                            this.classList.remove('bg-gray-200', 'text-gray-700');
+                            filterProducts();
+                        });
+                    });
+                    
+                    // Initial filter call in case there are pre-set values (not typical for pure client-side)
+                    // or to hide the "no products" message if products exist.
+                    if (productCards.length > 0 && initialNoProductsMessage) {
+                        initialNoProductsMessage.style.display = 'none';
+                    }
+                    filterProducts(); 
+                });
+            /*]]>*/
+            </script>
+        </th:block>
+    </div>
+
+</body>
+</html>
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
                     const cartButtons = document.querySelectorAll('.add-to-cart-btn');

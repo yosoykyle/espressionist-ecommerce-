@@ -3,41 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle != null ? pageTitle : 'Espressionist E-Commerce'}">Espressionist</title>
-    <!-- Tailwind CSS CDN for functionality-first approach -->
+    <title th:text="${pageTitle != null ? pageTitle : 'espressionist'}">espressionist</title>
+    <!-- Tailwind CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Placeholder for custom CSS if needed later -->
-    <!-- <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"> -->
+    <style>
+        /* Fallback font if Seagull Serial is not available */
+        .font-logo {
+            font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback */
+        }
+        /* Fallback font if Pruno Deck Medium is not available */
+        .font-tagline {
+            font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback */
+        }
+    </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen bg-white text-gray-800 font-sans">
 
-    <!-- Header and Navigation Fragment Placeholder -->
-    <header th:fragment="header" class="bg-gray-800 text-white p-4">
-        <nav class="container mx-auto flex justify-between">
-            <a th:href="@{/}" class="text-xl font-bold">Espressionist</a>
-            <div>
-                <a th:href="@{/}" class="px-3 hover:text-gray-300">Home</a>
-                <a th:href="@{/products}" class="px-3 hover:text-gray-300">Products</a>
-                <!-- <a th:href="@{/cart}" class="px-3 hover:text-gray-300">Cart</a> -->
-                <!-- <a th:href="@{/admin/dashboard}" class="px-3 hover:text-gray-300">Admin</a> -->
+    <!-- Header -->
+    <header th:fragment="header" class="bg-[#F56401] text-white shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a th:href="@{/}" class="text-2xl font-logo font-bold">espressionist</a>
+            <div class="hidden md:flex space-x-4">
+                <a th:href="@{/}" class="hover:text-gray-200">Home</a>
+                <a th:href="@{/products}" class="hover:text-gray-200">Products</a>
+                <a th:href="@{/cart}" class="hover:text-gray-200 flex items-center">
+                    <!-- Placeholder for Cart Icon -->
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Cart 
+                    <!-- <span id="cart-item-count" class="ml-1 bg-white text-[#F56401] rounded-full px-2 text-xs">0</span> -->
+                </a>
+            </div>
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
             </div>
         </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-[#F56401] px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a th:href="@{/}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white">Home</a>
+            <a th:href="@{/products}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white">Products</a>
+            <a th:href="@{/cart}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white flex items-center">
+                 <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                Cart
+            </a>
+        </div>
     </header>
 
     <!-- Main Content Placeholder -->
-    <main class="flex-grow container mx-auto p-4">
+    <main class="flex-grow container mx-auto p-4 bg-[#F5F5DC]"> <!-- Beige background for content area -->
         <div th:replace="${content}">
             <!-- Content will be replaced here -->
             <p>Loading content...</p>
         </div>
     </main>
 
-    <!-- Footer Fragment Placeholder -->
-    <footer th:fragment="footer" class="bg-gray-700 text-white p-4 text-center">
-        <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> Espressionist E-Commerce. All rights reserved.</p>
-        <!-- Detailed footer content can be added later -->
+    <!-- Footer -->
+    <footer th:fragment="footer" class="bg-gray-800 text-white py-8 px-4">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+            <div>
+                <h3 class="text-lg font-semibold text-[#F56401] mb-2 font-logo">espressionist</h3>
+                <p class="font-tagline">coffee. canvas. culture.</p>
+                <p class="mt-4">&copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> espressionist. All rights reserved.</p>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-[#F56401] mb-2">Quick Links</h3>
+                <ul>
+                    <li><a th:href="@{/}" class="hover:text-gray-300">Home</a></li>
+                    <li><a th:href="@{/products}" class="hover:text-gray-300">Products</a></li>
+                    <li><a th:href="@{/cart}" class="hover:text-gray-300">Cart</a></li>
+                    <li><a th:href="@{/admin/dashboard}" class="hover:text-gray-300">Admin</a></li> <!-- Link to admin dashboard -->
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-[#F56401] mb-2">Contact Us</h3>
+                <p>109 Rizal Blvd, Santa Rosa, Philippines</p>
+                <p>Phone: 0995 965 9332</p>
+                <p>Email: <a href="mailto:espressionist.ph@gmail.com" class="hover:text-gray-300">espressionist.ph@gmail.com</a></p>
+                <div class="mt-2">
+                    <h4 class="font-semibold">Follow Us:</h4>
+                    <a href="https://www.instagram.com/espressionist.ph/" target="_blank" class="hover:text-gray-300 mr-2">[Instagram]</a>
+                    <a href="https://www.facebook.com/espressionist.ph" target="_blank" class="hover:text-gray-300 mr-2">[Facebook]</a>
+                    <a href="https://linktr.ee/espressionist" target="_blank" class="hover:text-gray-300">[Linktree]</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <script th:src="@{/js/cart.js}"></script>
+    <script th:src="@{/js/ui.js}"></script>
+    
+    <!-- Toast Container for ui.js -->
+    <div id="toast-container" class="fixed top-5 right-5 space-y-3 z-[100] w-auto max-w-sm">
+        <!-- Toasts will be appended here by ui.js -->
+    </div>
+
+    <script>
+        // Basic mobile menu toggle
+        const menuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (menuButton && mobileMenu) {
+            menuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
 </body>
 </html>

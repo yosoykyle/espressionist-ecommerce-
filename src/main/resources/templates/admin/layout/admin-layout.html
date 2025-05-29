@@ -3,52 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle != null ? pageTitle + ' - Admin' : 'Espressionist Admin'}">Admin Panel</title>
-    <!-- Using Tailwind CSS from CDN, similar to main user-facing layout -->
+    <title th:text="${pageTitle != null ? pageTitle : 'espressionist Admin'}">espressionist Admin</title>
+    <!-- Tailwind CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Basic wrapper for sticky footer */
-        body { display: flex; flex-direction: column; min-height: 100vh; }
-        .content-wrapper { flex: 1; }
+        /* Fallback font if Seagull Serial is not available */
+        .font-logo {
+            font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback */
+        }
+        /* Fallback font if Pruno Deck Medium is not available */
+        .font-tagline {
+            font-family: 'Arial', 'Helvetica', sans-serif; /* Example fallback */
+        }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="flex flex-col min-h-screen bg-white text-gray-800 font-sans">
 
-    <header class="bg-gray-800 text-white shadow-md">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <h1 class="text-xl font-semibold">Espressionist Admin Panel</h1>
-            <nav>
-                <span class="mr-4" th:if="${#authentication.name != null}">
-                    Welcome, <strong sec:authentication="name">User</strong>
-                </span>
-                <a th:href="@{/admin/logout}" class="text-gray-300 hover:text-white underline">Logout</a>
-            </nav>
+    <!-- Header -->
+    <header th:fragment="header" class="bg-[#F56401] text-white shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a th:href="@{/admin/dashboard}" class="text-2xl font-logo font-bold">espressionist Admin</a>
+            <div class="hidden md:flex space-x-4">
+                <a th:href="@{/admin/dashboard}" class="hover:text-gray-200">Dashboard</a>
+                <a th:href="@{/admin/products}" class="hover:text-gray-200">Products</a>
+                <a th:href="@{/admin/orders}" class="hover:text-gray-200">Orders</a>
+                <a th:href="@{/admin/users}" class="hover:text-gray-200">Admins</a>
+                <a th:href="@{/logout}" class="hover:text-gray-200">Logout</a>
+            </div>
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button-admin" class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu-admin" class="md:hidden hidden bg-[#F56401] px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a th:href="@{/admin/dashboard}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white">Dashboard</a>
+            <a th:href="@{/admin/products}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white">Products</a>
+            <a th:href="@{/admin/orders}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white">Orders</a>
+            <a th:href="@{/admin/users}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white">Admins</a>
+            <a th:href="@{/logout}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-500 hover:text-white">Logout</a>
         </div>
     </header>
 
-    <div class="content-wrapper flex">
-        <aside class="w-64 bg-gray-700 text-gray-200 p-4 space-y-2">
-            <h2 class="text-lg font-semibold mb-3">Navigation</h2>
-            <a th:href="@{/admin/dashboard}" class="block py-2 px-3 rounded hover:bg-gray-600">Dashboard</a>
-            <a th:href="@{/admin/products}" class="block py-2 px-3 rounded hover:bg-gray-600">Products</a>
-            <a th:href="@{/admin/orders}" class="block py-2 px-3 rounded hover:bg-gray-600">Orders</a>
-            <a th:href="@{/admin/admins}" class="block py-2 px-3 rounded hover:bg-gray-600">Admins</a>
-        </aside>
+    <!-- Main Content Placeholder -->
+    <main class="flex-grow container mx-auto p-4 bg-[#F5F5DC]"> <!-- Beige background for content area -->
+        <div th:replace="${content}">
+            <!-- Content will be replaced here -->
+            <p>Loading admin content...</p>
+        </div>
+    </main>
 
-        <main class="flex-1 p-6">
-            <!-- Page specific title can be shown here if desired -->
-            <!-- <h1 th:if="${pageTitle}" th:text="${pageTitle}" class="text-2xl font-bold mb-5">Page Title</h1> -->
-            
-            <!-- Content will be replaced here by specific admin pages -->
-            <div th:fragment="content">
-                <p>This is default content. It should be replaced by the specific admin page.</p>
+    <!-- Footer -->
+    <footer th:fragment="footer" class="bg-gray-800 text-white py-8 px-4">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+            <div>
+                <h3 class="text-lg font-semibold text-[#F56401] mb-2 font-logo">espressionist Admin</h3>
+                <p class="font-tagline">coffee. canvas. culture.</p>
+                <p class="mt-4">&copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> espressionist Admin. All rights reserved.</p>
             </div>
-        </main>
-    </div>
-
-    <footer class="bg-gray-800 text-white text-center p-3 mt-auto">
-        <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> Espressionist Admin</p>
+            <div>
+                <h3 class="text-lg font-semibold text-[#F56401] mb-2">Quick Links</h3>
+                <ul>
+                    <li><a th:href="@{/admin/dashboard}" class="hover:text-gray-300">Dashboard</a></li>
+                    <li><a th:href="@{/admin/products}" class="hover:text-gray-300">Products</a></li>
+                    <li><a th:href="@{/admin/orders}" class="hover:text-gray-300">Orders</a></li>
+                    <li><a th:href="@{/admin/users}" class="hover:text-gray-300">Admins</a></li>
+                    <li><a th:href="@{/logout}" class="hover:text-gray-300">Logout</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-[#F56401] mb-2">Contact Us</h3>
+                <p>109 Rizal Blvd, Santa Rosa, Philippines</p>
+                <p>Phone: 0995 965 9332</p>
+                <p>Email: <a href="mailto:espressionist.ph@gmail.com" class="hover:text-gray-300">espressionist.ph@gmail.com</a></p>
+                <div class="mt-2">
+                    <h4 class="font-semibold">Follow Us:</h4>
+                    <a href="https://www.instagram.com/espressionist.ph/" target="_blank" class="hover:text-gray-300 mr-2">[Instagram]</a>
+                    <a href="https://www.facebook.com/espressionist.ph" target="_blank" class="hover:text-gray-300 mr-2">[Facebook]</a>
+                    <a href="https://linktr.ee/espressionist" target="_blank" class="hover:text-gray-300">[Linktree]</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
+    <!-- Include ui.js, ensure cart.js is not included if not needed for admin -->
+    <script th:src="@{/js/ui.js}"></script>
+
+    <!-- Toast Container for ui.js -->
+    <div id="toast-container" class="fixed top-5 right-5 space-y-3 z-[100] w-auto max-w-sm">
+        <!-- Toasts will be appended here by ui.js -->
+    </div>
+
+    <script>
+        // Basic mobile menu toggle for admin
+        const menuButtonAdmin = document.getElementById('mobile-menu-button-admin');
+        const mobileMenuAdmin = document.getElementById('mobile-menu-admin');
+        if (menuButtonAdmin && mobileMenuAdmin) {
+            menuButtonAdmin.addEventListener('click', function() {
+                mobileMenuAdmin.classList.toggle('hidden');
+            });
+        }
+    </script>
 </body>
 </html>

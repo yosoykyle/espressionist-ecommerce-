@@ -6,56 +6,98 @@
     <!-- Replace the content placeholder in main-layout.html -->
     <div th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <section class="py-8">
-                <h1 class="text-3xl font-semibold text-center mb-8">Your Shopping Cart</h1>
+            <section class="py-10 bg-[#F5F5DC]"> <!-- Beige background for the whole cart section -->
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">Your Shopping Cart</h1>
 
-                <div id="cart-container" class="container mx-auto px-4">
-                    <!-- Cart items will be rendered here by JavaScript -->
-                </div>
+                    <!-- Empty Cart Message Area -->
+                    <div id="emptyCartMessage" class="text-center" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p class="mt-6 text-xl text-gray-600">Your cart is currently empty.</p>
+                        <p class="mt-2 text-gray-500">Looks like you haven't added anything to your cart yet.</p>
+                        <a th:href="@{/products}"
+                           class="mt-8 inline-block bg-[#F56401] text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">
+                           Shop Products
+                        </a>
+                    </div>
+                    
+                    <!-- Cart Items Area -->
+                    <div id="cartItemsArea">
+                        <div id="cart-container" class="bg-white shadow-xl rounded-lg overflow-hidden">
+                            <!-- Cart items table will be rendered here by JavaScript -->
+                        </div>
 
-                <div id="cart-summary" class="container mx-auto px-4 mt-8 text-right">
-                    <p class="text-xl font-semibold">Total: $<span id="cart-total">0.00</span></p>
-                    <div class="mt-4">
-                        <button id="clear-cart-btn" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 mr-2">Clear Cart</button>
-                        <a th:href="@{/checkout}" id="checkout-btn" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Proceed to Checkout</a>
+                        <!-- Cart Summary & Actions -->
+                        <div id="cart-summary-actions" class="mt-10 md:flex md:justify-between md:items-start">
+                            <div class="md:w-1/2 lg:w-2/3 mb-6 md:mb-0">
+                                <button id="clear-cart-btn"
+                                        class="border border-red-500 text-red-500 font-semibold py-3 px-6 rounded-lg hover:bg-red-500 hover:text-white transition duration-300 ease-in-out">
+                                    Clear Cart
+                                </button>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-lg md:w-1/2 lg:w-1/3">
+                                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Order Summary</h2>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-600">Subtotal:</span>
+                                    <span class="text-gray-900 font-semibold">$<span id="cart-subtotal">0.00</span></span>
+                                </div>
+                                <p class="text-sm text-gray-500 mb-6">VAT will be calculated at checkout. Shipping costs may apply.</p>
+                                <a th:href="@{/checkout}" id="checkout-btn"
+                                   class="block w-full text-center bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">
+                                   Proceed to Checkout
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- JavaScript for rendering and interacting with the cart -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
                     const cartContainer = document.getElementById('cart-container');
-                    const cartTotalEl = document.getElementById('cart-total');
+                    const cartSubtotalEl = document.getElementById('cart-subtotal'); // Changed ID
                     const clearCartBtn = document.getElementById('clear-cart-btn');
                     const checkoutBtn = document.getElementById('checkout-btn');
+                    const emptyCartMessageEl = document.getElementById('emptyCartMessage');
+                    const cartItemsAreaEl = document.getElementById('cartItemsArea');
 
                     function renderCart() {
                         const cart = getCart(); // from cart.js
                         cartContainer.innerHTML = ''; // Clear previous items
 
                         if (cart.length === 0) {
-                            cartContainer.innerHTML = '<p class="text-center text-gray-500">Your cart is empty.</p>';
-                            cartTotalEl.textContent = '0.00';
-                            checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                            checkoutBtn.href = '#'; // Prevent navigation if cart is empty
+                            emptyCartMessageEl.style.display = 'block';
+                            cartItemsAreaEl.style.display = 'none';
+                            // The checkout button is part of cartItemsAreaEl now, so it will be hidden.
+                            // If it were separate, we'd disable it:
+                            // checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                            // checkoutBtn.setAttribute('disabled', 'disabled');
+                            // checkoutBtn.href = '#'; 
+                            // cartSubtotalEl.textContent = '0.00'; // Not strictly needed if area is hidden
                             return;
                         }
-                        checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                        checkoutBtn.href = /*[[@{/checkout}]]*/ '/checkout';
+                        
+                        emptyCartMessageEl.style.display = 'none';
+                        cartItemsAreaEl.style.display = 'block';
+                        // checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                        // checkoutBtn.removeAttribute('disabled');
+                        // checkoutBtn.href = /*[[@{/checkout}]]*/ '/checkout';
 
 
                         const table = document.createElement('table');
                         table.className = 'min-w-full divide-y divide-gray-200';
+                        // Responsive table headers
                         table.innerHTML = `
-                            <thead class="bg-gray-50">
+                            <thead class="bg-gray-100">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Product</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider hidden sm:table-cell">Price</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Quantity</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider hidden md:table-cell">Subtotal</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Remove</th>
                                 </tr>
                             </thead>
                             <tbody id="cart-items-body" class="bg-white divide-y divide-gray-200">
@@ -67,84 +109,105 @@
 
                         cart.forEach(item => {
                             const row = cartItemsBody.insertRow();
-                            row.innerHTML = `
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-16 w-16">
-                                            <img class="h-16 w-16 rounded-md object-cover" src="${item.imageUrl}" alt="${item.name}">
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">${item.name}</div>
-                                        </div>
+                            row.className = 'hover:bg-gray-50 transition-colors duration-150';
+                            // Product Column (Image & Name)
+                            const productCell = row.insertCell();
+                            productCell.className = 'px-4 sm:px-6 py-4 whitespace-nowrap';
+                            productCell.innerHTML = `
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-16 w-16 sm:h-20 sm:w-20">
+                                        <img class="h-full w-full rounded-md object-cover shadow" src="${item.imageUrl || '/images/placeholder.png'}" alt="${item.name}">
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">$${item.price.toFixed(2)}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <button class="quantity-change-btn p-1 border rounded-l" data-product-id="${item.id}" data-change="-1">-</button>
-                                        <input type="number" value="${item.quantity}" min="1" class="quantity-input w-12 text-center border-t border-b" data-product-id="${item.id}" readonly />
-                                        <button class="quantity-change-btn p-1 border rounded-r" data-product-id="${item.id}" data-change="1">+</button>
+                                    <div class="ml-3 sm:ml-4">
+                                        <div class="text-sm sm:text-base font-medium text-gray-900">${item.name}</div>
+                                        <div class="text-xs sm:text-sm text-gray-500 sm:hidden">Unit: $${item.price.toFixed(2)}</div> <!-- Price for mobile -->
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">$${(item.price * item.quantity).toFixed(2)}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button class="remove-item-btn text-red-600 hover:text-red-900" data-product-id="${item.id}">Remove</button>
-                                </td>
-                            `;
+                                </div>`;
+                            
+                            // Price Column (hidden on small screens)
+                            const priceCell = row.insertCell();
+                            priceCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-700 hidden sm:table-cell';
+                            priceCell.innerHTML = `$${item.price.toFixed(2)}`;
+
+                            // Quantity Column
+                            const quantityCell = row.insertCell();
+                            quantityCell.className = 'px-4 sm:px-6 py-4 whitespace-nowrap';
+                            quantityCell.innerHTML = `
+                                <div class="flex items-center justify-center space-x-1 sm:space-x-2">
+                                    <button class="quantity-change-btn p-1 border rounded-md text-gray-600 hover:bg-gray-200 transition" data-product-id="${item.id}" data-change="-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                    </button>
+                                    <span class="text-sm sm:text-base text-gray-800 w-8 text-center">${item.quantity}</span>
+                                    <button class="quantity-change-btn p-1 border rounded-md text-gray-600 hover:bg-gray-200 transition" data-product-id="${item.id}" data-change="1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                    </button>
+                                </div>`;
+
+                            // Subtotal Column (hidden on small-mid screens)
+                            const subtotalCell = row.insertCell();
+                            subtotalCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-right hidden md:table-cell';
+                            subtotalCell.innerHTML = `$${(item.price * item.quantity).toFixed(2)}`;
+
+                            // Action (Remove) Column
+                            const actionCell = row.insertCell();
+                            actionCell.className = 'px-4 sm:px-6 py-4 whitespace-nowrap text-center';
+                            actionCell.innerHTML = `
+                                <button class="remove-item-btn text-red-500 hover:text-red-700 transition p-1" data-product-id="${item.id}" title="Remove item">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>`;
                         });
 
-                        cartTotalEl.textContent = getCartTotal().toFixed(2);
-                        attachEventListeners();
+                        cartSubtotalEl.textContent = getCartTotal().toFixed(2);
+                        attachEventListeners(); // Re-attach listeners to new elements
                     }
 
                     function attachEventListeners() {
-                        // Quantity change buttons (+ / -)
                         document.querySelectorAll('.quantity-change-btn').forEach(button => {
+                            // Check if already has listener to prevent duplicates if attachEventListeners is called multiple times
+                            if (button.dataset.listenerAttached === 'true') return;
+                            button.dataset.listenerAttached = 'true';
+
                             button.addEventListener('click', function() {
                                 const productId = this.dataset.productId;
                                 const change = parseInt(this.dataset.change);
-                                const cart = getCart();
+                                const cart = getCart(); // Get current cart state
                                 const item = cart.find(ci => ci.id === productId);
                                 if (item) {
-                                    updateItemQuantity(productId, item.quantity + change);
+                                    let newQuantity = item.quantity + change;
+                                    // If decrementing and quantity becomes 0, it will be handled by updateItemQuantity/removeItemFromCart in cart.js
+                                    updateItemQuantity(productId, newQuantity); // This should trigger 'cartUpdated'
                                 }
                             });
                         });
                         
-                        // Direct quantity input (if we want to allow typing - currently readonly, so this is for future)
-                        // For now, the input is readonly, so this part is less critical.
-                        // document.querySelectorAll('.quantity-input').forEach(input => {
-                        //     input.addEventListener('change', function() { // Or 'blur'
-                        //         const productId = this.dataset.productId;
-                        //         const newQuantity = parseInt(this.value);
-                        //         if (newQuantity >= 0) { // Allow 0 to remove via input
-                        //            updateItemQuantity(productId, newQuantity);
-                        //         } else {
-                        //             renderCart(); // Re-render to reset if invalid
-                        //         }
-                        //     });
-                        // });
-
-                        // Remove item buttons
                         document.querySelectorAll('.remove-item-btn').forEach(button => {
+                            if (button.dataset.listenerAttached === 'true') return;
+                            button.dataset.listenerAttached = 'true';
+
                             button.addEventListener('click', function() {
                                 const productId = this.dataset.productId;
-                                if (confirm('Are you sure you want to remove this item from the cart?')) {
-                                    removeItemFromCart(productId);
-                                }
+                                // Using showModal for confirmation
+                                showModal(
+                                    'Confirm Removal', 
+                                    'Are you sure you want to remove this item from the cart?',
+                                    function() { // onConfirm
+                                        removeItemFromCart(productId); // This should trigger 'cartUpdated'
+                                    }
+                                    // onCancel can be omitted if no action is needed
+                                );
                             });
                         });
                     }
 
                     if (clearCartBtn) {
                         clearCartBtn.addEventListener('click', function() {
-                            if (confirm('Are you sure you want to clear your entire cart?')) {
-                                clearCart(); // from cart.js
-                            }
+                             showModal(
+                                'Confirm Clear Cart',
+                                'Are you sure you want to clear your entire cart?',
+                                function() { // onConfirm
+                                    clearCart(); // from cart.js, should trigger 'cartUpdated'
+                                }
+                            );
                         });
                     }
                     
