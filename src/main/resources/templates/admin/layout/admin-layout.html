@@ -90,6 +90,12 @@
 
     <!-- Include ui.js, ensure cart.js is not included if not needed for admin -->
     <script th:src="@{/js/ui.js}"></script>
+
+    <!-- Toast Container for ui.js -->
+    <div id="toast-container" class="fixed top-5 right-5 space-y-3 z-[100] w-auto max-w-sm">
+        <!-- Toasts will be appended here by ui.js -->
+    </div>
+
     <script>
         // Basic mobile menu toggle for admin
         const menuButtonAdmin = document.getElementById('mobile-menu-button-admin');

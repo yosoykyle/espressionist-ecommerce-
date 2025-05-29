@@ -93,6 +93,12 @@
 
     <script th:src="@{/js/cart.js}"></script>
     <script th:src="@{/js/ui.js}"></script>
+    
+    <!-- Toast Container for ui.js -->
+    <div id="toast-container" class="fixed top-5 right-5 space-y-3 z-[100] w-auto max-w-sm">
+        <!-- Toasts will be appended here by ui.js -->
+    </div>
+
     <script>
         // Basic mobile menu toggle
         const menuButton = document.getElementById('mobile-menu-button');
