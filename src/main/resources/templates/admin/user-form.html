@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:with="pageTitle=${adminUser.id == null ? 'Add New Admin User' : 'Edit Admin User - ' + adminUser.username}">
+<body>
+
+    <div th:replace="~{admin/layout/admin-layout :: content}">
+        <th:block>
+            <h1 class="text-3xl font-bold text-gray-800 mb-8" th:text="${pageTitle}">Form Title</h1>
+
+            <div class="bg-white p-8 rounded-xl shadow-xl max-w-2xl mx-auto">
+                <form id="adminUserForm" th:action="@{/admin/users/save}" th:object="${adminUser}" method="post" class="space-y-6">
+                    
+                    <input type="hidden" th:if="${adminUser.id != null}" th:field="*{id}" />
+
+                    <!-- Username -->
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <input type="text" id="username" th:field="*{username}"
+                               class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#F56401] focus:border-transparent"
+                               th:disabled="${adminUser.id != null}" required
+                               th:classappend="${adminUser.id != null ? 'bg-gray-100 cursor-not-allowed' : ''}">
+                        <p id="usernameError" class="text-red-500 text-xs mt-1"></p>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" th:field="*{email}"
+                               class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#F56401] focus:border-transparent"
+                               required>
+                        <p id="emailError" class="text-red-500 text-xs mt-1"></p>
+                    </div>
+                    
+                    <!-- Name (Optional) -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name (Optional)</label>
+                        <input type="text" id="name" th:field="*{name}"
+                               class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#F56401] focus:border-transparent">
+                        <p id="nameError" class="text-red-500 text-xs mt-1"></p> <!-- Though optional, can add validation if specific rules apply -->
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="password" name="password" 
+                               class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#F56401] focus:border-transparent"
+                               th:placeholder="${adminUser.id != null ? 'Leave blank to keep current password' : 'Enter password'}">
+                        <p id="passwordError" class="text-red-500 text-xs mt-1"></p>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                               class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#F56401] focus:border-transparent"
+                               th:placeholder="${adminUser.id != null ? 'Leave blank if not changing password' : 'Confirm password'}">
+                        <p id="confirmPasswordError" class="text-red-500 text-xs mt-1"></p>
+                    </div>
+                    
+                    <!-- Note about roles -->
+                    <div class="p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700">
+                        <p>Note: All admin users are assigned the "ADMIN" role by default.</p>
+                    </div>
+
+
+                    <!-- Buttons -->
+                    <div class="flex items-center justify-end space-x-4 pt-4">
+                        <a th:href="@{/admin/users}"
+                           class="bg-gray-200 text-gray-700 font-semibold py-2 px-6 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300 ease-in-out">
+                            Cancel
+                        </a>
+                        <button type="submit" id="saveAdminBtn"
+                                class="bg-[#F56401] text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">
+                            Save Admin
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <script th:inline="javascript">
+            /*<![CDATA[*/
+                document.addEventListener('DOMContentLoaded', function () {
+                    const adminUserForm = document.getElementById('adminUserForm');
+                    const usernameInput = document.getElementById('username');
+                    const emailInput = document.getElementById('email');
+                    const passwordInput = document.getElementById('password');
+                    const confirmPasswordInput = document.getElementById('confirmPassword');
+                    
+                    // Assuming adminUser.id is available if editing, null/undefined if new
+                    const isEditing = /*[[${adminUser.id != null}]]*/ false;
+
+                    adminUserForm.addEventListener('submit', function (event) {
+                        let isValid = true;
+
+                        // Clear previous errors
+                        document.querySelectorAll('.text-red-500.text-xs.mt-1').forEach(el => el.textContent = '');
+
+                        // Username validation (only if not editing, as it's disabled)
+                        if (!isEditing && usernameInput.value.trim() === '') {
+                            document.getElementById('usernameError').textContent = 'Username is required.';
+                            isValid = false;
+                        } else if (!isEditing && usernameInput.value.trim().length < 3) {
+                             document.getElementById('usernameError').textContent = 'Username must be at least 3 characters.';
+                             isValid = false;
+                        }
+
+
+                        // Email validation
+                        if (emailInput.value.trim() === '') {
+                            document.getElementById('emailError').textContent = 'Email is required.';
+                            isValid = false;
+                        } else {
+                            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (!emailPattern.test(emailInput.value.trim())) {
+                                document.getElementById('emailError').textContent = 'Please enter a valid email address.';
+                                isValid = false;
+                            }
+                        }
+                        
+                        // Password validation
+                        // Required for new users. For editing, only validate if password field is not empty.
+                        if (!isEditing && passwordInput.value.trim() === '') {
+                            document.getElementById('passwordError').textContent = 'Password is required for new users.';
+                            isValid = false;
+                        }
+                        
+                        if (passwordInput.value.trim() !== '') { // Validate if password field has content (for new or edit)
+                            if (passwordInput.value.length < 8) {
+                                document.getElementById('passwordError').textContent = 'Password must be at least 8 characters long.';
+                                isValid = false;
+                            }
+                            if (passwordInput.value !== confirmPasswordInput.value) {
+                                document.getElementById('confirmPasswordError').textContent = 'Passwords do not match.';
+                                isValid = false;
+                            }
+                        } else if (passwordInput.value.trim() === '' && confirmPasswordInput.value.trim() !== '') {
+                            // If password is blank but confirm password is not
+                             document.getElementById('confirmPasswordError').textContent = 'Please also fill the Password field if you intend to set/change it.';
+                             isValid = false;
+                        }
+
+
+                        if (!isValid) {
+                            event.preventDefault(); // Prevent form submission
+                            showToast('Please correct the errors in the form.', 'error');
+                        } else {
+                            const submitButton = document.getElementById('saveAdminBtn');
+                            submitButton.disabled = true;
+                            submitButton.innerHTML = 'Saving... <svg class="animate-spin inline h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                        }
+                    });
+                });
+            /*]]>*/
+            </script>
+        </th:block>
+    </div>
+
+</body>
+</html>

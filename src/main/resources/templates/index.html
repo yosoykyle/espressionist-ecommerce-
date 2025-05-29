@@ -8,40 +8,77 @@
         <!-- This specific content will be inserted into main-layout's content placeholder -->
         <th:block>
             <!-- Welcome Banner Section -->
-            <section class="text-center py-12 bg-gray-100">
-                <h1 class="text-4xl font-bold text-gray-800">Welcome to Espressionist!</h1>
-                <p class="text-xl text-gray-600 mt-2">coffee. canvas. culture.</p>
-                <!-- CTA buttons - non-functional for now as per 'functionality first' -->
-                <div class="mt-6">
-                    <a href="#" class="bg-orange-500 text-white font-bold py-3 px-6 rounded hover:bg-orange-600 mx-2">Shop Products</a>
-                    <a href="#" class="bg-gray-500 text-white font-bold py-3 px-6 rounded hover:bg-gray-600 mx-2">Learn More</a>
+            <section class="text-center py-16 bg-gradient-to-r from-orange-50 via-amber-50 to-red-50">
+                <h1 class="text-5xl font-bold text-[#F56401] font-logo">espressionist</h1>
+                <p class="text-2xl text-gray-700 mt-3 font-tagline">coffee. canvas. culture.</p>
+                <div class="mt-8 space-x-4">
+                    <a th:href="@{/products}" class="bg-[#F56401] text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">Shop Products</a>
+                    <a href="#about-us-snippet" class="border-2 border-[#F56401] text-[#F56401] font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-[#F56401] hover:text-white transition duration-300 ease-in-out">Learn More</a>
+                </div>
+            </section>
+
+            <!-- About Us Snippet Section -->
+            <section id="about-us-snippet" class="py-12 bg-white">
+                <div class="container mx-auto px-6 text-center">
+                    <h2 class="text-3xl font-semibold text-gray-800 mb-6">About Espressionist</h2>
+                    <p class="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                        Espressionist is more than just a café; it's a vibrant space where the aroma of freshly brewed coffee blends
+                        with the vivid colors of art and the rich tapestry of local culture. We are passionate about crafting
+                        the perfect cup, showcasing talented artists, and fostering a community that appreciates the finer sips and sights in life.
+                        Join us for an experience that stimulates your senses and inspires your soul.
+                    </p>
                 </div>
             </section>
 
             <!-- Featured Products Section -->
-            <section class="py-12">
-                <h2 class="text-3xl font-semibold text-center mb-8">Featured Products</h2>
-                <div th:if="${featuredProducts != null && !featuredProducts.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-4">
+            <section class="py-12 bg-[#F5F5DC]"> <!-- Using the beige background from main-layout -->
+                <h2 class="text-3xl font-semibold text-center text-gray-800 mb-10">Featured Products</h2>
+                <div th:if="${featuredProducts != null && !featuredProducts.isEmpty()}" class="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-4">
                     <!-- Loop through featured products -->
-                    <div th:each="product : ${featuredProducts}" class="border rounded-lg p-4 shadow-lg">
-                        <img th:if="${product.id != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="w-full h-48 object-cover rounded-md mb-4"/>
-                        <div th:if="${product.id == null}" class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-md mb-4">
-                            <span class="text-gray-500">No Image</span>
+                    <div th:each="product : ${featuredProducts}" class="bg-white border border-gray-200 rounded-lg p-5 shadow-lg flex flex-col transition-transform transform hover:scale-105"
+                         th:classappend="${product.quantity == 0 ? 'opacity-70 bg-gray-100' : ''}">
+                        <img th:if="${product.id != null && product.image != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="w-full h-56 object-cover rounded-md mb-4"/>
+                         <div th:if="${product.id == null || product.image == null}" class="w-full h-56 bg-gray-200 flex items-center justify-center rounded-md mb-4 text-gray-400">
+                            <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         </div>
-                        <h3 th:text="${product.name}" class="text-xl font-semibold mb-2">Product Name</h3>
-                        <p th:text="'Price: $' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}" class="text-gray-700 mb-4">Price: $0.00</p>
-                        <!-- Stock can be added later if needed: <p th:text="'Stock: ' + ${product.quantity}" class="text-sm text-gray-500">Stock: 0</p> -->
-                        <button th:attr="data-product-id=${product.id},
-                                         data-product-name=${product.name},
-                                         data-product-price=${product.price},
-                                         data-product-image-url=@{'/api/products/' + ${product.id} + '/image'}"
-                                class="add-to-cart-btn mt-auto bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full">
-                            Add to Cart
-                        </button>
+                        <h3 th:text="${product.name}" class="text-xl font-semibold text-gray-800 mb-2 truncate" th:title="${product.name}">Product Name</h3>
+                        <p th:text="'Price: $' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}" class="text-gray-700 mb-3">Price: $0.00</p>
+                        <p class="text-sm text-gray-600 mb-3">Stock: <span th:text="${product.quantity}">0</span></p>
+                        
+                        <div th:if="${product.quantity > 0}" class="mt-auto"> <!-- Ensure button is at the bottom -->
+                            <button th:attr="data-product-id=${product.id},
+                                             data-product-name=${product.name},
+                                             data-product-price=${product.price},
+                                             data-product-stock=${product.quantity},
+                                             data-product-image-url=@{'/api/products/' + ${product.id} + '/image'}"
+                                    class="add-to-cart-btn bg-[#F56401] text-white py-2 px-4 rounded-lg hover:bg-orange-600 w-full transition duration-300 ease-in-out">
+                                Add to Cart
+                            </button>
+                        </div>
+                        <div th:if="${product.quantity == 0}" class="mt-auto"> <!-- Ensure button is at the bottom -->
+                            <button class="bg-gray-400 text-white py-2 px-4 rounded-lg w-full cursor-not-allowed" disabled>
+                                Out of Stock
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div th:if="${featuredProducts == null || featuredProducts.isEmpty()}" class="text-center text-gray-500">
+                <div th:if="${featuredProducts == null || featuredProducts.isEmpty()}" class="text-center text-gray-500 py-8">
                     <p>No featured products to display at the moment.</p>
+                </div>
+            </section>
+
+            <!-- Google Maps Embed Section -->
+            <section class="py-12 bg-white">
+                <h2 class="text-3xl font-semibold text-center text-gray-800 mb-8">Our Location</h2>
+                <div class="container mx-auto px-4">
+                    <div class="aspect-w-16 aspect-h-9"> <!-- Responsive aspect ratio container -->
+                         <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7731.682543584867!2d121.100823!3d14.320651!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397d9006b676453%3A0xfba2c30aae1cf0d3!2sEspressionist!5e0!3m2!1sen!2sph!4v1745721835963!5m2!1sen!2sph" 
+                                 class="w-full h-full" 
+                                 style="border:0;" 
+                                 allowfullscreen="" 
+                                 loading="lazy" 
+                                 referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
                 </div>
             </section>
 
@@ -55,6 +92,7 @@
                             const productName = this.dataset.productName;
                             const productPrice = parseFloat(this.dataset.productPrice);
                             const productImageUrl = this.dataset.productImageUrl; // Will be used on cart page
+                            const productStock = parseInt(this.dataset.productStock); // Get stock
 
                             // Assuming default quantity of 1 when adding from product listings
                             const item = {
@@ -62,10 +100,12 @@
                                 name: productName,
                                 price: productPrice,
                                 imageUrl: productImageUrl, // Store for cart page display
-                                quantity: 1
+                                quantity: 1,
+                                originalStock: productStock // Add originalStock here
                             };
                             addItemToCart(item);
-                            alert(productName + ' added to cart!'); // Simple feedback
+                            // Rely on addItemToCart's alerts for stock issues.
+                            // Consider a more subtle success notification for better UX.
                         });
                     });
                 });

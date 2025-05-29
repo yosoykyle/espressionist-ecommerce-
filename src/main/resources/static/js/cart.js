@@ -14,38 +14,65 @@ function saveCart(cart) {
 }
 
 // Function to add an item to the cart
-// item: { id, name, price, imageUrl, quantity }
+// item: { id, name, price, imageUrl, quantity, originalStock }
 function addItemToCart(item) {
     const cart = getCart();
     const existingItemIndex = cart.findIndex(cartItem => cartItem.id === item.id);
 
     if (existingItemIndex > -1) {
-        cart[existingItemIndex].quantity += item.quantity;
+        const newProposedQuantity = cart[existingItemIndex].quantity + item.quantity;
+        if (newProposedQuantity <= cart[existingItemIndex].originalStock) {
+            cart[existingItemIndex].quantity = newProposedQuantity;
+        } else {
+            showToast('Cannot add more. Not enough stock available! Max stock: ' + cart[existingItemIndex].originalStock, 'error');
+            return; // Do not save or dispatch event if quantity didn't change
+        }
     } else {
-        if (item.quantity > 0) { // Ensure quantity is positive before adding
-            cart.push(item);
+        if (item.quantity > 0) {
+            // Ensure originalStock is part of the item pushed to cart
+            if (item.quantity <= item.originalStock) {
+                cart.push(item); // item already has id, name, price, imageUrl, quantity, originalStock
+            } else {
+                showToast('Cannot add item. Requested quantity ('+ item.quantity +') exceeds stock! Stock: ' + item.originalStock, 'error');
+                return;
+            }
+        } else {
+            return; // Do not add if initial quantity is not positive
         }
     }
     saveCart(cart);
-    console.log('Item added to cart:', item, 'Current cart:', getCart());
-    // Optionally, trigger an event or callback to update UI
+    console.log('Item added/updated in cart:', item, 'Current cart:', getCart());
+    showToast(`'${item.name}' added to cart!`, 'success');
     document.dispatchEvent(new CustomEvent('cartUpdated'));
 }
 
 // Function to update an item's quantity in the cart
-function updateItemQuantity(productId, quantity) {
+function updateItemQuantity(productId, newQuantity) {
     const cart = getCart();
     const itemIndex = cart.findIndex(cartItem => cartItem.id === productId);
 
     if (itemIndex > -1) {
-        if (quantity > 0) {
-            cart[itemIndex].quantity = quantity;
+        if (newQuantity > 0) {
+            // Check stock only if increasing quantity
+            if (newQuantity > cart[itemIndex].quantity) { // If trying to increase
+                if (newQuantity <= cart[itemIndex].originalStock) {
+                    cart[itemIndex].quantity = newQuantity;
+                } else {
+                    showToast('Cannot increase quantity further. Not enough stock available! Max stock: ' + cart[itemIndex].originalStock, 'error');
+                    return; // Do not save or dispatch event if quantity didn't change
+                }
+            } else { // Decreasing quantity or setting to same is always fine (down to 1)
+                cart[itemIndex].quantity = newQuantity;
+            }
         } else {
             // If quantity is 0 or less, remove the item
             cart.splice(itemIndex, 1);
+            showToast('Item removed from cart.', 'info'); // Specific toast for removal
+        } else {
+            showToast('Cart updated!', 'success'); // General success for quantity change
         }
         saveCart(cart);
-        console.log('Item quantity updated for product:', productId, 'New quantity:', quantity, 'Current cart:', getCart());
+        console.log('Item quantity updated for product:', productId, 'New quantity:', newQuantity, 'Current cart:', getCart());
         document.dispatchEvent(new CustomEvent('cartUpdated'));
     }
 }
