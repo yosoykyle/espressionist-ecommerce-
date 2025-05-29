@@ -78,22 +78,8 @@
         The 'flex-grow' class ensures it takes up available vertical space.
         'bg-[#F5F5DC]' sets a beige background for the primary content area of most pages.
     */ -->
-    <main class="flex-grow container mx-auto p-4 bg-[#F5F5DC]"> 
-        <!-- /* 
-            Thymeleaf's th:replace attribute is used to insert content from another template fragment.
-            The actual content fragment is defined in each specific view template (e.g., index.html, products.html).
-            It expects a model attribute named 'content' that points to the fragment to be inserted.
-            However, a more common pattern is `th:replace="~{specific-page :: content-fragment-name}"`
-            or by using `layout:decorate` with `layout:fragment`. Here, it assumes `${content}` is resolved.
-            If `${content}` is not a fragment path, but a direct variable, this might be a simplified approach.
-            For typical Thymeleaf layouts, one would expect `th:insert="${view} :: ${fragment}"` or similar.
-            Given the project structure, this is likely being used with `ModelAndView.setViewName("template-name")`
-            and the template itself replaces a `content` fragment within this layout.
-        */ -->
-        <div th:replace="${content}">
-            <!-- Fallback content if the replacement fails or content is not provided. -->
-            <p>Loading content...</p>
-        </div>
+    <main th:fragment="content" class="flex-grow container mx-auto p-4 bg-[#F5F5DC]">
+        <!-- Content from the calling page (e.g., the th:block in index.html) will be inserted here by Thymeleaf -->
     </main>
 
     <!-- Footer Section -->
