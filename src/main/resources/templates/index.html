@@ -23,21 +23,31 @@
                 <h2 class="text-3xl font-semibold text-center mb-8">Featured Products</h2>
                 <div th:if="${featuredProducts != null && !featuredProducts.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-4">
                     <!-- Loop through featured products -->
-                    <div th:each="product : ${featuredProducts}" class="border rounded-lg p-4 shadow-lg">
-                        <img th:if="${product.id != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="w-full h-48 object-cover rounded-md mb-4"/>
-                        <div th:if="${product.id == null}" class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-md mb-4">
-                            <span class="text-gray-500">No Image</span>
+                    <div th:each="product : ${featuredProducts}" class="border rounded-lg p-4 shadow-lg flex flex-col"
+                         th:classappend="${product.quantity == 0 ? 'opacity-75 bg-gray-50' : ''}">
+                        <img th:if="${product.id != null && product.image != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="w-full h-48 object-cover rounded-md mb-4"/>
+                         <div th:if="${product.id == null || product.image == null}" class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-md mb-4 text-gray-500">
+                            <span>No Image</span>
                         </div>
                         <h3 th:text="${product.name}" class="text-xl font-semibold mb-2">Product Name</h3>
-                        <p th:text="'Price: $' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}" class="text-gray-700 mb-4">Price: $0.00</p>
-                        <!-- Stock can be added later if needed: <p th:text="'Stock: ' + ${product.quantity}" class="text-sm text-gray-500">Stock: 0</p> -->
-                        <button th:attr="data-product-id=${product.id},
-                                         data-product-name=${product.name},
-                                         data-product-price=${product.price},
-                                         data-product-image-url=@{'/api/products/' + ${product.id} + '/image'}"
-                                class="add-to-cart-btn mt-auto bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full">
-                            Add to Cart
-                        </button>
+                        <p th:text="'Price: $' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}" class="text-gray-700 mb-2">Price: $0.00</p>
+                        <p class="text-sm text-gray-600 mb-1">Stock: <span th:text="${product.quantity}">0</span></p>
+                        
+                        <div th:if="${product.quantity > 0}" class="mt-auto"> <!-- Ensure button is at the bottom -->
+                            <button th:attr="data-product-id=${product.id},
+                                             data-product-name=${product.name},
+                                             data-product-price=${product.price},
+                                             data-product-stock=${product.quantity},
+                                             data-product-image-url=@{'/api/products/' + ${product.id} + '/image'}"
+                                    class="add-to-cart-btn bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full">
+                                Add to Cart
+                            </button>
+                        </div>
+                        <div th:if="${product.quantity == 0}" class="mt-auto"> <!-- Ensure button is at the bottom -->
+                            <button class="bg-gray-400 text-white py-2 px-4 rounded w-full cursor-not-allowed" disabled>
+                                Out of Stock
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div th:if="${featuredProducts == null || featuredProducts.isEmpty()}" class="text-center text-gray-500">
@@ -55,6 +65,7 @@
                             const productName = this.dataset.productName;
                             const productPrice = parseFloat(this.dataset.productPrice);
                             const productImageUrl = this.dataset.productImageUrl; // Will be used on cart page
+                            const productStock = parseInt(this.dataset.productStock); // Get stock
 
                             // Assuming default quantity of 1 when adding from product listings
                             const item = {
@@ -62,10 +73,12 @@
                                 name: productName,
                                 price: productPrice,
                                 imageUrl: productImageUrl, // Store for cart page display
-                                quantity: 1
+                                quantity: 1,
+                                originalStock: productStock // Add originalStock here
                             };
                             addItemToCart(item);
-                            alert(productName + ' added to cart!'); // Simple feedback
+                            // Rely on addItemToCart's alerts for stock issues.
+                            // Consider a more subtle success notification for better UX.
                         });
                     });
                 });
