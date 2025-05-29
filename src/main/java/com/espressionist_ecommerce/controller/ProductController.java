@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional; // Added import
 
 @RestController
 @RequestMapping("/api/products")
@@ -66,24 +67,26 @@ public class ProductController {
 
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getProductImage(@PathVariable Long id) {
-        return productService.getProductById(id) // Using existing getProductById as it fetches the Product entity
-            .map(product -> {
-                if (product.getImage() != null && product.getImageType() != null) {
-                    HttpHeaders headers = new HttpHeaders();
-                    try {
-                        headers.setContentType(MediaType.parseMediaType(product.getImageType()));
-                    } catch (Exception e) {
-                        // Fallback if imageType is invalid or not parseable
-                        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                        logger.warn("Could not parse media type {} for product image id {}. Falling back to OCTET_STREAM.", product.getImageType(), id, e);
-                    }
-                    // Optional: Add Content-Disposition if you want to suggest a filename
-                    // headers.setContentDisposition(ContentDisposition.inline().filename("product-" + id + "." + extractExtension(product.getImageType())).build());
-                    return new ResponseEntity<>(product.getImage(), headers, HttpStatus.OK);
-                }
-                return ResponseEntity.notFound().build();
-            })
-            .orElse(ResponseEntity.notFound().build());
+        // ProductService.getProductById now throws ResourceNotFoundException if product is not found,
+        // which will be handled by the GlobalExceptionHandler.
+        Product product = productService.getProductById(id);
+
+        if (product.getImage() != null && product.getImageType() != null) {
+            HttpHeaders headers = new HttpHeaders();
+            try {
+                headers.setContentType(MediaType.parseMediaType(product.getImageType()));
+            } catch (Exception e) {
+                // Fallback if imageType is invalid or not parseable
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                logger.warn("Could not parse media type {} for product image id {}. Falling back to OCTET_STREAM.", product.getImageType(), id, e);
+            }
+            // Optional: Add Content-Disposition if you want to suggest a filename
+            // headers.setContentDisposition(ContentDisposition.inline().filename("product-" + id + "." + extractExtension(product.getImageType())).build());
+            return new ResponseEntity<>(product.getImage(), headers, HttpStatus.OK);
+        } else {
+            // Product found, but no image or imageType
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // Optional helper method (not implementing Content-Disposition for now as it's optional)
