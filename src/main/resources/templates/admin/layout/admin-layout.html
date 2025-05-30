@@ -29,16 +29,16 @@
 <!-- /* Body ensures footer sticks to the bottom, similar to the main layout. */ -->
 <body class="flex flex-col min-h-screen bg-white text-gray-800 font-sans">
 
-    <!-- Admin Header Section -->
+    <!-- Admin Header Fragment -->
     <!-- /* 
         Thymeleaf fragment 'header' for the admin panel.
         Contains the admin site logo/title and admin navigation links.
         Styled with the primary brand color.
     */ -->
-    <header th:fragment="header" class="bg-[#F56401] text-white shadow-md">
-        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+    <header th:fragment="header" class="bg-[#F56401] text-white shadow-md" aria-label="Admin Navigation">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center" role="navigation">
             <!-- /* Admin panel title/logo linking to the admin dashboard. */ -->
-            <a th:href="@{/admin/dashboard}" class="text-2xl font-logo font-bold">espressionist Admin</a>
+            <a th:href="@{/admin/dashboard}" class="text-2xl font-logo font-bold" aria-label="Espressionist Admin Home">espressionist Admin</a>
             <!-- /* Desktop navigation links for admin sections. Hidden on smaller screens. */ -->
             <div class="hidden md:flex space-x-4">
                 <a th:href="@{/admin/dashboard}" class="hover:text-gray-200">Dashboard</a>
@@ -64,12 +64,12 @@
         </div>
     </header>
 
-    <!-- Admin Main Content Placeholder -->
+    <!-- Admin Main Content Fragment -->
     <!-- /* 
         This 'main' element is where specific admin page content will be injected.
         'bg-[#F5F5DC]' sets a beige background for the primary content area of admin pages.
     */ -->
-    <main class="flex-grow container mx-auto p-4 bg-[#F5F5DC]"> 
+    <main th:fragment="content" class="flex-grow container mx-auto p-4 bg-[#F5F5DC]" aria-label="Admin Main Content">
         <!-- /* 
             Thymeleaf's th:replace attribute inserts the content from the specific admin page template.
             This works similarly to the main user-facing layout.
@@ -80,12 +80,12 @@
         </div>
     </main>
 
-    <!-- Admin Footer Section -->
+    <!-- Admin Footer Fragment -->
     <!-- /* 
         Thymeleaf fragment 'footer' for the admin panel.
         Similar structure to the user-facing footer but with "espressionist Admin" branding and admin-specific quick links.
     */ -->
-    <footer th:fragment="footer" class="bg-gray-800 text-white py-8 px-4">
+    <footer th:fragment="footer" class="bg-gray-800 text-white py-8 px-4" aria-label="Admin Footer">
         <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
             <!-- Footer Column 1: Admin Brand and Copyright -->
             <div>

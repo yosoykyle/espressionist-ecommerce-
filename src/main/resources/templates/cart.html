@@ -5,54 +5,28 @@
     Cart data is managed client-side via cart.js and ui.js for notifications.
 */ -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Your Shopping Cart'"> <!-- /* Sets the page title for the layout. */ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="pageTitle='Your Shopping Cart'">
 <body>
-
-    <!-- /* Injects content into the 'content' placeholder of main-layout.html. */ -->
-    <div th:replace="~{layout/main-layout :: content}">
+    <div th:replace="~{layout/main-layout :: header}"></div>
+    <main th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <!-- /* Main section for the cart page with a beige background. */ -->
-            <section class="py-10 bg-[#F5F5DC]"> 
+            <section class="py-10 bg-[#F5F5DC]" aria-label="Shopping Cart">
                 <div class="container mx-auto px-4">
                     <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">Your Shopping Cart</h1>
-
-                    <!-- Empty Cart Message Area -->
-                    <!-- /* 
-                        This section is displayed by JavaScript if the cart is empty.
-                        It includes an icon, message, and a link to the products page.
-                    */ -->
                     <div id="emptyCartMessage" class="text-center" style="display: none;">
                         <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         <p class="mt-6 text-xl text-gray-600">Your cart is currently empty.</p>
                         <p class="mt-2 text-gray-500">Looks like you haven't added anything to your cart yet.</p>
-                        <a th:href="@{/products}"
-                           class="mt-8 inline-block bg-[#F56401] text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">
-                           Shop Products
-                        </a>
+                        <a th:href="@{/products}" class="mt-8 inline-block bg-[#F56401] text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">Shop Products</a>
                     </div>
-                    
-                    <!-- Cart Items Area -->
-                    <!-- /* This container holds the cart items table and the summary/actions section. Displayed by JS if cart is not empty. */ -->
                     <div id="cartItemsArea">
-                        <!-- /* The 'cart-container' div will be populated by JavaScript with a table of cart items. */ -->
-                        <div id="cart-container" class="bg-white shadow-xl rounded-lg overflow-hidden">
-                            <!-- Cart items table will be rendered here by JavaScript -->
-                        </div>
-
-                        <!-- Cart Summary & Actions -->
-                        <!-- /* Section for displaying the cart total, clear cart button, and checkout button. */ -->
+                        <div id="cart-container" class="bg-white shadow-xl rounded-lg overflow-hidden"></div>
                         <div id="cart-summary-actions" class="mt-10 md:flex md:justify-between md:items-start">
-                            <!-- Clear Cart Button -->
                             <div class="md:w-1/2 lg:w-2/3 mb-6 md:mb-0">
-                                <button id="clear-cart-btn"
-                                        class="border border-red-500 text-red-500 font-semibold py-3 px-6 rounded-lg hover:bg-red-500 hover:text-white transition duration-300 ease-in-out">
-                                    Clear Cart
-                                </button>
+                                <button id="clear-cart-btn" class="border border-red-500 text-red-500 font-semibold py-3 px-6 rounded-lg hover:bg-red-500 hover:text-white transition duration-300 ease-in-out">Clear Cart</button>
                             </div>
-                            <!-- Order Summary Box -->
                             <div class="bg-white p-6 rounded-lg shadow-lg md:w-1/2 lg:w-1/3">
                                 <h2 class="text-2xl font-semibold text-gray-800 mb-4">Order Summary</h2>
                                 <div class="flex justify-between mb-2">
@@ -60,18 +34,12 @@
                                     <span class="text-gray-900 font-semibold">$<span id="cart-subtotal">0.00</span></span>
                                 </div>
                                 <p class="text-sm text-gray-500 mb-6">VAT will be calculated at checkout. Shipping costs may apply.</p>
-                                <!-- Checkout Button -->
-                                <a th:href="@{/checkout}" id="checkout-btn"
-                                   class="block w-full text-center bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">
-                                   Proceed to Checkout
-                                </a>
+                                <a th:href="@{/checkout}" id="checkout-btn" class="block w-full text-center bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">Proceed to Checkout</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-
-            <!-- /* Inline JavaScript for managing the cart page UI. Interacts with cart.js and ui.js. */ -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
@@ -249,7 +217,7 @@
             /*]]>*/
             </script>
         </th:block>
-    </div>
-
+    </main>
+    <div th:replace="~{layout/main-layout :: footer}"></div>
 </body>
 </html>
