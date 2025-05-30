@@ -7,11 +7,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       th:with="pageTitle=${adminUser.id == null ? 'Add New Admin User' : 'Edit Admin User - ' + adminUser.username}">
-      <!-- /* Dynamically sets page title based on whether creating or editing an admin user. */ -->
 <body>
-
-    <!-- /* Injects content into admin-layout.html. */ -->
-    <div th:replace="~{admin/layout/admin-layout :: content}">
+    <div th:replace="~{admin/layout/admin-layout :: header}"></div>
+    <main th:replace="~{admin/layout/admin-layout :: content}">
         <th:block>
             <h1 class="text-3xl font-bold text-gray-800 mb-8" th:text="${pageTitle}">Form Title</h1>
 
@@ -182,7 +180,7 @@
             /*]]>*/
             </script>
         </th:block>
-    </div>
-
+    </main>
+    <div th:replace="~{admin/layout/admin-layout :: footer}"></div>
 </body>
 </html>

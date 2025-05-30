@@ -5,16 +5,14 @@
     The 'pageTitle' variable is passed to the main-layout for the browser tab title.
 */ -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Welcome to Espressionist'"> <!-- Setting pageTitle for main-layout -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="pageTitle='Welcome to Espressionist'">
 <body>
-
-    <!-- /* Replaces the 'content' placeholder in layout/main-layout.html with the content defined in this th:block. */ -->
-    <div th:replace="~{layout/main-layout :: content}">
+    <div th:replace="~{layout/main-layout :: header}"></div>
+    <main th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <!-- Welcome Banner Section -->
+            <!-- Welcome Banner -->
             <!-- /* A prominent banner to welcome users, featuring the brand name, tagline, and Call-to-Action (CTA) buttons. */ -->
-            <section class="text-center py-16 bg-gradient-to-r from-orange-50 via-amber-50 to-red-50">
+            <section class="text-center py-16 bg-gradient-to-r from-orange-50 via-amber-50 to-red-50" aria-label="Welcome">
                 <h1 class="text-5xl font-bold text-[#F56401] font-logo">espressionist</h1>
                 <p class="text-2xl text-gray-700 mt-3 font-tagline">coffee. canvas. culture.</p>
                 <div class="mt-8 space-x-4">
@@ -24,13 +22,12 @@
                     <a href="#about-us-snippet" class="border-2 border-[#F56401] text-[#F56401] font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-[#F56401] hover:text-white transition duration-300 ease-in-out">Learn More</a>
                 </div>
             </section>
-
-            <!-- About Us Snippet Section -->
+            <!-- About Us -->
             <!-- /* 
                 A brief introduction to Espressionist.
                 The id 'about-us-snippet' is used as an anchor target for the "Learn More" button.
             */ -->
-            <section id="about-us-snippet" class="py-12 bg-white">
+            <section id="about-us-snippet" class="py-12 bg-white" aria-label="About Us">
                 <div class="container mx-auto px-6 text-center">
                     <h2 class="text-3xl font-semibold text-gray-800 mb-6">About Espressionist</h2>
                     <p class="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
@@ -41,14 +38,13 @@
                     </p>
                 </div>
             </section>
-
-            <!-- Featured Products Section -->
+            <!-- Featured Products -->
             <!-- /* 
                 Displays a selection of featured products.
                 Data for 'featuredProducts' is expected to be provided by the backend model.
                 The background color matches the main content area defined in main-layout.
             */ -->
-            <section class="py-12 bg-[#F5F5DC]"> 
+            <section class="py-12 bg-[#F5F5DC]" aria-label="Featured Products">
                 <h2 class="text-3xl font-semibold text-center text-gray-800 mb-10">Featured Products</h2>
                 <!-- /* 
                     Conditionally renders the product grid if 'featuredProducts' is not null and not empty.
@@ -72,7 +68,6 @@
                         <!-- /* Product price, formatted to two decimal places. */ -->
                         <p th:text="'Price: $' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}" class="text-gray-700 mb-3">Price: $0.00</p>
                         <p class="text-sm text-gray-600 mb-3">Stock: <span th:text="${product.quantity}">0</span></p>
-                        
                         <!-- /* "Add to Cart" button, shown only if product quantity > 0.
                              Data attributes are used by cart.js to add the item to the cart. */ -->
                         <div th:if="${product.quantity > 0}" class="mt-auto"> 
@@ -98,10 +93,9 @@
                     <p>No featured products to display at the moment.</p>
                 </div>
             </section>
-
-            <!-- Google Maps Embed Section -->
+            <!-- Location Map -->
             <!-- /* Displays an embedded Google Map showing the location of Espressionist. */ -->
-            <section class="py-12 bg-white">
+            <section class="py-12 bg-white" aria-label="Location">
                 <h2 class="text-3xl font-semibold text-center text-gray-800 mb-8">Our Location</h2>
                 <div class="container mx-auto px-4">
                     <!-- /* Tailwind's aspect-ratio plugin classes can be used for responsive iframe embeds. Here, a simple w-full h-full is used. */ -->
@@ -115,7 +109,6 @@
                     </div>
                 </div>
             </section>
-
             <!-- /* Inline JavaScript for "Add to Cart" functionality for featured products. */ -->
             <script th:inline="javascript">
             /*<![CDATA[*/
@@ -154,7 +147,7 @@
             /*]]>*/
             </script>
         </th:block>
-    </div>
-
+    </main>
+    <div th:replace="~{layout/main-layout :: footer}"></div>
 </body>
 </html>

@@ -5,34 +5,22 @@
     Uses main-layout.html as its base.
 */ -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Track Your Order'"> <!-- /* Sets page title for the layout. */ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="pageTitle='Track Your Order'">
 <body>
-
-    <!-- /* Injects content into main-layout.html. */ -->
-    <div th:replace="~{layout/main-layout :: content}">
+    <div th:replace="~{layout/main-layout :: header}"></div>
+    <main th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <section class="py-12 bg-[#F5F5DC]"> <!-- /* Main section with beige background. */ -->
+            <section class="py-12 bg-[#F5F5DC]" aria-label="Order Status">
                 <div class="container mx-auto px-4">
                     <h1 class="text-4xl font-bold text-center mb-10 text-gray-800">Track Your Order</h1>
-
-                    <!-- Order Code Input Form -->
-                    <!-- /* Form for users to manually enter their order code. */ -->
                     <form id="orderStatusForm" class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-xl mb-12">
                         <label for="orderCodeInput" class="block text-sm font-medium text-gray-700 mb-2">Enter Your Order Code:</label>
                         <div class="flex space-x-3">
-                            <input type="text" id="orderCodeInput" name="orderCode"
-                                   class="flex-grow w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]"
-                                   placeholder="e.g., ESP-XXXXXXX" required>
-                            <button type="submit" id="trackOrderBtnForm"
-                                    class="bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">
-                                Track
-                            </button>
+                            <input type="text" id="orderCodeInput" name="orderCode" class="flex-grow w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" placeholder="e.g., ESP-XXXXXXX" required>
+                            <button type="submit" id="trackOrderBtnForm" class="bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">Track</button>
                         </div>
-                        <p id="formErrorMessage" class="text-red-500 text-xs mt-2"></p> <!-- For empty input error -->
+                        <p id="formErrorMessage" class="text-red-500 text-xs mt-2"></p>
                     </form>
-
-                    <!-- Loading Indicator: Shown while fetching order status. -->
                     <div id="loadingIndicatorOrderStatus" class="my-10 text-center" style="display: none;">
                         <svg class="animate-spin h-8 w-8 text-[#F56401] mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -40,17 +28,11 @@
                         </svg>
                         <p class="mt-2 text-lg text-gray-600">Fetching order status...</p>
                     </div>
-                    
-                    <!-- API Error Message Area: Shown if API call fails. -->
                     <div id="apiErrorMessage" class="my-10 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg max-w-lg mx-auto text-center" style="display: none;">
                         <p id="apiErrorMessageText">Could not retrieve order details.</p>
                     </div>
-
-                    <!-- Order Details Display Area: Shown after successful data fetch. -->
                     <div id="orderDetailsDisplayArea" class="bg-white p-8 rounded-xl shadow-xl max-w-2xl mx-auto" style="display: none;">
                         <h2 class="text-2xl font-semibold mb-6 text-gray-700 text-center">Order Status</h2>
-                        
-                        <!-- Order Code and Date -->
                         <div class="mb-4">
                             <strong class="font-medium text-gray-600">Order Code:</strong>
                             <span id="displayOrderCode" class="text-gray-800 font-mono ml-2">N/A</span>
@@ -59,42 +41,29 @@
                             <strong class="font-medium text-gray-600">Order Date:</strong>
                             <span id="displayOrderDate" class="text-gray-800 ml-2">N/A</span>
                         </div>
-                        <!-- Order Status Badge: Dynamically styled based on status value. -->
                         <div class="mb-6 p-3 rounded-lg text-center" id="statusBadge">
                             <strong class="font-medium text-gray-600">Status:</strong>
                             <span id="displayOrderStatus" class="text-lg font-semibold ml-2">N/A</span>
                         </div>
-
                         <hr class="my-6">
-
-                        <!-- Shipping Information Section -->
                         <h3 class="text-xl font-semibold mb-3 text-gray-700">Shipping Information</h3>
                         <div class="text-sm space-y-1 mb-6">
                             <p><strong class="font-medium text-gray-600">Name:</strong> <span id="displayCustomerName" class="text-gray-800">N/A</span></p>
                             <p><strong class="font-medium text-gray-600">Email:</strong> <span id="displayCustomerEmail" class="text-gray-800">N/A</span></p>
                             <p><strong class="font-medium text-gray-600">Address:</strong> <span id="displayShippingAddress" class="text-gray-800">N/A</span></p>
                         </div>
-
                         <hr class="my-6">
-
-                        <!-- Items Ordered Section -->
                         <h3 class="text-xl font-semibold mb-3 text-gray-700">Items Ordered</h3>
                         <div id="displayOrderItems" class="space-y-2 text-sm max-h-60 overflow-y-auto border rounded-md p-3 bg-gray-50">
-                            <!-- Items will be rendered here by JavaScript -->
-                            <p class="text-gray-500">No items found.</p> <!-- Fallback if items array is empty -->
+                            <p class="text-gray-500">No items found.</p>
                         </div>
-                        
-                        <!-- Order Total (conditionally displayed if available) -->
                         <div id="displayOrderTotalContainer" class="text-right mt-4" style="display: none;">
                              <strong class="font-medium text-gray-600">Total Paid:</strong>
                              <span id="displayOrderTotal" class="text-lg text-gray-800 font-semibold ml-2">N/A</span>
                         </div>
-
                     </div>
                 </div>
             </section>
-
-            <!-- /* Inline JavaScript for order status page functionalities. */ -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
@@ -264,7 +233,7 @@
             /*]]>*/
             </script>
         </th:block>
-    </div>
-
+    </main>
+    <div th:replace="~{layout/main-layout :: footer}"></div>
 </body>
 </html>

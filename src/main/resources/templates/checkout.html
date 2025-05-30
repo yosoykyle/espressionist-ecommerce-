@@ -6,47 +6,35 @@
     and submitting the order via a fetch request.
 */ -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Checkout'"> <!-- /* Sets page title for the layout. */ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="pageTitle='Checkout'">
 <body>
-
-    <!-- /* Injects content into main-layout.html. */ -->
-    <div th:replace="~{layout/main-layout :: content}">
+    <div th:replace="~{layout/main-layout :: header}"></div>
+    <main th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <section class="py-10 bg-[#F5F5DC]"> <!-- /* Main section with beige background. */ -->
+            <section class="py-10 bg-[#F5F5DC]" aria-label="Checkout">
                 <div class="container mx-auto px-4">
                     <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">Checkout</h1>
-
-                    <!-- /* Responsive grid for form and order summary. Stacks on smaller screens. */ -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <!-- Shipping Details Form -->
                         <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-xl">
                             <h2 class="text-2xl font-semibold mb-6 text-gray-700">Shipping Details</h2>
-                            <!-- /* novalidate attribute disables default browser validation, relying on custom JS validation. */ -->
                             <form id="checkout-form" novalidate>
-                                <!-- Full Name Field -->
                                 <div class="mb-5">
                                     <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                                     <input type="text" id="customerName" name="customerName" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" required>
-                                    <span id="customerNameError" class="text-red-500 text-xs mt-1"></span> <!-- Error message placeholder -->
+                                    <span id="customerNameError" class="text-red-500 text-xs mt-1"></span>
                                 </div>
-                                <!-- Email Address Field -->
                                 <div class="mb-5">
                                     <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                                     <input type="email" id="customerEmail" name="customerEmail" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" required>
-                                    <span id="customerEmailError" class="text-red-500 text-xs mt-1"></span> <!-- Error message placeholder -->
+                                    <span id="customerEmailError" class="text-red-500 text-xs mt-1"></span>
                                 </div>
-                                <!-- Shipping Address Field -->
                                 <div class="mb-6">
                                     <label for="shippingAddress" class="block text-sm font-medium text-gray-700 mb-1">Shipping Address</label>
                                     <textarea id="shippingAddress" name="shippingAddress" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401]" required></textarea>
-                                    <span id="shippingAddressError" class="text-red-500 text-xs mt-1"></span> <!-- Error message placeholder -->
+                                    <span id="shippingAddressError" class="text-red-500 text-xs mt-1"></span>
                                 </div>
-                                 <!-- Place Order Button with Loading Spinner -->
-                                 <button type="submit" id="place-order-btn"
-                                         class="w-full bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out flex items-center justify-center">
+                                <button type="submit" id="place-order-btn" class="w-full bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out flex items-center justify-center">
                                     <span id="place-order-btn-text">Place Order</span>
-                                    <!-- /* SVG spinner for loading state, initially hidden. */ -->
                                     <svg id="loading-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -54,17 +42,12 @@
                                 </button>
                             </form>
                         </div>
-
-                        <!-- Order Summary Section -->
-                        <!-- /* Displays a summary of items in the cart, subtotal, VAT, and final total. 'h-fit' ensures it doesn't stretch unnecessarily. */ -->
                         <div class="lg:col-span-1 bg-white p-8 rounded-xl shadow-xl h-fit">
                             <h2 class="text-2xl font-semibold mb-6 text-gray-700">Your Order</h2>
-                            <!-- /* Container for itemized list, populated by JavaScript. 'max-h-60 overflow-y-auto' for scrollability if many items. */ -->
                             <div id="order-summary-items" class="space-y-3 mb-6 max-h-60 overflow-y-auto">
-                                <p class="text-gray-500">Loading order summary...</p> <!-- Initial message -->
+                                <p class="text-gray-500">Loading order summary...</p>
                             </div>
                             <hr class="my-5 border-gray-200">
-                            <!-- Subtotal and VAT Display -->
                             <div class="space-y-2 text-sm text-gray-600">
                                 <div class="flex justify-between">
                                     <span>Subtotal:</span>
@@ -76,7 +59,6 @@
                                 </div>
                             </div>
                             <hr class="my-5 border-gray-200">
-                            <!-- Final Total Display -->
                             <div class="flex justify-between text-xl font-semibold text-gray-800">
                                 <span>Total:</span>
                                 <span id="order-summary-final-total">$0.00</span>
@@ -85,8 +67,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- /* Inline JavaScript for checkout page functionalities. */ -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
@@ -287,7 +267,7 @@
             /*]]>*/
             </script>
         </th:block>
-    </div>
-
+    </main>
+    <div th:replace="~{layout/main-layout :: footer}"></div>
 </body>
 </html>

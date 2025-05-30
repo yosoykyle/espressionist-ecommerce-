@@ -4,34 +4,20 @@
     Uses main-layout.html as its base.
 */ -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Our Products'"> <!-- /* Sets the page title for the layout. */ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="pageTitle='Our Products'">
 <body>
-
-    <!-- /* Injects content into the 'content' placeholder of main-layout.html. */ -->
-    <div th:replace="~{layout/main-layout :: content}">
+    <div th:replace="~{layout/main-layout :: header}"></div>
+    <main th:replace="~{layout/main-layout :: content}">
         <th:block>
-            <!-- /* Main section for the products page with a beige background. */ -->
-            <section class="py-8 bg-[#F5F5DC]"> 
+            <section class="py-8 bg-[#F5F5DC]" aria-label="Product Listing">
                 <div class="container mx-auto px-4">
                     <h1 class="text-4xl font-bold text-center mb-10 text-gray-800">Our Products</h1>
-
-                    <!-- Filters Section - Client Side -->
-                    <!-- /* 
-                        Container for client-side filtering controls (search input and category buttons).
-                        Styled as a white card with shadow.
-                    */ -->
                     <div class="mb-10 p-6 bg-white rounded-xl shadow-lg">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                            <!-- Search Input -->
                             <div class="md:col-span-1">
                                 <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-1">Search by Name:</label>
-                                <input type="text" id="searchInput" placeholder="Enter product name..."
-                                       class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401] transition">
+                                <input type="text" id="searchInput" placeholder="Enter product name..." class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#F56401] focus:border-[#F56401] transition">
                             </div>
-
-                            <!-- Category Filters -->
-                            <!-- /* Buttons for filtering products by category. 'data-category' attribute is used by JavaScript. */ -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Category:</label>
                                 <div id="categoryFilters" class="flex flex-wrap gap-3">
@@ -44,212 +30,74 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Products Grid -->
-                    <!-- /* 
-                        Container for displaying product cards. Products are loaded from the backend via Thymeleaf.
-                        JavaScript handles filtering of these client-side rendered cards.
-                    */ -->
                     <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                        <!-- /* 
-                            Thymeleaf loop to iterate over the 'products' list provided by the backend.
-                            Each product card has 'data-category' and 'data-name' attributes used by the client-side filtering JavaScript.
-                            'product.category.toString().replace('_', ' ')' converts enum-like category names (e.g., COFFEE_AND_TEA)
-                            to a more display-friendly format (e.g., Coffee & Tea) for the data-category attribute.
-                        */ -->
-                        <div th:each="product : ${products}" 
-                             th:attr="data-category=${product.category.toString().replace('_', ' ')}, data-name=${product.name}"
-                             class="product-card bg-white border border-gray-200 rounded-lg p-5 shadow-lg flex flex-col transition-transform transform hover:scale-105"
-                             th:classappend="${product.quantity == 0 ? 'opacity-70 bg-gray-100' : ''}"> <!-- /* Style for out-of-stock items */ -->
-                            
-                            <!-- /* Product image, dynamically loaded. Shows SVG placeholder if no image. */ -->
+                        <div th:each="product : ${products}" th:attr="data-category=${product.category.toString().replace('_', ' ')}, data-name=${product.name}" class="product-card bg-white border border-gray-200 rounded-lg p-5 shadow-lg flex flex-col transition-transform transform hover:scale-105" th:classappend="${product.quantity == 0 ? 'opacity-70 bg-gray-100' : ''}">
                             <img th:if="${product.id != null && product.image != null}" th:src="@{'/api/products/' + ${product.id} + '/image'}" alt="Product Image" class="w-full h-56 object-cover rounded-md mb-4"/>
                             <div th:if="${product.id == null || product.image == null}" class="w-full h-56 bg-gray-200 flex items-center justify-center rounded-md mb-4 text-gray-400">
-                                <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             </div>
-                            
                             <h3 th:text="${product.name}" class="text-xl font-semibold text-gray-800 mb-2 truncate" th:title="${product.name}">Product Name</h3>
                             <p th:text="'Price: $' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}" class="text-gray-700 mb-3">Price: $0.00</p>
                             <p class="text-sm text-gray-600 mb-3">Stock: <span th:text="${product.quantity}">0</span></p>
-                            
-                            <!-- /* "Add to Cart" button, conditional on product stock.
-                                 Data attributes provide necessary info for cart.js.
-                                 Conditional image URL construction to avoid error if image is null.
-                            */ -->
-                            <div th:if="${product.quantity > 0}" class="mt-auto"> 
-                                <button th:attr="data-product-id=${product.id},
-                                                 data-product-name=${product.name},
-                                                 data-product-price=${product.price},
-                                                 data-product-stock=${product.quantity},
-                                                 data-product-image-url=( ${product.id != null && product.image != null} ? @{'/api/products/' + ${product.id} + '/image'} : '' )"
-                                        class="add-to-cart-btn bg-[#F56401] text-white py-2 px-4 rounded-lg hover:bg-orange-600 w-full transition duration-300 ease-in-out">
-                                    Add to Cart
-                                </button>
+                            <div th:if="${product.quantity > 0}" class="mt-auto">
+                                <button th:attr="data-product-id=${product.id},data-product-name=${product.name},data-product-price=${product.price},data-product-stock=${product.quantity},data-product-image-url=@{'/api/products/' + ${product.id} + '/image'}" class="add-to-cart-btn bg-[#F56401] text-white py-2 px-4 rounded-lg hover:bg-orange-600 w-full transition duration-300 ease-in-out">Add to Cart</button>
                             </div>
-                            <!-- /* "Out of Stock" button if quantity is 0. */ -->
-                            <div th:if="${product.quantity == 0}" class="mt-auto"> 
-                                <button class="bg-gray-400 text-white py-2 px-4 rounded-lg w-full cursor-not-allowed" disabled>
-                                    Out of Stock
-                                </button>
+                            <div th:if="${product.quantity == 0}" class="mt-auto">
+                                <button class="bg-gray-400 text-white py-2 px-4 rounded-lg w-full cursor-not-allowed" disabled>Out of Stock</button>
                             </div>
                         </div>
                     </div>
-                    <!-- /* Message displayed by JavaScript if no products match active filters. */ -->
-                    <div id="noProductsMessage" class="text-center text-gray-500 py-10" style="display: none;">
-                        <p>No products found matching your criteria.</p>
-                    </div>
-                    <!-- /* Message displayed if no products are loaded from the backend at all. */ -->
                     <div th:if="${products == null || products.isEmpty()}" id="initialNoProductsMessage" class="text-center text-gray-500 py-10">
                         <p>No products available at the moment.</p>
                     </div>
                 </div>
             </section>
-
-            <!-- /* Inline JavaScript for client-side functionalities: Add to Cart and Product Filtering. */ -->
             <script th:inline="javascript">
             /*<![CDATA[*/
                 document.addEventListener('DOMContentLoaded', function() {
-                    // --- Add to Cart Functionality ---
+                    // Add to Cart
                     const cartButtons = document.querySelectorAll('.add-to-cart-btn');
                     cartButtons.forEach(button => {
                         button.addEventListener('click', function() {
-                            // Gather product details from data attributes on the button.
                             const item = {
                                 id: this.dataset.productId,
                                 name: this.dataset.productName,
                                 price: parseFloat(this.dataset.productPrice),
                                 imageUrl: this.dataset.productImageUrl,
-                                quantity: 1, // Default quantity to add
+                                quantity: 1,
                                 originalStock: parseInt(this.dataset.productStock)
                             };
-                            addItemToCart(item); // Calls global function from cart.js
+                            addItemToCart(item);
                         });
                     });
-
-                    // --- Client-side Filtering Logic ---
+                    // Filtering
                     const searchInput = document.getElementById('searchInput');
                     const categoryButtons = document.querySelectorAll('.category-btn');
-                    const productGrid = document.getElementById('productGrid');
-                    // Get all product cards once at the start for filtering.
-                    const productCards = Array.from(productGrid.querySelectorAll('.product-card'));
-                    const noProductsMessage = document.getElementById('noProductsMessage'); // Message for when filters yield no results
-                    const initialNoProductsMessage = document.getElementById('initialNoProductsMessage'); // Message for when no products are loaded initially
-
-                    let currentCategory = 'All'; // Default category filter
-                    let currentSearchTerm = '';  // Default search term
-
-                    // Function to apply filters and update product visibility.
+                    const productCards = document.querySelectorAll('.product-card');
                     function filterProducts() {
-                        let hasVisibleProducts = false;
+                        const search = searchInput.value.toLowerCase();
+                        const activeCategory = document.querySelector('.category-btn.bg-[#F56401]')?.dataset.category || 'All';
                         productCards.forEach(card => {
-                            const productName = card.dataset.name.toLowerCase(); // Product name from data-name attribute
-                            const productCategory = card.dataset.category;     // Product category from data-category attribute
-                            
-                            // Check if product matches current category filter
-                            const categoryMatch = (currentCategory === 'All' || productCategory === currentCategory);
-                            // Check if product matches current search term (case-insensitive)
-                            const searchMatch = (currentSearchTerm === '' || productName.includes(currentSearchTerm));
-
-                            // Show card if both category and search term match
-                            if (categoryMatch && searchMatch) {
-                                card.style.display = ''; // Show card (reset display style)
-                                hasVisibleProducts = true;
-                            } else {
-                                card.style.display = 'none'; // Hide card
-                            }
+                            const name = card.getAttribute('data-name').toLowerCase();
+                            const category = card.getAttribute('data-category');
+                            const matchesCategory = activeCategory === 'All' || category === activeCategory;
+                            const matchesSearch = name.includes(search);
+                            card.style.display = (matchesCategory && matchesSearch) ? '' : 'none';
                         });
-
-                        // Manage visibility of "no products" messages.
-                        if (initialNoProductsMessage && productCards.length > 0) {
-                             initialNoProductsMessage.style.display = 'none'; // Hide initial server-side "no products" message if cards were loaded
-                        }
-                        
-                        if (!hasVisibleProducts && productCards.length > 0) { // If filters hide all loaded cards
-                            noProductsMessage.style.display = 'block';
-                        } else {
-                            noProductsMessage.style.display = 'none';
-                        }
-                        
-                        // If no products were loaded from server at all, ensure that message persists.
-                        if (productCards.length === 0 && initialNoProductsMessage) {
-                            initialNoProductsMessage.style.display = 'block';
-                            noProductsMessage.style.display = 'none';
-                        }
                     }
-
-                    // Event listener for search input (filters as user types).
-                    searchInput.addEventListener('input', function() {
-                        currentSearchTerm = this.value.toLowerCase();
-                        filterProducts();
-                    });
-
-                    // Event listeners for category filter buttons.
-                    categoryButtons.forEach(button => {
-                        button.addEventListener('click', function() {
-                            currentCategory = this.dataset.category;
-                            // Update active button styling for category filters.
-                            categoryButtons.forEach(btn => {
-                                btn.classList.remove('bg-[#F56401]', 'text-white'); // Remove active style from all
-                                btn.classList.add('bg-gray-200', 'text-gray-700');  // Set to inactive style
-                            });
-                            this.classList.add('bg-[#F56401]', 'text-white');       // Add active style to clicked button
-                            this.classList.remove('bg-gray-200', 'text-gray-700'); // Remove inactive style
-                            filterProducts(); // Re-apply filters
-                        });
-                    });
-                    
-                    // Initial filter application on page load.
-                    // This hides the "initialNoProductsMessage" if products were loaded from the server.
-                    if (productCards.length > 0 && initialNoProductsMessage) {
-                        initialNoProductsMessage.style.display = 'none';
-                    }
-                    filterProducts(); 
-                });
-            /*]]>*/
-            </script>
-        </th:block>
-    </div>
-
-</body>
-</html>
-            /*<![CDATA[*/
-                document.addEventListener('DOMContentLoaded', function() {
-                    const cartButtons = document.querySelectorAll('.add-to-cart-btn');
-                    cartButtons.forEach(button => {
-                        button.addEventListener('click', function() {
-                            const productId = this.dataset.productId;
-                            const productName = this.dataset.productName;
-                            const productPrice = parseFloat(this.dataset.productPrice);
-                            const productImageUrl = this.dataset.productImageUrl;
-                            const productStock = parseInt(this.dataset.productStock); // Get stock
-
-                            const item = {
-                                id: productId,
-                                name: productName,
-                                price: productPrice,
-                                imageUrl: productImageUrl,
-                                quantity: 1, // Default add 1
-                                originalStock: productStock // Add originalStock here
-                            };
-                            addItemToCart(item);
-                            // Alert is now handled by addItemToCart if stock is exceeded, or if successful.
-                            // For successful addition, you might want a more subtle notification.
-                            // For now, if addItemToCart doesn't alert for error, assume success.
-                            // Consider adding a success alert/toast here if needed, but only if addItemToCart doesn't show its own error.
-                            // A simple success alert could be:
-                            // if (getCart().find(i => i.id === productId)) { // Check if item was actually added/updated
-                            //     alert(productName + ' added to cart!');
-                            // }
-                            // However, since addItemToCart might fail silently if stock is an issue on first add,
-                            // and alerts on its own for stock issues, we'll rely on its alerts.
-                            // A better approach for UI feedback is a toast notification system.
+                    searchInput.addEventListener('input', filterProducts);
+                    categoryButtons.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            categoryButtons.forEach(b => b.classList.remove('bg-[#F56401]', 'text-white'));
+                            this.classList.add('bg-[#F56401]', 'text-white');
+                            filterProducts();
                         });
                     });
                 });
             /*]]>*/
             </script>
         </th:block>
-    </div>
-
+    </main>
+    <div th:replace="~{layout/main-layout :: footer}"></div>
 </body>
 </html>

@@ -6,12 +6,10 @@
     'isCurrentUser' boolean flag on each adminUser object is crucial for self-deletion prevention.
 */ -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:with="pageTitle='Manage Admin Users'"> <!-- /* Sets page title for admin layout. */ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="pageTitle='Manage Admin Users'">
 <body>
-
-    <!-- /* Injects content into admin-layout.html. */ -->
-    <div th:replace="~{admin/layout/admin-layout :: content}">
+    <div th:replace="~{admin/layout/admin-layout :: header}"></div>
+    <main th:replace="~{admin/layout/admin-layout :: content}">
         <th:block>
             <!-- /* Page header with title and "Add New Admin" button. */ -->
             <div class="flex justify-between items-center mb-8">
@@ -25,7 +23,7 @@
 
             <!-- /* Container for the admin users table. Styled as a white card with shadow. */ -->
             <div class="bg-white shadow-xl rounded-lg overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full divide-y divide-gray-200" aria-label="Admin User List">
                     <thead class="bg-gray-100">
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Username</th>
@@ -167,7 +165,7 @@
             /*]]>*/
             </script>
         </th:block>
-    </div>
-
+    </main>
+    <div th:replace="~{admin/layout/admin-layout :: footer}"></div>
 </body>
 </html>
