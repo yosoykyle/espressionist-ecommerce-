@@ -22,7 +22,7 @@
     <section class="success-section">
         <div class="container">
             <!-- Success Message (shown when order is found) -->
-            <div class="success-container" id="success-container">
+            <div class="success-container" id="success-container" th:if="${order != null}">
                 <div class="success-icon">
                     <i class="fas fa-check-circle"></i>
                 </div>
@@ -32,21 +32,27 @@
                 <div class="order-details">
                     <div class="tracking-info">
                         <h2>Your Tracking Code</h2>
-                        <div class="tracking-code" id="tracking-code"></div>
+                        <div class="tracking-code" th:text="${order.code}"></div>
                     </div>
                     
                     <div class="order-summary">
                         <div class="summary-item">
                             <span class="label">Total Amount:</span>
-                            <span class="value" id="total-amount"></span>
+                            <span class="value" th:text="${order.totalWithVat}"></span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Items:</span>
-                            <span class="value" id="total-items"></span>
+                            <span class="value">
+                                <ul>
+                                    <li th:each="item : ${order.items}">
+                                        <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span>
+                                    </li>
+                                </ul>
+                            </span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Order Date:</span>
-                            <span class="value" id="order-date"></span>
+                            <span class="value" th:text="${order.orderDate}"></span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Estimated Delivery:</span>
@@ -61,20 +67,18 @@
                 </div>
                 
                 <div class="success-actions">
-                    <a href="track.html" class="btn-track">Track My Order</a>
-                    <a href="index.html" class="btn-shop">Return to Shop</a>
+                    <a th:href="@{'/order-status/' + ${order.code}}" class="btn-track">Track My Order</a>
+                    <a th:href="@{/}" class="btn-shop">Return to Shop</a>
                 </div>
             </div>
             
             <!-- Fallback Message (shown when order is not found) -->
-            <div class="fallback-container" id="fallback-container">
+            <div class="fallback-container" id="fallback-container" th:if="${order == null}">
                 <div class="fallback-icon">
                     <i class="fas fa-exclamation-circle"></i>
                 </div>
                 
                 <h1 class="fallback-title">Oops! We couldn't find your order.</h1>
-                
-                <div class="fallback  We couldn't find your order.</h1>
                 
                 <div class="fallback-message">
                     <p>The order ID you're looking for doesn't exist or has been removed.</p>
@@ -82,7 +86,7 @@
                 </div>
                 
                 <div class="fallback-actions">
-                    <a href="index.html" class="btn-shop">Return to Shop</a>
+                    <a th:href="@{/}" class="btn-shop">Return to Shop</a>
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
@@ -13,9 +13,7 @@
 <body>
     <!-- Header -->
     <header class="header">
-        <div class="container" data-component="navbar">
-            <!-- Navbar will be loaded here -->
-        </div>
+        <div class="container" th:replace="fragments/navbar :: navbar"></div>
     </header>
 
     <!-- Hero Section -->
@@ -24,7 +22,7 @@
             <h1>espressionist</h1>
             <p class="tagline">coffee. canvas. culture.</p>
             <div class="hero-buttons">
-                <a href="products.html" class="btn btn-secondary">Shop Now</a>
+                <a th:href="@{/products}" class="btn btn-secondary">Shop Now</a>
                 <a href="#about" class="btn btn-secondary">Book a Spot</a>
             </div>
         </div>
@@ -34,25 +32,25 @@
     <section class="categories">
         <div class="container">
             <div class="category-grid">
-                <a href="products.html" class="category-card">
+                <a th:href="@{/products}" class="category-card">
                     <div class="category-content">
                         <i class="fas fa-mug-hot" aria-hidden="true"></i>
                         <h3>Coffee & Tea</h3>
                     </div>
                 </a>
-                <a href="products.html" class="category-card">
+                <a th:href="@{/products}" class="category-card">
                     <div class="category-content">
                         <i class="fas fa-paint-brush" aria-hidden="true"></i>
                         <h3>Art & Merch</h3>
                     </div>
                 </a>
-                <a href="products.html" class="category-card">
+                <a th:href="@{/products}" class="category-card">
                     <div class="category-content">
                         <i class="fas fa-gift" aria-hidden="true"></i>
                         <h3>Gift Sets</h3>
                     </div>
                 </a>
-                <a href="products.html" class="category-card">
+                <a th:href="@{/products}" class="category-card">
                     <div class="category-content">
                         <i class="fas fa-ticket-alt" aria-hidden="true"></i>
                         <h3>Voucher</h3>

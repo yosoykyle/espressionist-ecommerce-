@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,8 +28,8 @@
                 <h1 class="confirmation-title">Thank you for your order!</h1>
                 
                 <div class="tracking-info">
-                    <h2 class="tracking-code">Your Tracking Code: <span>ESPR-XXXXXX</span></h2>
-                    <p>You can use this code to track your order on our <a href="track.html">Tracking Page</a>.</p>
+                    <h2 class="tracking-code">Your Tracking Code: <span th:text="${order.code}"></span></h2>
+                    <p>You can use this code to track your order on our <a th:href="@{'/order-status/' + ${order.code}}">Tracking Page</a>.</p>
                     <p>We've also sent an order summary to your email.</p>
                 </div>
                 
@@ -42,6 +42,16 @@
                     </p>
                 </div>
 
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <ul>
+                        <li th:each="item : ${order.items}">
+                            <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span> — ₱<span th:text="${item.totalPrice}"></span>
+                        </li>
+                    </ul>
+                    <p><strong>Total (with VAT): ₱<span th:text="${order.totalWithVat}"></span></strong></p>
+                    <p><strong>Shipping to:</strong> <span th:text="${order.shippingAddress}"></span></p>
+                </div>
                 
                 <div class="confirmation-actions">
                     <a href="index.html" class="btn-continue">Continue Shopping</a>

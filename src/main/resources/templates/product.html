@@ -26,34 +26,28 @@
             
             <div class="product-container">
                 <div class="product-image-large">
-                    <!-- Placeholder for product image -->
-                    <div class="image-placeholder-large"></div>
+                    <img th:src="@{'/images/' + ${product.image}}" alt="Product Image" class="image-placeholder-large"/>
                 </div>
-                
                 <div class="product-info">
-                    <div class="product-category">Coffee & Tea</div>
-                    <h1 class="product-title">Product Name</h1>
-                    <div class="product-price">₱—</div>
-                    
+                    <div class="product-category" th:text="${product.category}"></div>
+                    <h1 class="product-title" th:text="${product.name}"></h1>
+                    <div class="product-price">₱<span th:text="${product.price}"></span></div>
                     <div class="product-availability">
-                        <span class="available-tag">Available</span>
+                        <span class="available-tag" th:if="${product.quantity > 0}">Available</span>
+                        <span class="unavailable-tag" th:if="${product.quantity == 0}">Out of Stock</span>
                     </div>
-                    
                     <div class="product-description">
-                        <p>Description here</p>
+                        <p th:text="${product.description}"></p>
                     </div>
-                    
                     <div class="product-actions">
-                        <div class="quantity-selector">
-                            <label for="quantity">Quantity:</label>
-                            <div class="quantity-controls">
-                                <button class="quantity-btn" type="button" aria-label="Decrease quantity">-</button>
-                                <input type="number" id="quantity" name="quantity" value="1" min="1" aria-label="Quantity">
-                                <button class="quantity-btn" type="button" aria-label="Increase quantity">+</button>
+                        <form th:action="@{/cart/add}" method="post">
+                            <input type="hidden" name="productId" th:value="${product.id}"/>
+                            <div class="quantity-selector">
+                                <label for="quantity">Quantity:</label>
+                                <input type="number" id="quantity" name="quantity" min="1" th:attr="max=${product.quantity}" value="1"/>
                             </div>
-                        </div>
-                        
-                        <button class="add-to-cart-btn-large">Add to Cart</button>
+                            <button class="btn btn-primary" type="submit" th:disabled="${product.quantity == 0}">Add to Cart</button>
+                        </form>
                     </div>
                 </div>
             </div>

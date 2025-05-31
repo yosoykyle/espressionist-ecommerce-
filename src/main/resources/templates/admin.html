@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,44 +43,41 @@
             <div class="admin-tab-content active" id="inventory-tab">
                 <div class="admin-section-header">
                     <h2>Inventory Management</h2>
-                    <button class="btn-primary add-product-btn">
+                    <button class="btn-primary add-product-btn" onclick="document.getElementById('addProductModal').style.display='block'">
                         <i class="fas fa-plus"></i> Add New Product
                     </button>
                 </div>
-                
-                <!-- Product Categories Filter -->
-                <div class="admin-filter">
-                    <label for="category-filter">Filter by Category:</label>
-                    <select id="category-filter" class="admin-select">
-                        <option value="all">All Categories</option>
-                        <option value="coffee-tea">Coffee & Tea</option>
-                        <option value="art-merch">Art & Merch</option>
-                        <option value="gift-sets">Gift Sets</option>
-                        <option value="vouchers">Vouchers</option>
-                    </select>
-                </div>
-                
-                <!-- Products Table -->
-                <div class="admin-table-container">
-                    <table class="admin-table" id="products-table">
-                        <thead>
-                            <tr>
-                                <th>Image</th>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Products will be loaded here -->
-                            <tr class="empty-row">
-                                <td colspan="6">No products found. Add a new product to get started.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Archived</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${products}">
+                            <td th:text="${product.name}"></td>
+                            <td th:text="${product.category}"></td>
+                            <td th:text="${product.price}"></td>
+                            <td th:text="${product.quantity}"></td>
+                            <td th:text="${product.archived ? 'Yes' : 'No'}"></td>
+                            <td>
+                                <form th:action="@{/admin/products/archive}" method="post" th:if="${!product.archived}">
+                                    <input type="hidden" name="productId" th:value="${product.id}"/>
+                                    <button type="submit" class="btn btn-warning">Archive</button>
+                                </form>
+                                <form th:action="@{/admin/products/edit}" method="get">
+                                    <input type="hidden" name="productId" th:value="${product.id}"/>
+                                    <button type="submit" class="btn btn-secondary">Edit</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             
             <!-- Customer Management Tab -->
@@ -124,48 +121,75 @@
                 <div class="admin-section-header">
                     <h2>Order Management</h2>
                 </div>
-                
-                <!-- Order Filters -->
-                <div class="admin-filter-group">
-                    <div class="admin-filter">
-                        <label for="order-status-filter">Filter by Status:</label>
-                        <select id="order-status-filter" class="admin-select">
-                            <option value="all">All Statuses</option>
-                            <option value="pending">Pending</option>
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                    </div>
-                    
-                    <div class="admin-filter">
-                        <label for="order-date-filter">Filter by Date:</label>
-                        <input type="date" id="order-date-filter" class="admin-date">
-                    </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order Code</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Shipping Address</th>
+                            <th>Status</th>
+                            <th>Total (with VAT)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td th:text="${order.code}"></td>
+                            <td th:text="${order.customerName}"></td>
+                            <td th:text="${order.email}"></td>
+                            <td th:text="${order.shippingAddress}"></td>
+                            <td th:text="${order.status}"></td>
+                            <td th:text="${order.totalWithVat}"></td>
+                            <td>
+                                <form th:action="@{/admin/orders/update-status}" method="post">
+                                    <input type="hidden" name="orderId" th:value="${order.id}"/>
+                                    <select name="status" th:value="${order.status}">
+                                        <option th:selected="${order.status == 'Pending'}">Pending</option>
+                                        <option th:selected="${order.status == 'Processing'}">Processing</option>
+                                        <option th:selected="${order.status == 'Shipped'}">Shipped</option>
+                                        <option th:selected="${order.status == 'Delivered'}">Delivered</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">Update</button>
+                                </form>
+                                <form th:action="@{/admin/orders/archive}" method="post" th:if="${order.status == 'Delivered' && !order.archived}">
+                                    <input type="hidden" name="orderId" th:value="${order.id}"/>
+                                    <button type="submit" class="btn btn-warning">Archive</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Admin Management Tab -->
+            <div class="admin-tab-content" id="admins-tab">
+                <div class="admin-section-header">
+                    <h2>Admin Account Management</h2>
+                    <button class="btn-primary add-admin-btn" onclick="document.getElementById('addAdminModal').style.display='block'">
+                        <i class="fas fa-user-plus"></i> Add Admin
+                    </button>
                 </div>
-                
-                <!-- Orders Table -->
-                <div class="admin-table-container">
-                    <table class="admin-table" id="orders-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Orders will be loaded here -->
-                            <tr class="empty-row">
-                                <td colspan="6">No orders found.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="admin : ${admins}">
+                            <td th:text="${admin.username}"></td>
+                            <td>
+                                <form th:action="@{/admin/delete}" method="post" th:if="${admin.username != currentAdmin}">
+                                    <input type="hidden" name="adminId" th:value="${admin.id}"/>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                                <span th:if="${admin.username == currentAdmin}">Cannot delete self</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
@@ -181,12 +205,12 @@
             </div>
             
             <div class="admin-modal-body">
-                <form id="product-form" class="admin-form">
-                    <input type="hidden" id="product-id">
+                <form id="product-form" class="admin-form" th:action="@{/admin/products/save}" method="post">
+                    <input type="hidden" id="product-id" name="productId" th:value="${product.id}">
                     
                     <div class="form-group">
                         <label for="product-name">Product Name*</label>
-                        <input type="text" id="product-name" name="product-name" required>
+                        <input type="text" id="product-name" name="product-name" required th:value="${product.name}">
                         <div class="error-message" id="product-name-error"></div>
                     </div>
                     
@@ -194,10 +218,10 @@
                         <label for="product-category">Category*</label>
                         <select id="product-category" name="product-category" required>
                             <option value="">Select Category</option>
-                            <option value="coffee-tea">Coffee & Tea</option>
-                            <option value="art-merch">Art & Merch</option>
-                            <option value="gift-sets">Gift Sets</option>
-                            <option value="vouchers">Vouchers</option>
+                            <option value="coffee-tea" th:selected="${product.category == 'coffee-tea'}">Coffee & Tea</option>
+                            <option value="art-merch" th:selected="${product.category == 'art-merch'}">Art & Merch</option>
+                            <option value="gift-sets" th:selected="${product.category == 'gift-sets'}">Gift Sets</option>
+                            <option value="vouchers" th:selected="${product.category == 'vouchers'}">Vouchers</option>
                         </select>
                         <div class="error-message" id="product-category-error"></div>
                     </div>
@@ -205,20 +229,20 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="product-price">Price (₱)*</label>
-                            <input type="number" id="product-price" name="product-price" min="0" step="0.01" required>
+                            <input type="number" id="product-price" name="product-price" min="0" step="0.01" required th:value="${product.price}">
                             <div class="error-message" id="product-price-error"></div>
                         </div>
                         
                         <div class="form-group">
                             <label for="product-stock">Stock Quantity*</label>
-                            <input type="number" id="product-stock" name="product-stock" min="0" step="1" required>
+                            <input type="number" id="product-stock" name="product-stock" min="0" step="1" required th:value="${product.quantity}">
                             <div class="error-message" id="product-stock-error"></div>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="product-description">Description</label>
-                        <textarea id="product-description" name="product-description" rows="4"></textarea>
+                        <textarea id="product-description" name="product-description" rows="4" th:text="${product.description}"></textarea>
                         <div class="error-message" id="product-description-error"></div>
                     </div>
                     
