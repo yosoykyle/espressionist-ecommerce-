@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Espressionist</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Component loader script -->
+    <script src="js/components.js"></script>
+</head>
+<body class="admin-body">
+    <!-- Header -->
+    <header class="header">
+        <div class="container" data-component="navbar">
+            <!-- Navbar will be loaded here -->
+        </div>
+    </header>
+
+    <!-- Admin Login Section -->
+    <section class="admin-login-section">
+        <div class="container">
+            <div class="admin-login-container">
+                <div class="admin-login-header">
+                    <h1>Admin Login</h1>
+                    <p>Enter your credentials to access the admin dashboard</p>
+                </div>
+                
+                <form id="admin-login-form" class="admin-login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required 
+                            autocomplete="username"
+                            aria-describedby="username-error"
+                            autofocus
+                        >
+                        <div class="error-message" id="username-error" role="alert"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-input-container">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                required 
+                                autocomplete="current-password"
+                                aria-describedby="password-error"
+                            >
+                            <button 
+                                type="button" 
+                                id="toggle-password" 
+                                class="toggle-password" 
+                                aria-label="Show password"
+                                tabindex="0"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="error-message" id="password-error" role="alert"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="error-message" id="login-error" role="alert"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary admin-login-btn">
+                        <span>Login</span>
+                        <i class="fas fa-sign-in-alt"></i>
+                    </button>
+                </form>
+                
+                <div class="admin-login-footer">
+                    <p>Return to <a href="index.html">Customer Site</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container" data-component="footer">
+            <!-- Footer will be loaded here -->
+        </div>
+    </footer>
+
+    <script src="js/admin-login.js"></script>
+</body>
+</html>

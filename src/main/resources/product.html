@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Espressionist</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Component loader script -->
+    <script src="js/components.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container" data-component="navbar">
+            <!-- Navbar will be loaded here -->
+        </div>
+    </header>
+
+    <!-- Product Details Section -->
+    <section class="product-details">
+        <div class="container">
+            <div class="back-link">
+                <a href="products.html"><i class="fas fa-arrow-left"></i> Back to Shop</a>
+            </div>
+            
+            <div class="product-container">
+                <div class="product-image-large">
+                    <!-- Placeholder for product image -->
+                    <div class="image-placeholder-large"></div>
+                </div>
+                
+                <div class="product-info">
+                    <div class="product-category">Coffee & Tea</div>
+                    <h1 class="product-title">Product Name</h1>
+                    <div class="product-price">₱—</div>
+                    
+                    <div class="product-availability">
+                        <span class="available-tag">Available</span>
+                    </div>
+                    
+                    <div class="product-description">
+                        <p>Description here</p>
+                    </div>
+                    
+                    <div class="product-actions">
+                        <div class="quantity-selector">
+                            <label for="quantity">Quantity:</label>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" type="button" aria-label="Decrease quantity">-</button>
+                                <input type="number" id="quantity" name="quantity" value="1" min="1" aria-label="Quantity">
+                                <button class="quantity-btn" type="button" aria-label="Increase quantity">+</button>
+                            </div>
+                        </div>
+                        
+                        <button class="add-to-cart-btn-large">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container" data-component="footer">
+            <!-- Footer will be loaded here -->
+        </div>
+    </footer>
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript" src="js/storage.js"></script>
+    <script type="text/javascript" src="js/product.js"></script>
+</body>
+</html>
