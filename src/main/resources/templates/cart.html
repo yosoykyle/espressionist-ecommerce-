@@ -27,8 +27,8 @@
             <h1 class="page-title">Your Cart</h1>
             
             <div class="cart-container">
-                <!-- Empty Cart Message (will be shown/hidden by JavaScript) -->
-                <div class="empty-cart" id="empty-cart">
+                <!-- Empty Cart Message -->
+                <div class="empty-cart" th:if="${#lists.isEmpty(cartItems)}">
                     <div class="empty-state-icon">
                         <i class="fas fa-shopping-cart"></i>
                     </div>
@@ -38,9 +38,8 @@
                         <a href="products.html" class="btn btn-primary">Browse Products</a>
                     </div>
                 </div>
-                
-                <!-- Cart Items Table (will be shown/hidden by JavaScript) -->
-                <div class="cart-items-container" id="cart-items-container">
+                <!-- Cart Items Table -->
+                <div class="cart-items-container" th:if="${!#lists.isEmpty(cartItems)}">
                     <div class="cart-table">
                         <div class="cart-header">
                             <div class="cart-cell header-cell">Product</div>
@@ -49,38 +48,30 @@
                             <div class="cart-cell header-cell">Total</div>
                             <div class="cart-cell header-cell">Action</div>
                         </div>
-                        
-                        <!-- Cart items will be inserted here by JavaScript -->
-                        <div id="cart-items">
-                            <!-- Loading state for cart items -->
-                            <div id="cart-loading" class="loading-container">
-                                <div class="loading-spinner"></div>
-                                <span class="loading-text">Loading your cart...</span>
+                        <div class="cart-row" th:each="item, iterStat : ${cartItems}">
+                            <div class="cart-cell">
+                                <span th:text="${item.productName}"></span>
+                            </div>
+                            <div class="cart-cell">
+                                <span th:text="${item.quantity}"></span>
+                            </div>
+                            <div class="cart-cell">
+                                ₱<span th:text="${item.price}"></span>
+                            </div>
+                            <div class="cart-cell">
+                                ₱<span th:text="${item.totalPrice}"></span>
+                            </div>
+                            <div class="cart-cell">
+                                <form th:action="@{/cart/remove}" method="post">
+                                    <input type="hidden" name="productId" th:value="${item.productId}"/>
+                                    <button type="submit" class="btn btn-danger">Remove</button>
+                                </form>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Cart Summary -->
                     <div class="cart-summary">
-                        <h2>Cart Summary</h2>
-                        <div class="summary-row">
-                            <span>Subtotal:</span>
-                            <span class="cart-subtotal" id="cart-subtotal">₱0.00</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Tax (12% VAT):</span>
-                            <span class="cart-tax" id="cart-tax">₱0.00</span>
-                        </div>
-                        <div class="summary-row total-row">
-                            <span>Total:</span>
-                            <span class="cart-total" id="cart-total">₱0.00</span>
-                        </div>
-                        <p class="vat-disclaimer">*Prices are inclusive of 12% VAT</p>
-                        
-                        <div class="checkout-actions">
-                            <a href="products.html" class="btn-secondary" aria-label="Continue shopping">Continue Shopping</a>
-                            <a href="checkout.html" class="btn-checkout" aria-label="Proceed to checkout">Proceed to Checkout</a>
-                        </div>
+                        <p><strong>Total:</strong> ₱<span th:text="${cartTotal}"></span></p>
+                        <a href="checkout.html" class="btn btn-primary">Proceed to Checkout</a>
                     </div>
                 </div>
             </div>

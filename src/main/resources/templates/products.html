@@ -35,8 +35,8 @@
     <!-- Product Grid -->
     <section class="products" id="main-content">
         <div class="container">
-            <!-- Empty State Message (visible by default) -->
-            <div class="empty-state" id="empty-products">
+            <!-- Thymeleaf: Show empty state if no products -->
+            <div class="empty-state" th:if="${#lists.isEmpty(products)}">
                 <div class="empty-state-icon">
                     <i class="fas fa-mug-hot"></i>
                 </div>
@@ -46,29 +46,18 @@
                     <a href="index.html#about" class="btn btn-primary">Visit Our Café</a>
                 </div>
             </div>
-
-            <!-- Loading State -->
-            <div id="products-loading" class="loading-container" style="display: none;">
-                <div class="loading-spinner"></div>
-                <span class="loading-text">Loading products...</span>
-            </div>
-
-            <!-- Product Grid (hidden by default, would be shown when products are available) -->
-            <div class="product-grid" id="product-grid" style="display: none;">
-                <!-- Product Card Template (repeated for demonstration) -->
-                <div class="product-card">
-                    <div class="product-image">
-                        <!-- Placeholder for product image -->
-                        <div class="image-placeholder" aria-label="Product image placeholder"></div>
-                    </div>
-                    <div class="product-details">
-                        <h3 class="product-name">Product Name</h3>
-                        <p class="product-price">₱—</p>
-                        <button class="add-to-cart-btn" aria-label="Add Product Name to cart">Add to Cart</button>
-                    </div>
+            <!-- Thymeleaf: Product grid -->
+            <div class="product-grid" th:if="${!#lists.isEmpty(products)}">
+                <div class="product-card" th:each="product : ${products}">
+                    <a th:href="@{'/product/' + ${product.id}}">
+                        <img th:src="@{'/images/' + ${product.image}}" alt="Product Image" class="product-image"/>
+                        <div class="product-info">
+                            <h3 th:text="${product.name}"></h3>
+                            <p class="product-price">₱<span th:text="${product.price}"></span></p>
+                            <p class="product-stock" th:text="'Stock: ' + ${product.quantity}"></p>
+                        </div>
+                    </a>
                 </div>
-                
-                <!-- More product cards would be added here dynamically -->
             </div>
         </div>
     </section>

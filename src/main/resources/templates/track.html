@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -107,85 +107,25 @@
             
             <div class="track-container">
                 <!-- Tracking Form -->
-                <form class="tracking-form" id="tracking-form" novalidate>
-    <p class="tracking-info" id="tracking-info">Enter your order tracking code below to check the status of your order.</p>
-    
-    <div class="form-group">
-        <label for="tracking-code">Tracking Code</label>
-        <input 
-            type="text" 
-            id="tracking-code" 
-            name="tracking-code" 
-            placeholder="e.g., ESPR-ABC123" 
-            autocomplete="off" 
-            aria-required="true" 
-            aria-describedby="tracking-info error-message"
-            autocapitalize="characters"
-            aria-label="Tracking Code"
-        >
-    </div>
-    
-    <button type="submit" id="track-btn" class="track-btn">Track My Order</button>
-</form>
-                
-                <!-- Order Results (initially hidden) -->
-                <div class="order-results" id="order-results">
-                    <div class="results-header">
-                        <h2>Order Information</h2>
-                        <div class="order-id">Order #<span id="result-order-id"></span></div>
+                <div class="tracking-form-container">
+                    <form th:action="@{/order-status}" method="get" class="tracking-form">
+                        <label for="orderCode">Enter your tracking code:</label>
+                        <input type="text" id="orderCode" name="orderCode" th:value="${orderCode}" required/>
+                        <button type="submit" class="btn btn-primary">Track Order</button>
+                    </form>
+                    <div class="tracking-info" th:if="${order != null}">
+                        <h3>Order Date: <span th:text="${order.orderDate}"></span></h3>
+                        <ul>
+                            <li th:each="item : ${order.items}">
+                                <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span>
+                            </li>
+                        </ul>
+                        <p><strong>Shipping Info:</strong> <span th:text="${order.shippingAddress}"></span></p>
+                        <p><strong>Status:</strong> <span th:text="${order.status}"></span></p>
                     </div>
-                    
-                    <div class="status-container">
-                        <div class="status-label">Status:</div>
-                        <div class="status-badge" id="order-status"></div>
+                    <div class="tracking-info error" th:if="${order == null && orderCode != null}">
+                        <p>Order not found. Please check your code and try again.</p>
                     </div>
-                    
-                    <div class="order-details">
-                        <div class="details-row">
-                            <div class="details-label">Order Date:</div>
-                            <div class="details-value" id="order-date"></div>
-                        </div>
-                        <div class="details-row">
-                            <div class="details-label">Total Amount:</div>
-                            <div class="details-value" id="order-total"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="shipping-info">
-                        <h3>Shipping Information</h3>
-                        <div class="shipping-details">
-                            <div class="details-row">
-                                <div class="details-label">Name:</div>
-                                <div class="details-value" id="shipping-name"></div>
-                            </div>
-                            <div class="details-row">
-                                <div class="details-label">Phone:</div>
-                                <div class="details-value" id="shipping-phone"></div>
-                            </div>
-                            <div class="details-row">
-                                <div class="details-label">Address:</div>
-                                <div class="details-value" id="shipping-address"></div>
-                            </div>
-                            <div class="details-row" id="shipping-note-row">
-                                <div class="details-label">Note:</div>
-                                <div class="details-value" id="shipping-note"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="estimated-delivery">
-                        <i class="fas fa-truck"></i>
-                        <span>Estimated delivery: 3–5 days within PH</span>
-                    </div>
-                </div>
-                
-                <!-- Error Message (initially hidden) -->
-                <div class="error-message with-icon" id="error-message" role="alert">
-                    <div class="error-icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <h3>Invalid or expired code</h3>
-                    <p>We couldn't find an order with that tracking code. Please check and try again.</p>
                 </div>
             </div>
         </div>
