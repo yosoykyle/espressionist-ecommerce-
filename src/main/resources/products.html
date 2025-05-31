@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop | Espressionist</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Component loader script -->
+    <script src="js/components.js"></script>
+</head>
+<body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container" data-component="navbar">
+            <!-- Navbar will be loaded here -->
+        </div>
+    </header>
+
+    <!-- Category Tabs -->
+    <section class="category-tabs">
+        <div class="container">
+            <div class="tabs-container">
+                <button class="tab-btn" aria-pressed="false">Coffee & Tea</button>
+                <button class="tab-btn" aria-pressed="false">Art & Merch</button>
+                <button class="tab-btn" aria-pressed="false">Gift Sets</button>
+                <button class="tab-btn" aria-pressed="false">Vouchers</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Grid -->
+    <section class="products" id="main-content">
+        <div class="container">
+            <!-- Empty State Message (visible by default) -->
+            <div class="empty-state" id="empty-products">
+                <div class="empty-state-icon">
+                    <i class="fas fa-mug-hot"></i>
+                </div>
+                <h2 class="empty-state-title">No products available yet</h2>
+                <p class="empty-state-message">We're working on adding our amazing products to our online store. Please check back soon or visit our physical store to see our full collection.</p>
+                <div class="empty-state-action">
+                    <a href="index.html#about" class="btn btn-primary">Visit Our Café</a>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="products-loading" class="loading-container" style="display: none;">
+                <div class="loading-spinner"></div>
+                <span class="loading-text">Loading products...</span>
+            </div>
+
+            <!-- Product Grid (hidden by default, would be shown when products are available) -->
+            <div class="product-grid" id="product-grid" style="display: none;">
+                <!-- Product Card Template (repeated for demonstration) -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <!-- Placeholder for product image -->
+                        <div class="image-placeholder" aria-label="Product image placeholder"></div>
+                    </div>
+                    <div class="product-details">
+                        <h3 class="product-name">Product Name</h3>
+                        <p class="product-price">₱—</p>
+                        <button class="add-to-cart-btn" aria-label="Add Product Name to cart">Add to Cart</button>
+                    </div>
+                </div>
+                
+                <!-- More product cards would be added here dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container" data-component="footer">
+            <!-- Footer will be loaded here -->
+        </div>
+    </footer>
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/products.js"></script>
+</body>
+</html>

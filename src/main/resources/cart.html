@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart | Espressionist</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Component loader script -->
+    <script src="js/components.js"></script>
+</head>
+<body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container" data-component="navbar">
+            <!-- Navbar will be loaded here -->
+        </div>
+    </header>
+
+    <!-- Cart Section -->
+    <section class="cart-section" id="main-content">
+        <div class="container">
+            <h1 class="page-title">Your Cart</h1>
+            
+            <div class="cart-container">
+                <!-- Empty Cart Message (will be shown/hidden by JavaScript) -->
+                <div class="empty-cart" id="empty-cart">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h2 class="empty-state-title">Your cart is empty</h2>
+                    <p class="empty-state-message">Looks like you haven't added any products to your cart yet. Browse our collection and find something you'll love!</p>
+                    <div class="empty-state-action">
+                        <a href="products.html" class="btn btn-primary">Browse Products</a>
+                    </div>
+                </div>
+                
+                <!-- Cart Items Table (will be shown/hidden by JavaScript) -->
+                <div class="cart-items-container" id="cart-items-container">
+                    <div class="cart-table">
+                        <div class="cart-header">
+                            <div class="cart-cell header-cell">Product</div>
+                            <div class="cart-cell header-cell">Quantity</div>
+                            <div class="cart-cell header-cell">Price</div>
+                            <div class="cart-cell header-cell">Total</div>
+                            <div class="cart-cell header-cell">Action</div>
+                        </div>
+                        
+                        <!-- Cart items will be inserted here by JavaScript -->
+                        <div id="cart-items">
+                            <!-- Loading state for cart items -->
+                            <div id="cart-loading" class="loading-container">
+                                <div class="loading-spinner"></div>
+                                <span class="loading-text">Loading your cart...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cart Summary -->
+                    <div class="cart-summary">
+                        <h2>Cart Summary</h2>
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span class="cart-subtotal" id="cart-subtotal">₱0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax (12% VAT):</span>
+                            <span class="cart-tax" id="cart-tax">₱0.00</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>Total:</span>
+                            <span class="cart-total" id="cart-total">₱0.00</span>
+                        </div>
+                        <p class="vat-disclaimer">*Prices are inclusive of 12% VAT</p>
+                        
+                        <div class="checkout-actions">
+                            <a href="products.html" class="btn-secondary" aria-label="Continue shopping">Continue Shopping</a>
+                            <a href="checkout.html" class="btn-checkout" aria-label="Proceed to checkout">Proceed to Checkout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container" data-component="footer">
+            <!-- Footer will be loaded here -->
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/cart.js"></script>
+</body>
+</html>
