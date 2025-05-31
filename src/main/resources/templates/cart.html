@@ -1,223 +1,101 @@
-<!-- /*
-    cart.html (Shopping Cart Page)
-    Displays items currently in the user's shopping cart.
-    Allows users to update item quantities, remove items, clear the cart, and proceed to checkout.
-    Cart data is managed client-side via cart.js and ui.js for notifications.
-*/ -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="pageTitle='Your Shopping Cart'">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart | Espressionist</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Component loader script -->
+    <script src="js/components.js"></script>
+</head>
 <body>
-    <div th:replace="~{layout/main-layout :: header}"></div>
-    <main th:replace="~{layout/main-layout :: content}">
-        <th:block>
-            <section class="py-10 bg-[#F5F5DC]" aria-label="Shopping Cart">
-                <div class="container mx-auto px-4">
-                    <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">Your Shopping Cart</h1>
-                    <div id="emptyCartMessage" class="text-center" style="display: none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <p class="mt-6 text-xl text-gray-600">Your cart is currently empty.</p>
-                        <p class="mt-2 text-gray-500">Looks like you haven't added anything to your cart yet.</p>
-                        <a th:href="@{/products}" class="mt-8 inline-block bg-[#F56401] text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">Shop Products</a>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container" data-component="navbar">
+            <!-- Navbar will be loaded here -->
+        </div>
+    </header>
+
+    <!-- Cart Section -->
+    <section class="cart-section" id="main-content">
+        <div class="container">
+            <h1 class="page-title">Your Cart</h1>
+            
+            <div class="cart-container">
+                <!-- Empty Cart Message (will be shown/hidden by JavaScript) -->
+                <div class="empty-cart" id="empty-cart">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-shopping-cart"></i>
                     </div>
-                    <div id="cartItemsArea">
-                        <div id="cart-container" class="bg-white shadow-xl rounded-lg overflow-hidden"></div>
-                        <div id="cart-summary-actions" class="mt-10 md:flex md:justify-between md:items-start">
-                            <div class="md:w-1/2 lg:w-2/3 mb-6 md:mb-0">
-                                <button id="clear-cart-btn" class="border border-red-500 text-red-500 font-semibold py-3 px-6 rounded-lg hover:bg-red-500 hover:text-white transition duration-300 ease-in-out">Clear Cart</button>
-                            </div>
-                            <div class="bg-white p-6 rounded-lg shadow-lg md:w-1/2 lg:w-1/3">
-                                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Order Summary</h2>
-                                <div class="flex justify-between mb-2">
-                                    <span class="text-gray-600">Subtotal:</span>
-                                    <span class="text-gray-900 font-semibold">$<span id="cart-subtotal">0.00</span></span>
-                                </div>
-                                <p class="text-sm text-gray-500 mb-6">VAT will be calculated at checkout. Shipping costs may apply.</p>
-                                <a th:href="@{/checkout}" id="checkout-btn" class="block w-full text-center bg-[#F56401] text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 transition duration-300 ease-in-out">Proceed to Checkout</a>
+                    <h2 class="empty-state-title">Your cart is empty</h2>
+                    <p class="empty-state-message">Looks like you haven't added any products to your cart yet. Browse our collection and find something you'll love!</p>
+                    <div class="empty-state-action">
+                        <a href="products.html" class="btn btn-primary">Browse Products</a>
+                    </div>
+                </div>
+                
+                <!-- Cart Items Table (will be shown/hidden by JavaScript) -->
+                <div class="cart-items-container" id="cart-items-container">
+                    <div class="cart-table">
+                        <div class="cart-header">
+                            <div class="cart-cell header-cell">Product</div>
+                            <div class="cart-cell header-cell">Quantity</div>
+                            <div class="cart-cell header-cell">Price</div>
+                            <div class="cart-cell header-cell">Total</div>
+                            <div class="cart-cell header-cell">Action</div>
+                        </div>
+                        
+                        <!-- Cart items will be inserted here by JavaScript -->
+                        <div id="cart-items">
+                            <!-- Loading state for cart items -->
+                            <div id="cart-loading" class="loading-container">
+                                <div class="loading-spinner"></div>
+                                <span class="loading-text">Loading your cart...</span>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-            <script th:inline="javascript">
-            /*<![CDATA[*/
-                document.addEventListener('DOMContentLoaded', function() {
-                    // DOM element references
-                    const cartContainer = document.getElementById('cart-container');
-                    const cartSubtotalEl = document.getElementById('cart-subtotal'); 
-                    const clearCartBtn = document.getElementById('clear-cart-btn');
-                    // const checkoutBtn = document.getElementById('checkout-btn'); // Checkout button is part of cartItemsArea, its state handled by parent visibility
-                    const emptyCartMessageEl = document.getElementById('emptyCartMessage');
-                    const cartItemsAreaEl = document.getElementById('cartItemsArea');
-
-                    /**
-                     * Renders the entire cart display.
-                     * Clears existing items and rebuilds the table based on data from getCart().
-                     * Handles display of empty cart message or cart items table and summary.
-                     */
-                    function renderCart() {
-                        const cart = getCart(); // Fetch current cart data from cart.js
-                        cartContainer.innerHTML = ''; // Clear previous cart items display
-
-                        if (cart.length === 0) {
-                            // If cart is empty, show the empty cart message and hide the items/summary area.
-                            emptyCartMessageEl.style.display = 'block';
-                            cartItemsAreaEl.style.display = 'none';
-                            return;
-                        }
-                        
-                        // If cart has items, hide empty message and show items/summary area.
-                        emptyCartMessageEl.style.display = 'none';
-                        cartItemsAreaEl.style.display = 'block';
-                        
-                        // Dynamically create the table for cart items.
-                        const table = document.createElement('table');
-                        table.className = 'min-w-full divide-y divide-gray-200';
-                        table.innerHTML = `
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Product</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider hidden sm:table-cell">Price</th>
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Quantity</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider hidden md:table-cell">Subtotal</th>
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Remove</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cart-items-body" class="bg-white divide-y divide-gray-200">
-                                <!-- Cart items will be appended here by the loop below -->
-                            </tbody>
-                        `;
-                        cartContainer.appendChild(table);
-                        const cartItemsBody = document.getElementById('cart-items-body');
-
-                        // Populate table rows with cart items.
-                        cart.forEach(item => {
-                            const row = cartItemsBody.insertRow();
-                            row.className = 'hover:bg-gray-50 transition-colors duration-150';
-                            
-                            // Product Column (Image & Name)
-                            const productCell = row.insertCell();
-                            productCell.className = 'px-4 sm:px-6 py-4 whitespace-nowrap';
-                            productCell.innerHTML = `
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-16 w-16 sm:h-20 sm:w-20">
-                                        <img class="h-full w-full rounded-md object-cover shadow" src="${item.imageUrl || '/images/placeholder.png'}" alt="${item.name}">
-                                    </div>
-                                    <div class="ml-3 sm:ml-4">
-                                        <div class="text-sm sm:text-base font-medium text-gray-900">${item.name}</div>
-                                        <div class="text-xs sm:text-sm text-gray-500 sm:hidden">Unit: $${item.price.toFixed(2)}</div> <!-- Unit price visible on mobile -->
-                                    </div>
-                                </div>`;
-                            
-                            // Price Column (hidden on small screens, unit price shown under name instead)
-                            const priceCell = row.insertCell();
-                            priceCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-700 hidden sm:table-cell';
-                            priceCell.innerHTML = `$${item.price.toFixed(2)}`;
-
-                            // Quantity Column with +/- buttons
-                            const quantityCell = row.insertCell();
-                            quantityCell.className = 'px-4 sm:px-6 py-4 whitespace-nowrap';
-                            quantityCell.innerHTML = `
-                                <div class="flex items-center justify-center space-x-1 sm:space-x-2">
-                                    <button class="quantity-change-btn p-1 border rounded-md text-gray-600 hover:bg-gray-200 transition" data-product-id="${item.id}" data-change="-1" aria-label="Decrease quantity">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                                    </button>
-                                    <span class="text-sm sm:text-base text-gray-800 w-8 text-center" aria-live="polite">${item.quantity}</span>
-                                    <button class="quantity-change-btn p-1 border rounded-md text-gray-600 hover:bg-gray-200 transition" data-product-id="${item.id}" data-change="1" aria-label="Increase quantity">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                    </button>
-                                </div>`;
-
-                            // Subtotal Column (for item total, hidden on smaller screens)
-                            const subtotalCell = row.insertCell();
-                            subtotalCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-right hidden md:table-cell';
-                            subtotalCell.innerHTML = `$${(item.price * item.quantity).toFixed(2)}`;
-
-                            // Action (Remove) Column
-                            const actionCell = row.insertCell();
-                            actionCell.className = 'px-4 sm:px-6 py-4 whitespace-nowrap text-center';
-                            actionCell.innerHTML = `
-                                <button class="remove-item-btn text-red-500 hover:text-red-700 transition p-1" data-product-id="${item.id}" title="Remove item" aria-label="Remove ${item.name} from cart">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>`;
-                        });
-
-                        // Update the cart subtotal display.
-                        cartSubtotalEl.textContent = getCartTotal().toFixed(2);
-                        // Re-attach event listeners to newly created quantity/remove buttons.
-                        attachEventListeners(); 
-                    }
-
-                    /**
-                     * Attaches event listeners to quantity change and remove item buttons.
-                     * Uses event delegation or re-attaches after each renderCart to handle dynamic elements.
-                     * This version re-attaches, ensuring listeners are on current elements.
-                     * Includes a 'listenerAttached' flag to prevent duplicate listeners if called multiple times on same static elements.
-                     */
-                    function attachEventListeners() {
-                        // Event listeners for quantity change buttons (+ / -)
-                        document.querySelectorAll('.quantity-change-btn').forEach(button => {
-                            if (button.dataset.listenerAttached === 'true') return; // Avoid duplicate listeners
-                            button.dataset.listenerAttached = 'true';
-
-                            button.addEventListener('click', function() {
-                                const productId = this.dataset.productId;
-                                const change = parseInt(this.dataset.change);
-                                const cart = getCart(); 
-                                const item = cart.find(ci => ci.id === productId);
-                                if (item) {
-                                    let newQuantity = item.quantity + change;
-                                    // updateItemQuantity (from cart.js) handles logic for stock and removal if newQuantity <= 0.
-                                    // It will also dispatch 'cartUpdated', triggering renderCart.
-                                    updateItemQuantity(productId, newQuantity); 
-                                }
-                            });
-                        });
-                        
-                        // Event listeners for remove item buttons (trash icon)
-                        document.querySelectorAll('.remove-item-btn').forEach(button => {
-                            if (button.dataset.listenerAttached === 'true') return; // Avoid duplicate listeners
-                            button.dataset.listenerAttached = 'true';
-
-                            button.addEventListener('click', function() {
-                                const productId = this.dataset.productId;
-                                // Use custom modal (from ui.js) for confirmation.
-                                showModal(
-                                    'Confirm Removal', 
-                                    'Are you sure you want to remove this item from the cart?',
-                                    function() { // onConfirm callback
-                                        removeItemFromCart(productId); // from cart.js, dispatches 'cartUpdated'
-                                    }
-                                );
-                            });
-                        });
-                    }
-
-                    // Event listener for the "Clear Cart" button.
-                    if (clearCartBtn) {
-                        clearCartBtn.addEventListener('click', function() {
-                             showModal(
-                                'Confirm Clear Cart',
-                                'Are you sure you want to clear your entire cart?',
-                                function() { // onConfirm callback
-                                    clearCart(); // from cart.js, dispatches 'cartUpdated'
-                                }
-                            );
-                        });
-                    }
                     
-                    // Listen for the custom 'cartUpdated' event dispatched by cart.js functions.
-                    // This ensures the cart display refreshes whenever the cart data changes.
-                    document.addEventListener('cartUpdated', renderCart);
+                    <!-- Cart Summary -->
+                    <div class="cart-summary">
+                        <h2>Cart Summary</h2>
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span class="cart-subtotal" id="cart-subtotal">₱0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax (12% VAT):</span>
+                            <span class="cart-tax" id="cart-tax">₱0.00</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>Total:</span>
+                            <span class="cart-total" id="cart-total">₱0.00</span>
+                        </div>
+                        <p class="vat-disclaimer">*Prices are inclusive of 12% VAT</p>
+                        
+                        <div class="checkout-actions">
+                            <a href="products.html" class="btn-secondary" aria-label="Continue shopping">Continue Shopping</a>
+                            <a href="checkout.html" class="btn-checkout" aria-label="Proceed to checkout">Proceed to Checkout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    // Initial render of the cart when the page loads.
-                    renderCart();
-                });
-            /*]]>*/
-            </script>
-        </th:block>
-    </main>
-    <div th:replace="~{layout/main-layout :: footer}"></div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container" data-component="footer">
+            <!-- Footer will be loaded here -->
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/cart.js"></script>
 </body>
 </html>
