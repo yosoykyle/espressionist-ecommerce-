@@ -358,3 +358,19 @@ This log entry summarizes the recent work and current standing of the backend.
 - The workspace does not contain a git repository. Version control is not currently active for this project directory.
 
 ---
+
+### **May 31, 2025**
+
+#### **Full Backend-Driven Frontend Integration & Session Cart Implementation**
+- Refactored all main Thymeleaf templates to use only backend-provided model attributes for dynamic content, forms, and actions.
+- Removed all legacy localStorage and JavaScript-based cart/order logic from the frontend.
+- Implemented a session-based cart system in the backend:
+  - Created `CartItemDTO` for cart item representation.
+  - Updated `CartPageController` to provide `cartItems` and `cartTotal` from the HTTP session to the model.
+  - Updated `OrderPageController` to provide `cartItems`, `totalWithVat`, and a new `OrderCreateDTO` as `checkoutForm` for the checkout page.
+- Ensured all cart and checkout flows are handled by backend logic and reflected in the frontend.
+- Verified all forms, links, and dynamic content use `th:action`, `th:href`, and `th:field` for backend endpoints and model attributes.
+- Cleaned up redundant frontend code and aligned with Spring Boot and Thymeleaf best practices.
+- Confirmed no business logic or data manipulation remains in frontend JS; only UI utilities are present.
+
+---

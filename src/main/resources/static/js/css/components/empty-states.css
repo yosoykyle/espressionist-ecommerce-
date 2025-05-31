@@ -1,0 +1,60 @@
+/* Enhanced empty states */
+.empty-state {
+  text-align: center;
+  padding: var(--space-xxl) var(--space-xl);
+  background-color: var(--color-background-light);
+  border-radius: var(--radius-lg);
+  margin: var(--space-xl) 0;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  color: var(--color-text-lighter);
+  margin-bottom: var(--space-lg);
+}
+
+.empty-state-title {
+  font-size: var(--font-size-xxl);
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+}
+
+.empty-state-message {
+  font-size: var(--font-size-md);
+  color: var(--color-text-light);
+  margin-bottom: var(--space-xl);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.empty-state-action {
+  margin-top: var(--space-lg);
+}
+
+/* Specific empty states */
+.empty-cart {
+  text-align: center;
+  padding: var(--space-xxl) var(--space-xl);
+  background-color: var(--color-background-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.empty-cart .empty-state-icon {
+  color: var(--color-primary-light);
+}
+
+.empty-search {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.empty-orders {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
