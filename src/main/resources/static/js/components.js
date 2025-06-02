@@ -8,14 +8,14 @@ const COMPONENTS = {
   navbar: {
     html: `
       <div class="logo">
-        <a href="index.html">espressionist</a>
+        <a href="/">espressionist</a>
       </div>
       <nav class="nav">
         <ul>
-          <li><a href="products.html" id="nav-shop">Shop</a></li>
-          <li><a href="cart.html" id="nav-cart">Cart</a></li>
-          <li><a href="track.html" id="nav-track">Track Order</a></li>
-          <li><a href="index.html#about" id="nav-about">About</a></li>
+          <li><a href="/products" id="nav-shop">Shop</a></li>
+          <li><a href="/cart" id="nav-cart">Cart</a></li>
+          <li><a href="/track" id="nav-track">Track Order</a></li>
+          <li><a href="/#about" id="nav-about">About</a></li>
         </ul>
       </nav>
     `,
@@ -29,18 +29,18 @@ const COMPONENTS = {
 
       // Set active class based on current page
       switch (currentPage) {
-        case "products.html":
+        case "products":
           element.querySelector("#nav-shop")?.classList.add("active")
           break
-        case "cart.html":
-        case "checkout.html":
-        case "success.html":
+        case "cart":
+        case "checkout":
+        case "success":
           element.querySelector("#nav-cart")?.classList.add("active")
           break
-        case "track.html":
+        case "track":
           element.querySelector("#nav-track")?.classList.add("active")
           break
-        case "index.html":
+        case "index":
         case "":
           // Only set About as active if the hash is #about
           if (window.location.hash === "#about") {
@@ -54,13 +54,13 @@ const COMPONENTS = {
   "admin-navbar": {
     html: `
       <div class="logo">
-        <a href="admin.html">espressionist admin</a>
+        <a href="/admin">espressionist admin</a>
       </div>
       <nav class="nav">
         <ul>
-          <li><a href="admin.html#inventory" id="nav-inventory">Inventory</a></li>
-          <li><a href="admin.html#customers" id="nav-customers">Customers</a></li>
-          <li><a href="admin.html#orders" id="nav-orders">Orders</a></li>
+          <li><a href="/admin#inventory" id="nav-inventory">Inventory</a></li>
+          <li><a href="/admin#customers" id="nav-customers">Customers</a></li>
+          <li><a href="/admin#orders" id="nav-orders">Orders</a></li>
           <li><a href="#" id="nav-logout">Logout</a></li>
         </ul>
       </nav>
@@ -97,12 +97,12 @@ const COMPONENTS = {
         <div class="footer-nav">
           <h3>Quick Links</h3>
           <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="products.html">Shop</a></li>
-            <li><a href="cart.html">Cart</a></li>
-            <li><a href="track.html">Track Order</a></li>
-            <li><a href="index.html#about">About</a></li>
-            <li><a href="admin-login.html">Admin</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/products">Shop</a></li>
+            <li><a href="/cart">Cart</a></li>
+            <li><a href="/track">Track Order</a></li>
+            <li><a href="/#about">About</a></li>
+            <li><a href="/admin/login">Admin</a></li>
           </ul>
         </div>
         

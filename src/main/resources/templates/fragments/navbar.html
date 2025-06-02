@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<nav th:fragment="navbar" class="nav">
+    <div class="logo">
+        <a href="/">
+            <span class="brand-name">espressionist</span>
+        </a>
+    </div>
+    <ul>
+        <li><a href="/" th:classappend="${#httpServletRequest.requestURI == '/' ? 'active' : ''}">Home</a></li>
+        <li><a href="/products" th:classappend="${#httpServletRequest.requestURI == '/products' ? 'active' : ''}">Shop</a></li>
+        <li><a href="/cart" th:classappend="${#httpServletRequest.requestURI == '/cart' ? 'active' : ''}">Cart</a></li>
+        <li><a href="/track" th:classappend="${#httpServletRequest.requestURI == '/track' ? 'active' : ''}">Track Order</a></li>
+        <li><a href="/#about">About</a></li>
+        <li><a href="/admin/login" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin') ? 'active' : ''}">Admin</a></li>
+    </ul>
+</nav>
+</html>

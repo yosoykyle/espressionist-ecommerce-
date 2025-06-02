@@ -1,151 +1,94 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:replace="fragments/head :: head(title='Checkout')">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | Espressionist</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/checkout.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Component loader script -->
-    <script src="js/components.js"></script>
-    <style>
-    /* Form validation styles */
-    .error-message {
-        color: #d32f2f;
-        font-size: 0.85rem;
-        margin-top: 5px;
-        display: none;
-        transition: all 0.3s ease;
-    }
-    
-    .error-message.visible {
-        display: block;
-    }
-    
-    input[aria-invalid="true"], 
-    textarea[aria-invalid="true"],
-    .invalid-input {
-        border-color: #d32f2f !important;
-        background-color: #fff8f8;
-        box-shadow: 0 0 0 1px #d32f2f;
-    }
-    
-    .form-group {
-        margin-bottom: 25px; /* Increased to accommodate error messages */
-        position: relative;
-    }
-    
-    /* Success message styling */
-    .tracking-info.success {
-        color: #388e3c;
-    }
-    
-    .tracking-info.error {
-        color: #d32f2f;
-    }
-    
-    /* Order success message animation */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translate(-50%, -60%); }
-        to { opacity: 1; transform: translate(-50%, -50%); }
-    }
-    
-    .order-success-message {
-        animation: fadeIn 0.3s ease forwards;
-    }
-</style>
+    <link rel="stylesheet" href="/css/checkout.css">
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container" data-component="navbar">
-            <!-- Navbar will be loaded here -->
-        </div>
-    </header>
-
-    <!-- Checkout Section -->
-    <section class="checkout-section">
-        <div class="container">
-            <h1 class="page-title">Checkout</h1>
-            
-            <div class="checkout-container">
-                <!-- Shipping Information Form -->
-                <div class="checkout-form">
-                    <h2>Shipping Information</h2>
-                    
-                    <form th:action="@{/checkout}" th:object="${checkoutForm}" method="post" class="checkout-form">
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" th:field="*{name}" required/>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" th:field="*{email}" required/>
-                        </div>
-                        <div class="form-group">
-                            <label for="shippingAddress">Shipping Address</label>
-                            <textarea id="shippingAddress" th:field="*{shippingAddress}" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Cart Items</label>
-                            <ul>
-                                <li th:each="item : ${cartItems}">
-                                    <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span> — ₱<span th:text="${item.totalPrice}"></span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="form-group">
-                            <label>Total (with VAT):</label>
-                            <span>₱<span th:text="${totalWithVat}"></span></span>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Place Order</button>
-                    </form>
-                </div>
+<body th:replace="fragments/layout :: layout('Checkout', ~{::main})">
+    <main>
+        <!-- Checkout Section -->
+        <section class="checkout-section">
+            <div class="container">
+                <h1 class="page-title">Checkout</h1>
                 
-                <!-- Order Summary -->
-                <div class="order-summary">
-                    <h2>Order Summary</h2>
-                    
-                    <div class="order-items" id="order-items">
-                        <!-- Order items will be inserted here by JavaScript -->
+                <div class="checkout-container">
+                    <!-- Shipping Information Form -->
+                    <div class="checkout-form">
+                        <h2>Shipping Information</h2>
+                        <form id="shipping-form" th:action="@{/checkout}" th:object="${checkoutForm}" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" th:field="*{name}" required/>
+                                <div class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" th:field="*{email}" required/>
+                                <div class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="shippingAddress">Shipping Address</label>
+                                <textarea id="shippingAddress" th:field="*{shippingAddress}" required></textarea>
+                                <div class="error-message" th:if="${#fields.hasErrors('shippingAddress')}" th:errors="*{shippingAddress}"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Order Summary</label>
+                                <ul>
+                                    <li th:each="item : ${cartItems}">
+                                        <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span> — ₱<span th:text="${item.totalPrice}"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="form-group">
+                                <label>Total (with VAT):</label>
+                                <span>₱<span th:text="${totalWithVat}"></span></span>
+                            </div>
+                            
+                            <div class="privacy-disclaimer">
+                                <p>By placing your order, you agree to our Terms of Service and Privacy Policy.</p>
+                            </div>
+                            
+                            <!-- Place Order Button -->
+                            <div class="place-order-container">
+                                <button type="submit" class="btn btn-primary">Place Order</button>
+                            </div>
+                        </form>
                     </div>
                     
-                    <div class="summary-content">
-                        <div class="summary-row">
-                            <span>Subtotal:</span>
-                            <span class="summary-value" id="order-subtotal">₱0.00</span>
+                    <!-- Order Summary -->
+                    <div class="order-summary">
+                        <h2>Order Summary</h2>
+                        <div class="order-items">
+                            <div class="order-item" th:each="item : ${cartItems}">
+                                <div class="item-details">
+                                    <div class="item-name" th:text="${item.productName}"></div>
+                                    <div class="item-quantity" th:text="'Quantity: ' + ${item.quantity}"></div>
+                                </div>
+                                <div class="item-price">₱<span th:text="${item.totalPrice}"></span></div>
+                            </div>
                         </div>
                         
-                        <div class="summary-row">
-                            <span>Tax (12% VAT):</span>
-                            <span class="summary-value" id="order-tax">₱0.00</span>
-                        </div>
-                        
-                        <div class="summary-row total-row">
-                            <span>Total:</span>
-                            <span class="summary-value" id="order-total">₱0.00</span>
+                        <div class="summary-content">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span class="summary-value">₱<span th:text="${cartTotal}"></span></span>
+                            </div>
+                            
+                            <div class="summary-row">
+                                <span>Tax (12% VAT):</span>
+                                <span class="summary-value">₱<span th:text="${totalWithVat - cartTotal}"></span></span>
+                            </div>
+                            
+                            <div class="summary-row total-row">
+                                <span>Total:</span>
+                                <span class="summary-value">₱<span th:text="${totalWithVat}"></span></span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Place Order Button -->
-            <div class="place-order-container">
-                <button type="submit" id="place-order-btn" class="place-order-btn" form="shipping-form" aria-label="Place your order">Place Order</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container" data-component="footer">
-            <!-- Footer will be loaded here -->
-        </div>
-    </footer>
-
-    <script src="js/utils.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/checkout.js"></script>
+        </section>
+    </main>
 </body>
 </html>
