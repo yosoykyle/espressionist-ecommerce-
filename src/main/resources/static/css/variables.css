@@ -112,7 +112,6 @@
   --z-index-footer: var(--z-index-sticky);
   --z-index-navigation: var(--z-index-dropdown);
   --z-index-tab: var(--z-index-dropdown);
-
 }
 
 /* Dark mode variables (for future implementation) */

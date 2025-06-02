@@ -1,4 +1,4 @@
-/* Enhanced empty states */
+/* Base empty state styles - these should be imported first */
 .empty-state {
   text-align: center;
   padding: var(--space-xxl) var(--space-xl);
@@ -34,10 +34,7 @@
 
 /* Specific empty states */
 .empty-cart {
-  text-align: center;
-  padding: var(--space-xxl) var(--space-xl);
-  background-color: var(--color-background-light);
-  border-radius: var(--radius-lg);
+  @extend .empty-state;
   box-shadow: var(--shadow-md);
 }
 
@@ -45,14 +42,9 @@
   color: var(--color-primary-light);
 }
 
-.empty-search {
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
+.empty-search,
 .empty-orders {
+  @extend .empty-state;
   min-height: 300px;
   display: flex;
   flex-direction: column;
