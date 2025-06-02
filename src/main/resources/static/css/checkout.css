@@ -1,0 +1,299 @@
+/* Checkout Page Specific Styles */
+
+/* Checkout container */
+.checkout-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Checkout form */
+.checkout-form {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.checkout-form h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* Form layout */
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+input[type="text"],
+input[type="tel"],
+textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="tel"]:focus,
+textarea:focus {
+  border-color: #f56401;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(245, 100, 1, 0.2);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Payment method */
+.payment-method {
+  margin-bottom: 1.5rem;
+}
+
+.payment-method h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.payment-option input[type="radio"] {
+  margin-right: 0.5rem;
+}
+
+/* Privacy disclaimer */
+.privacy-disclaimer {
+  font-size: 0.85rem;
+  color: #777;
+  margin-top: 1.5rem;
+  font-style: italic;
+}
+
+/* Order summary */
+.order-summary {
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  align-self: start;
+}
+
+.order-summary h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* Order items */
+.order-items {
+  margin-bottom: 1.5rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.item-quantity {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.item-price {
+  font-weight: 600;
+  color: #f56401;
+}
+
+/* Summary content */
+.summary-content {
+  padding: 1.5rem 0;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.total-row {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #333;
+  border-bottom: none;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.summary-value {
+  color: #f56401;
+  font-weight: 600;
+}
+
+/* Place order button */
+.place-order-container {
+  text-align: right;
+  margin-top: 2rem;
+}
+
+.place-order-btn {
+  padding: 0.875rem 2.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Form validation feedback */
+/* -------------------------------------------------- */
+
+/* Error message display */
+.error-message {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-xs);
+  display: none;
+  transition: all 0.3s ease;
+}
+
+.error-message.visible {
+  display: block;
+}
+
+/* Invalid input styling */
+input[aria-invalid="true"],
+textarea[aria-invalid="true"],
+.invalid-input {
+  border-color: var(--color-error) !important;
+  background-color: #fff8f8;
+}
+
+/* Focus state for invalid inputs */
+input[aria-invalid="true"]:focus,
+textarea[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 2px rgba(var(--color-error-rgb), 0.2);
+}
+
+/* Enhanced Responsive Styles for Checkout */
+@media (max-width: 768px) {
+  .checkout-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .place-order-container {
+    text-align: center;
+  }
+
+  .place-order-btn {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 576px) {
+  .checkout-form,
+  .order-summary {
+    padding: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+  }
+
+  .checkout-form h2,
+  .order-summary h2 {
+    font-size: 1.3rem;
+  }
+
+  /* Improve form usability on small screens */
+  input[type="text"],
+  input[type="tel"],
+  textarea {
+    padding: 0.875rem;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .checkout-section {
+    padding: 1.5rem 0 2.5rem;
+    min-height: auto;
+  }
+
+  .page-title {
+    margin-bottom: 1rem;
+  }
+
+  .checkout-form,
+  .order-summary {
+    padding: 1.25rem;
+  }
+
+  .checkout-form h2,
+  .order-summary h2 {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Larger screens */
+@media (min-width: 1200px) {
+  .checkout-container {
+    gap: 3.5rem;
+  }
+
+  .checkout-form,
+  .order-summary {
+    padding: 2.5rem;
+    border-radius: 12px;
+  }
+}

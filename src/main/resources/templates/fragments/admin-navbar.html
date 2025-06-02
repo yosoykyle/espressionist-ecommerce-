@@ -10,25 +10,25 @@
     <ul>
         <li>
             <a href="/admin/dashboard" 
-               th:classappend="${#httpServletRequest.requestURI == '/admin/dashboard' ? 'active' : ''}">
+               th:classappend="${#strings.equals(currentUri, '/admin/dashboard') ? 'active' : ''}">
                 <i class="fas fa-home"></i> Dashboard
             </a>
         </li>
         <li>
             <a href="/admin/products" 
-               th:classappend="${#httpServletRequest.requestURI == '/admin/products' ? 'active' : ''}">
+               th:classappend="${#strings.equals(currentUri, '/admin/products') ? 'active' : ''}">
                 <i class="fas fa-box"></i> Products
             </a>
         </li>
         <li>
             <a href="/admin/orders" 
-               th:classappend="${#httpServletRequest.requestURI == '/admin/orders' ? 'active' : ''}">
+               th:classappend="${#strings.equals(currentUri, '/admin/orders') ? 'active' : ''}">
                 <i class="fas fa-shopping-cart"></i> Orders
             </a>
         </li>
         <li>
             <a href="/admin/customers" 
-               th:classappend="${#httpServletRequest.requestURI == '/admin/customers' ? 'active' : ''}">
+               th:classappend="${#strings.equals(currentUri, '/admin/customers') ? 'active' : ''}">
                 <i class="fas fa-users"></i> Customers
             </a>
         </li>
