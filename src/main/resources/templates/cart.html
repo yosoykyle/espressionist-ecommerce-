@@ -1,92 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head :: head(title='Shopping Cart')">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart | Espressionist</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/cart.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Component loader script -->
-    <script src="js/components.js"></script>
+    <link rel="stylesheet" href="/css/cart.css">
 </head>
-<body>
-    <!-- Skip to main content link for accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <!-- Header -->
-    <header class="header">
-        <div class="container" data-component="navbar">
-            <!-- Navbar will be loaded here -->
-        </div>
-    </header>
-
-    <!-- Cart Section -->
-    <section class="cart-section" id="main-content">
-        <div class="container">
-            <h1 class="page-title">Your Cart</h1>
-            
-            <div class="cart-container">
-                <!-- Empty Cart Message -->
-                <div class="empty-cart" th:if="${#lists.isEmpty(cartItems)}">
-                    <div class="empty-state-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <h2 class="empty-state-title">Your cart is empty</h2>
-                    <p class="empty-state-message">Looks like you haven't added any products to your cart yet. Browse our collection and find something you'll love!</p>
-                    <div class="empty-state-action">
-                        <a href="products.html" class="btn btn-primary">Browse Products</a>
-                    </div>
-                </div>
-                <!-- Cart Items Table -->
-                <div class="cart-items-container" th:if="${!#lists.isEmpty(cartItems)}">
-                    <div class="cart-table">
-                        <div class="cart-header">
-                            <div class="cart-cell header-cell">Product</div>
-                            <div class="cart-cell header-cell">Quantity</div>
-                            <div class="cart-cell header-cell">Price</div>
-                            <div class="cart-cell header-cell">Total</div>
-                            <div class="cart-cell header-cell">Action</div>
+<body th:replace="fragments/layout :: layout('Shopping Cart', ~{::main})">
+    <main>
+        <!-- Cart Section -->
+        <section class="cart-section" id="main-content">
+            <div class="container">
+                <h1 class="page-title">Your Cart</h1>
+                
+                <div class="cart-container">
+                    <!-- Empty Cart Message -->
+                    <div class="empty-cart" th:if="${#lists.isEmpty(cartItems)}">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-shopping-cart"></i>
                         </div>
-                        <div class="cart-row" th:each="item, iterStat : ${cartItems}">
-                            <div class="cart-cell">
-                                <span th:text="${item.productName}"></span>
-                            </div>
-                            <div class="cart-cell">
-                                <span th:text="${item.quantity}"></span>
-                            </div>
-                            <div class="cart-cell">
-                                ₱<span th:text="${item.price}"></span>
-                            </div>
-                            <div class="cart-cell">
-                                ₱<span th:text="${item.totalPrice}"></span>
-                            </div>
-                            <div class="cart-cell">
-                                <form th:action="@{/cart/remove}" method="post">
-                                    <input type="hidden" name="productId" th:value="${item.productId}"/>
-                                    <button type="submit" class="btn btn-danger">Remove</button>
-                                </form>
-                            </div>
+                        <h2 class="empty-state-title">Your cart is empty</h2>
+                        <p class="empty-state-message">Looks like you haven't added any products to your cart yet. Browse our collection and find something you'll love!</p>
+                        <div class="empty-state-action">
+                            <a th:href="@{/products}" class="btn btn-primary">Browse Products</a>
                         </div>
                     </div>
-                    <div class="cart-summary">
-                        <p><strong>Total:</strong> ₱<span th:text="${cartTotal}"></span></p>
-                        <a href="checkout.html" class="btn btn-primary">Proceed to Checkout</a>
+                    
+                    <!-- Cart Items Table -->
+                    <div class="cart-items-container" th:if="${!#lists.isEmpty(cartItems)}">
+                        <div class="cart-table">
+                            <div class="cart-header">
+                                <div class="cart-cell header-cell">Product</div>
+                                <div class="cart-cell header-cell">Quantity</div>
+                                <div class="cart-cell header-cell">Price</div>
+                                <div class="cart-cell header-cell">Total</div>
+                                <div class="cart-cell header-cell">Action</div>
+                            </div>
+                            <div class="cart-row" th:each="item, iterStat : ${cartItems}">
+                                <div class="cart-cell">
+                                    <span th:text="${item.productName}"></span>
+                                </div>
+                                <div class="cart-cell">
+                                    <span th:text="${item.quantity}"></span>
+                                </div>
+                                <div class="cart-cell">
+                                    ₱<span th:text="${item.price}"></span>
+                                </div>
+                                <div class="cart-cell">
+                                    ₱<span th:text="${item.totalPrice}"></span>
+                                </div>
+                                <div class="cart-cell">
+                                    <form th:action="@{/cart/remove}" method="post">
+                                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                        <input type="hidden" name="productId" th:value="${item.productId}"/>
+                                        <button type="submit" class="btn btn-danger">Remove</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cart-summary">
+                            <p><strong>Total:</strong> ₱<span th:text="${cartTotal}"></span></p>
+                            <div class="checkout-actions">
+                                <a th:href="@{/products}" class="btn btn-secondary">Continue Shopping</a>
+                                <a th:href="@{/checkout}" class="btn btn-primary">Proceed to Checkout</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container" data-component="footer">
-            <!-- Footer will be loaded here -->
-        </div>
-    </footer>
-
-    <script src="js/utils.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/cart.js"></script>
+        </section>
+    </main>
 </body>
 </html>

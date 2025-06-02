@@ -1,460 +1,186 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:replace="fragments/admin-head :: admin-head(title='Admin Dashboard')">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Espressionist</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Component loader script -->
-    <script src="js/components.js"></script>
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
-<body class="admin-body">
-    <!-- Header -->
-    <header class="header admin-header">
-        <div class="container" data-component="admin-navbar">
-            <!-- Admin Navbar will be loaded here -->
-        </div>
-    </header>
-
-    <!-- Admin Dashboard Section -->
-    <section class="admin-dashboard-section">
-        <div class="container">
-            <div class="admin-dashboard-header">
-                <h1>Admin Dashboard</h1>
-                <p>Manage your products and customers</p>
-            </div>
-            
-            <!-- Admin Tabs -->
-            <div class="admin-tabs">
-                <button class="admin-tab-btn active" data-tab="inventory">
-                    <i class="fas fa-box"></i> Inventory Management
-                </button>
-                <button class="admin-tab-btn" data-tab="customers">
-                    <i class="fas fa-users"></i> Customer Management
-                </button>
-                <button class="admin-tab-btn" data-tab="orders">
-                    <i class="fas fa-shopping-cart"></i> Order Management
-                </button>
-            </div>
-            
-            <!-- Inventory Management Tab -->
-            <div class="admin-tab-content active" id="inventory-tab">
-                <div class="admin-section-header">
-                    <h2>Inventory Management</h2>
-                    <button class="btn-primary add-product-btn" onclick="document.getElementById('addProductModal').style.display='block'">
-                        <i class="fas fa-plus"></i> Add New Product
-                    </button>
-                </div>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Archived</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="product : ${products}">
-                            <td th:text="${product.name}"></td>
-                            <td th:text="${product.category}"></td>
-                            <td th:text="${product.price}"></td>
-                            <td th:text="${product.quantity}"></td>
-                            <td th:text="${product.archived ? 'Yes' : 'No'}"></td>
-                            <td>
-                                <form th:action="@{/admin/products/archive}" method="post" th:if="${!product.archived}">
-                                    <input type="hidden" name="productId" th:value="${product.id}"/>
-                                    <button type="submit" class="btn btn-warning">Archive</button>
-                                </form>
-                                <form th:action="@{/admin/products/edit}" method="get">
-                                    <input type="hidden" name="productId" th:value="${product.id}"/>
-                                    <button type="submit" class="btn btn-secondary">Edit</button>
-                                </form>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Customer Management Tab -->
-            <div class="admin-tab-content" id="customers-tab">
-                <div class="admin-section-header">
-                    <h2>Customer Management</h2>
+<body th:replace="fragments/admin-layout :: admin-layout('Admin Dashboard', ~{::main})">
+    <main>
+        <!-- Admin Dashboard Section -->
+        <section class="admin-dashboard-section">
+            <div class="container">
+                <div class="admin-dashboard-header">
+                    <h1>Admin Dashboard</h1>
+                    <p>Manage your products and customers</p>
                 </div>
                 
-                <!-- Customer Search -->
-                <div class="admin-search">
-                    <input type="text" id="customer-search" placeholder="Search customers by name or email...">
-                    <button class="btn-primary search-btn">
-                        <i class="fas fa-search"></i> Search
+                <!-- Admin Tabs -->
+                <div class="admin-tabs">
+                    <button class="admin-tab-btn active" data-tab="inventory">
+                        <i class="fas fa-box"></i> Inventory Management
+                    </button>
+                    <button class="admin-tab-btn" data-tab="customers">
+                        <i class="fas fa-users"></i> Customer Management
+                    </button>
+                    <button class="admin-tab-btn" data-tab="orders">
+                        <i class="fas fa-shopping-cart"></i> Order Management
                     </button>
                 </div>
                 
-                <!-- Customers Table -->
-                <div class="admin-table-container">
-                    <table class="admin-table" id="customers-table">
+                <!-- Inventory Management Tab -->
+                <div class="admin-tab-content active" id="inventory-tab">
+                    <div class="admin-section-header">
+                        <h2>Inventory Management</h2>
+                        <button class="btn-primary add-product-btn" onclick="document.getElementById('addProductModal').style.display='block'">
+                            <i class="fas fa-plus"></i> Add New Product
+                        </button>
+                    </div>
+                    <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Recent Order</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Archived</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Customers will be loaded here -->
-                            <tr class="empty-row">
-                                <td colspan="5">No customers found.</td>
+                            <tr th:each="product : ${products}">
+                                <td th:text="${product.name}"></td>
+                                <td th:text="${product.category}"></td>
+                                <td th:text="${product.price}"></td>
+                                <td th:text="${product.quantity}"></td>
+                                <td th:text="${product.archived ? 'Yes' : 'No'}"></td>
+                                <td>
+                                    <form th:action="@{/admin/products/archive}" method="post" th:if="${!product.archived}">
+                                        <input type="hidden" name="productId" th:value="${product.id}"/>
+                                        <button type="submit" class="btn btn-warning">Archive</button>
+                                    </form>
+                                    <form th:action="@{/admin/products/edit}" method="get">
+                                        <input type="hidden" name="productId" th:value="${product.id}"/>
+                                        <button type="submit" class="btn btn-secondary">Edit</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Customer Management Tab -->
+                <div class="admin-tab-content" id="customers-tab">
+                    <div class="admin-section-header">
+                        <h2>Customer Management</h2>
+                    </div>
+                    
+                    <!-- Customer Search -->
+                    <div class="admin-search">
+                        <input type="text" id="customer-search" placeholder="Search customers by name or email...">
+                        <button class="btn-primary search-btn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    
+                    <!-- Customers Table -->
+                    <div class="admin-table-container">
+                        <table class="admin-table" id="customers-table">
+                            <thead>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Recent Order</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Customers will be loaded here -->
+                                <tr class="empty-row">
+                                    <td colspan="5">No customers found.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Order Management Tab -->
+                <div class="admin-tab-content" id="orders-tab">
+                    <div class="admin-section-header">
+                        <h2>Order Management</h2>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order Code</th>
+                                <th>Customer</th>
+                                <th>Email</th>
+                                <th>Shipping Address</th>
+                                <th>Status</th>
+                                <th>Total (with VAT)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="order : ${orders}">
+                                <td th:text="${order.code}"></td>
+                                <td th:text="${order.customerName}"></td>
+                                <td th:text="${order.email}"></td>
+                                <td th:text="${order.shippingAddress}"></td>
+                                <td th:text="${order.status}"></td>
+                                <td th:text="${order.totalWithVat}"></td>
+                                <td>
+                                    <form th:action="@{/admin/orders/update-status}" method="post">
+                                        <input type="hidden" name="orderId" th:value="${order.id}"/>
+                                        <select name="status" th:value="${order.status}">
+                                            <option th:selected="${order.status == 'Pending'}">Pending</option>
+                                            <option th:selected="${order.status == 'Processing'}">Processing</option>
+                                            <option th:selected="${order.status == 'Shipped'}">Shipped</option>
+                                            <option th:selected="${order.status == 'Delivered'}">Delivered</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </form>
+                                    <form th:action="@{/admin/orders/archive}" method="post" th:if="${order.status == 'Delivered' && !order.archived}">
+                                        <input type="hidden" name="orderId" th:value="${order.id}"/>
+                                        <button type="submit" class="btn btn-warning">Archive</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Admin Management Tab -->
+                <div class="admin-tab-content" id="admins-tab">
+                    <div class="admin-section-header">
+                        <h2>Admin Account Management</h2>
+                        <button class="btn-primary add-admin-btn" onclick="document.getElementById('addAdminModal').style.display='block'">
+                            <i class="fas fa-user-plus"></i> Add Admin
+                        </button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="admin : ${admins}">
+                                <td th:text="${admin.username}"></td>
+                                <td>
+                                    <form th:action="@{/admin/delete}" method="post" th:if="${admin.username != currentAdmin}">
+                                        <input type="hidden" name="adminId" th:value="${admin.id}"/>
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                    <span th:if="${admin.username == currentAdmin}">Cannot delete self</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            
-            <!-- Order Management Tab -->
-            <div class="admin-tab-content" id="orders-tab">
-                <div class="admin-section-header">
-                    <h2>Order Management</h2>
-                </div>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Order Code</th>
-                            <th>Customer</th>
-                            <th>Email</th>
-                            <th>Shipping Address</th>
-                            <th>Status</th>
-                            <th>Total (with VAT)</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="order : ${orders}">
-                            <td th:text="${order.code}"></td>
-                            <td th:text="${order.customerName}"></td>
-                            <td th:text="${order.email}"></td>
-                            <td th:text="${order.shippingAddress}"></td>
-                            <td th:text="${order.status}"></td>
-                            <td th:text="${order.totalWithVat}"></td>
-                            <td>
-                                <form th:action="@{/admin/orders/update-status}" method="post">
-                                    <input type="hidden" name="orderId" th:value="${order.id}"/>
-                                    <select name="status" th:value="${order.status}">
-                                        <option th:selected="${order.status == 'Pending'}">Pending</option>
-                                        <option th:selected="${order.status == 'Processing'}">Processing</option>
-                                        <option th:selected="${order.status == 'Shipped'}">Shipped</option>
-                                        <option th:selected="${order.status == 'Delivered'}">Delivered</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary">Update</button>
-                                </form>
-                                <form th:action="@{/admin/orders/archive}" method="post" th:if="${order.status == 'Delivered' && !order.archived}">
-                                    <input type="hidden" name="orderId" th:value="${order.id}"/>
-                                    <button type="submit" class="btn btn-warning">Archive</button>
-                                </form>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Admin Management Tab -->
-            <div class="admin-tab-content" id="admins-tab">
-                <div class="admin-section-header">
-                    <h2>Admin Account Management</h2>
-                    <button class="btn-primary add-admin-btn" onclick="document.getElementById('addAdminModal').style.display='block'">
-                        <i class="fas fa-user-plus"></i> Add Admin
-                    </button>
-                </div>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="admin : ${admins}">
-                            <td th:text="${admin.username}"></td>
-                            <td>
-                                <form th:action="@{/admin/delete}" method="post" th:if="${admin.username != currentAdmin}">
-                                    <input type="hidden" name="adminId" th:value="${admin.id}"/>
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
-                                <span th:if="${admin.username == currentAdmin}">Cannot delete self</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- Product Modal -->
-    <div class="admin-modal" id="product-modal">
-        <div class="admin-modal-content">
-            <div class="admin-modal-header">
-                <h2 id="product-modal-title">Add New Product</h2>
-                <button class="admin-modal-close" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="admin-modal-body">
-                <form id="product-form" class="admin-form" th:action="@{/admin/products/save}" method="post">
-                    <input type="hidden" id="product-id" name="productId" th:value="${product.id}">
-                    
-                    <div class="form-group">
-                        <label for="product-name">Product Name*</label>
-                        <input type="text" id="product-name" name="product-name" required th:value="${product.name}">
-                        <div class="error-message" id="product-name-error"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="product-category">Category*</label>
-                        <select id="product-category" name="product-category" required>
-                            <option value="">Select Category</option>
-                            <option value="coffee-tea" th:selected="${product.category == 'coffee-tea'}">Coffee & Tea</option>
-                            <option value="art-merch" th:selected="${product.category == 'art-merch'}">Art & Merch</option>
-                            <option value="gift-sets" th:selected="${product.category == 'gift-sets'}">Gift Sets</option>
-                            <option value="vouchers" th:selected="${product.category == 'vouchers'}">Vouchers</option>
-                        </select>
-                        <div class="error-message" id="product-category-error"></div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="product-price">Price (₱)*</label>
-                            <input type="number" id="product-price" name="product-price" min="0" step="0.01" required th:value="${product.price}">
-                            <div class="error-message" id="product-price-error"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="product-stock">Stock Quantity*</label>
-                            <input type="number" id="product-stock" name="product-stock" min="0" step="1" required th:value="${product.quantity}">
-                            <div class="error-message" id="product-stock-error"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="product-description">Description</label>
-                        <textarea id="product-description" name="product-description" rows="4" th:text="${product.description}"></textarea>
-                        <div class="error-message" id="product-description-error"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="product-image">Product Image</label>
-                        <div class="image-upload-container">
-                            <div class="image-preview" id="image-preview">
-                                <i class="fas fa-image"></i>
-                                <span>No image selected</span>
-                            </div>
-                            <input type="file" id="product-image" name="product-image" accept="image/*">
-                            <button type="button" class="btn-secondary upload-btn">
-                                <i class="fas fa-upload"></i> Choose Image
-                            </button>
-                        </div>
-                        <div class="error-message" id="product-image-error"></div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary cancel-btn">Cancel</button>
-                        <button type="submit" class="btn-primary save-btn">Save Product</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Customer Details Modal -->
-    <div class="admin-modal" id="customer-modal">
-        <div class="admin-modal-content">
-            <div class="admin-modal-header">
-                <h2>Customer Details</h2>
-                <button class="admin-modal-close" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="admin-modal-body">
-                <div class="customer-details">
-                    <div class="customer-info">
-                        <h3>Personal Information</h3>
-                        <div class="info-row">
-                            <span class="info-label">Full Name:</span>
-                            <span class="info-value" id="customer-name"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Email:</span>
-                            <span class="info-value" id="customer-email"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Phone:</span>
-                            <span class="info-value" id="customer-phone"></span>
-                        </div>
-                    </div>
-                    
-                    <div class="customer-orders">
-                        <h3>Order History</h3>
-                        <div class="admin-table-container">
-                            <table class="admin-table" id="customer-orders-table">
-                                <thead>
-                                    <tr>
-                                        <th>Order ID</th>
-                                        <th>Date</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Customer orders will be loaded here -->
-                                    <tr class="empty-row">
-                                        <td colspan="4">No orders found for this customer.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Order Details Modal -->
-    <div class="admin-modal" id="order-modal">
-        <div class="admin-modal-content">
-            <div class="admin-modal-header">
-                <h2>Order Details</h2>
-                <button class="admin-modal-close" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="admin-modal-body">
-                <div class="order-details">
-                    <div class="order-info">
-                        <h3>Order Information</h3>
-                        <div class="info-row">
-                            <span class="info-label">Order ID:</span>
-                            <span class="info-value" id="order-id"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Date:</span>
-                            <span class="info-value" id="order-date"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Status:</span>
-                            <div class="status-container">
-                                <select id="order-status" class="admin-select">
-                                    <option value="pending">Pending</option>
-                                    <option value="processing">Processing</option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="delivered">Delivered</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
-                                <button class="btn-primary update-status-btn">Update</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="customer-info">
-                        <h3>Customer Information</h3>
-                        <div class="info-row">
-                            <span class="info-label">Name:</span>
-                            <span class="info-value" id="order-customer-name"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Email:</span>
-                            <span class="info-value" id="order-customer-email"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Phone:</span>
-                            <span class="info-value" id="order-customer-phone"></span>
-                        </div>
-                    </div>
-                    
-                    <div class="shipping-info">
-                        <h3>Shipping Information</h3>
-                        <div class="info-row">
-                            <span class="info-label">Address:</span>
-                            <span class="info-value" id="order-address"></span>
-                        </div>
-                        <div class="info-row" id="order-note-row">
-                            <span class="info-label">Note:</span>
-                            <span class="info-value" id="order-note"></span>
-                        </div>
-                    </div>
-                    
-                    <div class="order-items">
-                        <h3>Order Items</h3>
-                        <div class="admin-table-container">
-                            <table class="admin-table" id="order-items-table">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Order items will be loaded here -->
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" class="text-right">Subtotal:</td>
-                                        <td id="order-subtotal"></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3" class="text-right">Tax (12% VAT):</td>
-                                        <td id="order-tax"></td>
-                                    </tr>
-                                    <tr class="total-row">
-                                        <td colspan="3" class="text-right">Total:</td>
-                                        <td id="order-total"></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div class="admin-modal" id="delete-modal">
-        <div class="admin-modal-content admin-modal-sm">
-            <div class="admin-modal-header">
-                <h2>Confirm Deletion</h2>
-                <button class="admin-modal-close" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="admin-modal-body">
-                <p id="delete-message">Are you sure you want to delete this item? This action cannot be undone.</p>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary cancel-delete-btn">Cancel</button>
-                    <button type="button" class="btn-danger confirm-delete-btn">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container" data-component="footer">
-            <!-- Footer will be loaded here -->
-        </div>
-    </footer>
-
-    <script src="js/utils.js"></script>
-    <script src="js/admin.js"></script>
+        </section>
+    </main>
 </body>
 </html>

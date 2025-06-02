@@ -1,23 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<head th:replace="fragments/head :: head('Home')">
     <meta name="description" content="Espressionist - Coffee, Canvas, and Culture in Santa Rosa, Philippines. Shop our coffee, art, and merchandise.">
     <title>Espressionist | Coffee. Canvas. Culture.</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Component loader script -->
-    <script src="js/components.js"></script>
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container" th:replace="fragments/navbar :: navbar"></div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
+<body th:replace="fragments/layout :: layout('Home', ~{::main})">
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
         <div class="container">
             <h1>espressionist</h1>
             <p class="tagline">coffee. canvas. culture.</p>
@@ -116,13 +106,8 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container" data-component="footer">
-            <!-- Footer will be loaded here -->
-        </div>
-    </footer>
-    <script type="text/javascript" src="js/utils.js"></script>
-    <script type="text/javascript" src="js/smooth-scroll.js"></script>
+    </main>
+    <script type="text/javascript" src="/js/utils.js"></script>
+    <script type="text/javascript" src="/js/smooth-scroll.js"></script>
 </body>
 </html>

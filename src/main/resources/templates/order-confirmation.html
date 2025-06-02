@@ -1,70 +1,52 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:replace="fragments/head :: head(title='Order Confirmation')">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmation | Espressionist</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Component loader script -->
-    <script src="js/components.js"></script>
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container" data-component="navbar">
-            <!-- Navbar will be loaded here -->
-        </div>
-    </header>
+<body th:replace="fragments/layout :: layout('Order Confirmation', ~{::main})">
+    <main>
+        <!-- Order Confirmation Section -->
+        <section class="confirmation-section">
+            <div class="container">
+                <div class="confirmation-container">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    
+                    <h1 class="confirmation-title">Thank you for your order!</h1>
+                    
+                    <div class="tracking-info">
+                        <h2 class="tracking-code">Your Tracking Code: <span th:text="${order.code}"></span></h2>
+                        <p>You can use this code to track your order on our <a th:href="@{'/order-status/' + ${order.code}}">Tracking Page</a>.</p>
+                        <p>We've also sent an order summary to your email.</p>
+                    </div>
+                    
+                    <div class="confirmation-message">
+                        <p>Your order is being processed and will be shipped soon.</p>
+                        <p>If you have any questions, please contact us at 
+                            <a href="mailto:espressionist.ph@gmail.com" class="highlight" target="_blank" rel="noopener noreferrer">
+                                espressionist.ph@gmail.com
+                            </a>
+                        </p>
+                    </div>
 
-    <!-- Order Confirmation Section -->
-    <section class="confirmation-section">
-        <div class="container">
-            <div class="confirmation-container">
-                <div class="confirmation-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                
-                <h1 class="confirmation-title">Thank you for your order!</h1>
-                
-                <div class="tracking-info">
-                    <h2 class="tracking-code">Your Tracking Code: <span th:text="${order.code}"></span></h2>
-                    <p>You can use this code to track your order on our <a th:href="@{'/order-status/' + ${order.code}}">Tracking Page</a>.</p>
-                    <p>We've also sent an order summary to your email.</p>
-                </div>
-                
-                <div class="confirmation-message">
-                    <p>Your order is being processed and will be shipped soon.</p>
-                    <p>If you have any questions, please contact us at 
-                        <a href="mailto:espressionist.ph@gmail.com" class="highlight" target="_blank" rel="noopener noreferrer">
-                            espressionist.ph@gmail.com
-                        </a>
-                    </p>
-                </div>
-
-                <div class="order-summary">
-                    <h3>Order Summary</h3>
-                    <ul>
-                        <li th:each="item : ${order.items}">
-                            <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span> — ₱<span th:text="${item.totalPrice}"></span>
-                        </li>
-                    </ul>
-                    <p><strong>Total (with VAT): ₱<span th:text="${order.totalWithVat}"></span></strong></p>
-                    <p><strong>Shipping to:</strong> <span th:text="${order.shippingAddress}"></span></p>
-                </div>
-                
-                <div class="confirmation-actions">
-                    <a href="index.html" class="btn-continue">Continue Shopping</a>
+                    <div class="order-summary">
+                        <h3>Order Summary</h3>
+                        <ul>
+                            <li th:each="item : ${order.items}">
+                                <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span> — ₱<span th:text="${item.totalPrice}"></span>
+                            </li>
+                        </ul>
+                        <p><strong>Total (with VAT): ₱<span th:text="${order.totalWithVat}"></span></strong></p>
+                        <p><strong>Shipping to:</strong> <span th:text="${order.shippingAddress}"></span></p>
+                    </div>
+                    
+                    <div class="confirmation-actions">
+                        <a th:href="@{/}" class="btn-continue">Continue Shopping</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container" data-component="footer">
-            <!-- Footer will be loaded here -->
-        </div>
-    </footer>
+        </section>
+    </main>
 </body>
 </html>

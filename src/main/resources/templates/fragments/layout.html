@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head :: head(${title})">
+    <title>Espressionist</title>
+</head>
+<body th:fragment="layout(title, content)">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav th:replace="fragments/navbar :: navbar"></nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <th:block th:replace="${content}">
+        <!-- Content will be injected here -->
+    </th:block>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div th:replace="fragments/footer :: footer"></div>
+        </div>
+    </footer>
+
+    <!-- Common Scripts -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+</body>
+</html>

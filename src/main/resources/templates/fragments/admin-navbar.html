@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<nav th:fragment="admin-navbar" class="admin-nav">
+    <div class="logo">
+        <a href="/admin/dashboard">
+            <span class="brand-name">espressionist</span>
+            <span class="admin-label">Admin</span>
+        </a>
+    </div>
+    <ul>
+        <li>
+            <a href="/admin/dashboard" 
+               th:classappend="${#httpServletRequest.requestURI == '/admin/dashboard' ? 'active' : ''}">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="/admin/products" 
+               th:classappend="${#httpServletRequest.requestURI == '/admin/products' ? 'active' : ''}">
+                <i class="fas fa-box"></i> Products
+            </a>
+        </li>
+        <li>
+            <a href="/admin/orders" 
+               th:classappend="${#httpServletRequest.requestURI == '/admin/orders' ? 'active' : ''}">
+                <i class="fas fa-shopping-cart"></i> Orders
+            </a>
+        </li>
+        <li>
+            <a href="/admin/customers" 
+               th:classappend="${#httpServletRequest.requestURI == '/admin/customers' ? 'active' : ''}">
+                <i class="fas fa-users"></i> Customers
+            </a>
+        </li>
+        <li>
+            <form th:action="@{/admin/logout}" method="post" class="logout-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </li>
+    </ul>
+</nav>
+</html>

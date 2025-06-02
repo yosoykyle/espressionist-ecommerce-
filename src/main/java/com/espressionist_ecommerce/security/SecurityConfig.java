@@ -25,7 +25,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())  // Simplified for school project
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/webhook/**") // Exclude webhook endpoints if any
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
@@ -43,6 +45,10 @@ public class SecurityConfig {
                 .logoutUrl("/admin/logout")
                 .logoutSuccessUrl("/")
                 .permitAll()
+            )
+            .headers(headers -> headers
+                .frameOptions().sameOrigin() // Allows frames from same origin (for h2-console if needed)
+                .xssProtection().disable() // Disabling as modern browsers handle XSS protection
             );
 
         return http.build();

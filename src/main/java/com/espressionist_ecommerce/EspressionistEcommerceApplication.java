@@ -21,10 +21,8 @@ public class EspressionistEcommerceApplication {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
-                // Allow requests only from our frontend
-                // Allow requests only from our frontend
-                registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:8080")
+                registry.addMapping("/api/**")
+                    .allowedOrigins("http://localhost:8080", "http://127.0.0.1:8080")
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
                     .allowCredentials(true);

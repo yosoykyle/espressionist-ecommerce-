@@ -1,24 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head :: head('Shop')">
     <title>Shop | Espressionist</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Component loader script -->
-    <script src="js/components.js"></script>
 </head>
-<body>
+<body th:replace="fragments/layout :: layout('Shop', ~{::main})">
     <!-- Skip to main content link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
-    <!-- Header -->
-    <header class="header">
-        <div class="container" data-component="navbar">
-            <!-- Navbar will be loaded here -->
-        </div>
-    </header>
+    <main>
 
     <!-- Category Tabs -->
     <section class="category-tabs">
@@ -68,8 +57,8 @@
             <!-- Footer will be loaded here -->
         </div>
     </footer>
-    <script src="js/utils.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/products.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/storage.js"></script>
+    <script src="/js/products.js"></script>
 </body>
 </html>

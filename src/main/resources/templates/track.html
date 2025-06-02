@@ -1,144 +1,71 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:replace="fragments/head :: head(title='Track Order')">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Order | Espressionist</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/track.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Component loader script -->
-    <script src="js/components.js"></script>
-    <style>
-        /* Additional styles for form validation */
-        .tracking-info {
-            transition: color 0.3s ease;
-        }
-        
-        .tracking-info.success {
-            color: #388e3c;
-        }
-        
-        .tracking-info.error {
-            color: #d32f2f;
-        }
-        
-        input[aria-invalid="true"] {
-            border-color: #d32f2f;
-            background-color: #fff8f8;
-        }
-        
-        /* Improve mobile responsiveness */
-        @media (max-width: 480px) {
-            .tracking-form input[type="text"] {
-                font-size: 16px; /* Prevents iOS zoom */
-            }
-            
-            .error-message {
-                padding: 15px;
-            }
-            
-            .error-message h3 {
-                font-size: 1.1rem;
-            }
-        }
-    </style>
-    <style>
-    /* Form validation styles */
-    .tracking-info {
-        transition: color 0.3s ease;
-        margin-bottom: 15px;
-    }
-    
-    .tracking-info.success {
-        color: #388e3c;
-    }
-    
-    .tracking-info.error {
-        color: #d32f2f;
-    }
-    
-    input[aria-invalid="true"],
-    .invalid-input {
-        border-color: #d32f2f !important;
-        background-color: #fff8f8;
-        box-shadow: 0 0 0 1px #d32f2f;
-    }
-    
-    /* Improve mobile responsiveness */
-    @media (max-width: 480px) {
-        .tracking-form input[type="text"] {
-            font-size: 16px; /* Prevents iOS zoom */
-        }
-        
-        .error-message {
-            padding: 15px;
-        }
-        
-        .error-message h3 {
-            font-size: 1.1rem;
-        }
-    }
-    
-    /* Animation for validation feedback */
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-    
-    .invalid-input:focus {
-        animation: shake 0.3s ease-in-out;
-    }
-</style>
+    <link rel="stylesheet" href="/css/track.css">
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container" data-component="navbar">
-            <!-- Navbar will be loaded here -->
-        </div>
-    </header>
-
-    <!-- Track Order Section -->
-    <section class="track-section">
-        <div class="container">
-            <h1 class="page-title">Track Your Order</h1>
-            
-            <div class="track-container">
-                <!-- Tracking Form -->
-                <div class="tracking-form-container">
-                    <form th:action="@{/order-status}" method="get" class="tracking-form">
-                        <label for="orderCode">Enter your tracking code:</label>
-                        <input type="text" id="orderCode" name="orderCode" th:value="${orderCode}" required/>
-                        <button type="submit" class="btn btn-primary">Track Order</button>
-                    </form>
-                    <div class="tracking-info" th:if="${order != null}">
-                        <h3>Order Date: <span th:text="${order.orderDate}"></span></h3>
-                        <ul>
-                            <li th:each="item : ${order.items}">
-                                <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span>
-                            </li>
-                        </ul>
-                        <p><strong>Shipping Info:</strong> <span th:text="${order.shippingAddress}"></span></p>
-                        <p><strong>Status:</strong> <span th:text="${order.status}"></span></p>
-                    </div>
-                    <div class="tracking-info error" th:if="${order == null && orderCode != null}">
-                        <p>Order not found. Please check your code and try again.</p>
+<body th:replace="fragments/layout :: layout('Track Order', ~{::main})">
+    <main>
+        <!-- Track Order Section -->
+        <section class="track-section">
+            <div class="container">
+                <h1 class="page-title">Track Your Order</h1>
+                
+                <div class="track-container">
+                    <div class="tracking-form-container">
+                        <form th:action="@{/order-status}" method="get" class="tracking-form">
+                            <label for="orderCode">Enter your tracking code:</label>
+                            <input type="text" id="orderCode" name="orderCode" th:value="${orderCode}" required/>
+                            <button type="submit" class="btn btn-primary">Track Order</button>
+                        </form>
+                        
+                        <!-- Order Status Info -->
+                        <div class="tracking-info" th:if="${order != null}">
+                            <div class="order-header">
+                                <h2>Order Status</h2>
+                                <div class="status-badge" th:classappend="'status-' + ${#strings.toLowerCase(order.status)}" th:text="${order.status}"></div>
+                            </div>
+                            
+                            <div class="order-details">
+                                <div class="details-section">
+                                    <h3>Order Information</h3>
+                                    <div class="details-row">
+                                        <span class="label">Order Date:</span>
+                                        <span class="value" th:text="${order.orderDate}"></span>
+                                    </div>
+                                    <div class="details-row">
+                                        <span class="label">Total Amount:</span>
+                                        <span class="value">₱<span th:text="${order.totalWithVat}"></span></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="details-section">
+                                    <h3>Items</h3>
+                                    <ul class="order-items">
+                                        <li th:each="item : ${order.items}">
+                                            <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="details-section">
+                                    <h3>Shipping Information</h3>
+                                    <div class="details-row">
+                                        <span class="label">Address:</span>
+                                        <span class="value" th:text="${order.shippingAddress}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Error Message -->
+                        <div class="tracking-info error" th:if="${order == null && orderCode != null}">
+                            <p>Order not found. Please check your code and try again.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container" data-component="footer">
-            <!-- Footer will be loaded here -->
-        </div>
-    </footer>
-
-    <script src="js/utils.js"></script>
-    <script src="js/track.js"></script>
+        </section>
+    </main>
 </body>
 </html>
