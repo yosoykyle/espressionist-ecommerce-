@@ -31,6 +31,9 @@ public class Admin {
     @Column
     private LocalDateTime lastLoginAt;
 
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int loginAttempts = 0;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -78,5 +81,13 @@ public class Admin {
 
     public void setLastLoginAt(LocalDateTime lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
+    }
+
+    public int getLoginAttempts() {
+        return loginAttempts;
+    }
+
+    public void setLoginAttempts(int loginAttempts) {
+        this.loginAttempts = loginAttempts;
     }
 }

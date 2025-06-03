@@ -6,6 +6,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
@@ -28,6 +33,7 @@ public class GlobalExceptionHandler {
         body.put("error", "Not Found");
         body.put("message", ex.getMessage());
         body.put("path", request.getDescription(false).substring(4)); // Removes "uri=" prefix
+        logger.error("Resource not found: {}", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
@@ -39,6 +45,7 @@ public class GlobalExceptionHandler {
         body.put("error", "Bad Request");
         body.put("message", ex.getMessage());
         body.put("path", request.getDescription(false).substring(4));
+        logger.error("Business exception: {}", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
@@ -55,6 +62,19 @@ public class GlobalExceptionHandler {
                                 .collect(Collectors.toList());
         body.put("messages", errors); // List of validation error messages
         body.put("path", request.getDescription(false).substring(4));
+        logger.error("Validation error: {}", errors);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException ex, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "File Upload Error");
+        body.put("message", "File size exceeds maximum limit (10MB)");
+        body.put("path", request.getDescription(false).substring(4));
+        logger.error("File upload size exceeded");
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
@@ -67,11 +87,12 @@ public class GlobalExceptionHandler {
         // It's generally good practice to avoid exposing raw exception messages to the client in production.
         // For this exercise, including ex.getMessage() as per instruction.
         String message = "An unexpected error occurred. Please contact support.";
-        if (ex.getMessage() != null && !ex.getMessage().isBlank()){
-             message = "An unexpected error occurred: " + ex.getMessage();
+        if (ex.getMessage() != null && !ex.getMessage().isBlank()) {
+            message = "An unexpected error occurred: " + ex.getMessage();
         }
         body.put("message", message);
         body.put("path", request.getDescription(false).substring(4));
+        logger.error("Uncaught error occurred", ex);
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

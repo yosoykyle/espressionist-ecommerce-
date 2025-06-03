@@ -2,10 +2,7 @@ package com.espressionist_ecommerce.controller;
 
 import com.espressionist_ecommerce.dto.OrderCreateDTO;
 import com.espressionist_ecommerce.dto.OrderTrackingDTO;
-import com.espressionist_ecommerce.exception.BusinessException;
 import com.espressionist_ecommerce.model.Order;
-import com.espressionist_ecommerce.model.OrderItem;
-import com.espressionist_ecommerce.model.OrderStatus;
 import com.espressionist_ecommerce.service.OrderService;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,18 +72,12 @@ public class OrderController {
     }
 
     private static class OrderSummaryResponse {
-        @JsonProperty
-        private final String orderCode;
-        @JsonProperty
-        private final String customerName;
-        @JsonProperty
-        private final String customerEmail;
-        @JsonProperty
-        private final String shippingAddress;
-        @JsonProperty
-        private final double totalWithVAT;
-        @JsonProperty
-        private final String message;
+        @JsonProperty private final String orderCode;
+        @JsonProperty private final String customerName;
+        @JsonProperty private final String customerEmail;
+        @JsonProperty private final String shippingAddress;
+        @JsonProperty private final double totalWithVAT;
+        @JsonProperty private final String message;
 
         public OrderSummaryResponse(String orderCode, String customerName, 
                 String customerEmail, String shippingAddress, 
@@ -99,7 +89,5 @@ public class OrderController {
             this.totalWithVAT = totalWithVAT;
             this.message = message;
         }
-
-        public String getOrderCode() { return orderCode; }
     }
 }
