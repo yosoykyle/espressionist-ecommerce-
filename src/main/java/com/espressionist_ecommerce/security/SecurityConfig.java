@@ -47,8 +47,9 @@ public class SecurityConfig {
                 .permitAll()
             )
             .headers(headers -> headers
-                .frameOptions().sameOrigin() // Allows frames from same origin (for h2-console if needed)
-                .xssProtection().disable() // Disabling as modern browsers handle XSS protection
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';")
+                )
             );
 
         return http.build();

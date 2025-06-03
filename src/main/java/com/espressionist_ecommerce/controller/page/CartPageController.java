@@ -13,15 +13,24 @@ import java.util.List;
 @Controller
 @RequestMapping("/cart")
 public class CartPageController {
-    @GetMapping("")
-    public String cartPage(Model model, HttpSession session) {
+
+    @GetMapping
+    public String cart(Model model, HttpSession session) {
+        @SuppressWarnings("unchecked")
         List<CartItemDTO> cartItems = (List<CartItemDTO>) session.getAttribute("cartItems");
         if (cartItems == null) {
             cartItems = new ArrayList<>();
         }
-        double cartTotal = cartItems.stream().mapToDouble(CartItemDTO::getTotalPrice).sum();
+
+        double total = calculateTotal(cartItems);
         model.addAttribute("cartItems", cartItems);
-        model.addAttribute("cartTotal", cartTotal);
+        model.addAttribute("total", total);
         return "cart";
+    }
+
+    private double calculateTotal(List<CartItemDTO> cartItems) {
+        return cartItems.stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
     }
 }

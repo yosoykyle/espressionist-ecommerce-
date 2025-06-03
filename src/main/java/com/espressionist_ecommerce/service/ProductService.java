@@ -12,10 +12,9 @@ import org.springframework.data.domain.PageRequest; // Ensure this import is add
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.List;
-// import java.util.Optional; // Removed as no longer needed
-import java.util.stream.Collectors; // This was present in the original file for the old logic, keeping it in case other methods use it.
 
 @Service
 @Transactional

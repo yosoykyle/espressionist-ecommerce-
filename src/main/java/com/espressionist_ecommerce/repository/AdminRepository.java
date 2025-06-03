@@ -20,4 +20,6 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
     Optional<Admin> findByUsernameAndArchivedFalse(String username);
     
     List<Admin> findByActiveIsTrueAndArchivedIsFalse();
+    
+    long countByActiveTrue();
 }
