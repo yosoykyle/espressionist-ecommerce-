@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head :: head(title='Shopping Cart')">
+<head th:replace="fragments/head :: head('Shopping Cart')">
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/cart.css">
 </head>
-<body th:replace="fragments/layout :: layout('Shopping Cart', ~{::main})">
+<body th:replace="fragments/layout :: layout('Shopping Cart', ~{::main}, ~{::scripts})">
     <main>
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="spinner"></div>
+        </div>
+        
         <!-- Cart Section -->
         <section class="cart-section" id="main-content">
             <div class="container">
@@ -34,21 +39,26 @@
                                 <div class="cart-cell header-cell">Total</div>
                                 <div class="cart-cell header-cell">Action</div>
                             </div>
-                            <div class="cart-row" th:each="item, iterStat : ${cartItems}">
-                                <div class="cart-cell">
-                                    <span th:text="${item.productName}"></span>
-                                </div>
-                                <div class="cart-cell">
-                                    <span th:text="${item.quantity}"></span>
-                                </div>
-                                <div class="cart-cell">
-                                    ₱<span th:text="${item.price}"></span>
-                                </div>
-                                <div class="cart-cell">
-                                    ₱<span th:text="${item.totalPrice}"></span>
-                                </div>
-                                <div class="cart-cell">
-                                    <form th:action="@{/cart/remove}" method="post">
+                            <tbody id="cart-items">
+                                <!-- Cart items will be injected here by JavaScript -->
+                            </tbody>
+                        </div>
+                        
+                        <!-- Cart Summary -->
+                        <div class="cart-summary">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">₱0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>VAT (12%):</span>
+                                <span id="vat">₱0.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total:</span>
+                                <span id="total">₱0.00</span>
+                            </div>
+                            <a href="/checkout" class="btn btn-primary">Proceed to Checkout
                                         <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                                         <input type="hidden" name="productId" th:value="${item.productId}"/>
                                         <button type="submit" class="btn btn-danger">Remove</button>
@@ -68,5 +78,6 @@
             </div>
         </section>
     </main>
+    <!-- All closing tags and scripts are handled by the layout fragment -->
 </body>
 </html>

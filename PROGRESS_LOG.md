@@ -459,3 +459,17 @@ This log entry summarizes the recent work and current standing of the backend.
   - Improved logging for admin operations
 
 Note: These changes significantly improve the security posture and code quality of the application while maintaining backward compatibility.
+---
+### **June 4, 2025**
+
+#### **Frontend & Template Refactoring, CSP, and Static Resource Fixes**
+- Fixed Content Security Policy (CSP) issues by downloading Font Awesome locally and updating templates to use local CSS/webfonts.
+- Cleaned up all Thymeleaf templates:
+  - Removed duplicate `<html>`, `<body>`, and closing tags from page templates.
+  - Ensured all scripts and closing tags are handled by the layout fragment.
+  - Verified all `th:action` and `th:href` attributes point to correct backend endpoints.
+- Verified and corrected all static resource paths for CSS and JS (`/css/...`, `/js/...`).
+- Checked and improved session and CSRF token handling in forms and AJAX requests.
+- Simplified and consolidated template structure for easier maintenance and student readability.
+- Updated documentation and comments for clarity.
+---

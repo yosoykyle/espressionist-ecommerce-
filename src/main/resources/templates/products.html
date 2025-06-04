@@ -3,10 +3,7 @@
 <head th:replace="fragments/head :: head('Shop')">
     <title>Shop | Espressionist</title>
 </head>
-<body th:replace="fragments/layout :: layout('Shop', ~{::main})">
-    <!-- Skip to main content link for accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
+<body th:replace="fragments/layout :: layout('Shop', ~{::main}, ~{::scripts})">
     <main>
 
     <!-- Category Tabs -->
@@ -32,7 +29,7 @@
                 <h2 class="empty-state-title">No products available yet</h2>
                 <p class="empty-state-message">We're working on adding our amazing products to our online store. Please check back soon or visit our physical store to see our full collection.</p>
                 <div class="empty-state-action">
-                    <a href="index.html#about" class="btn btn-primary">Visit Our Café</a>
+                    <a href="/#about" class="btn btn-primary">Visit Our Café</a>
                 </div>
             </div>
             <!-- Thymeleaf: Product grid -->
@@ -51,14 +48,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container" data-component="footer">
-            <!-- Footer will be loaded here -->
-        </div>
-    </footer>
-    <script src="/js/utils.js"></script>
-    <script src="/js/storage.js"></script>
-    <script src="/js/products.js"></script>
+    </main>
 </body>
 </html>
