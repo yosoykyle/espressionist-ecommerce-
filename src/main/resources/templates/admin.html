@@ -54,7 +54,8 @@
                                 <td th:text="${product.quantity}"></td>
                                 <td th:text="${product.archived ? 'Yes' : 'No'}"></td>
                                 <td>
-                                    <form th:action="@{/admin/products/archive}" method="post" th:if="${!product.archived}">
+                                    <form th:action="@{'/api/products/' + ${product.id} + '/archive'}" method="post">
+                                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                                         <input type="hidden" name="productId" th:value="${product.id}"/>
                                         <button type="submit" class="btn btn-warning">Archive</button>
                                     </form>

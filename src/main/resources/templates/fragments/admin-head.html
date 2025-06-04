@@ -6,14 +6,14 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https:; style-src 'self' https:; img-src 'self' data: https:;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <title th:text="${title} + ' | Admin | Espressionist'">Admin | Espressionist</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/all.min.css">
     <!-- Component loader script -->
     <script src="/js/components.js"></script>
 </head>

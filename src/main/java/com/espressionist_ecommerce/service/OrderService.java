@@ -153,4 +153,15 @@ public class OrderService {
     public List<Order> getRecentOrders() {
         return orderRepository.findTop10ByOrderByOrderDateDesc();
     }
+
+    public void archiveOrder(Long id) {
+        Order order = getOrderById(id);
+        order.setArchived(true);
+        orderRepository.save(order);
+    }
+
+    private Order getOrderById(Long id) {
+        return orderRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+    }
 }

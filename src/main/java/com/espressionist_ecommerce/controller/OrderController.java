@@ -71,6 +71,12 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/admin/orders/{id}/archive")
+    public ResponseEntity<?> archiveOrder(@PathVariable Long id) {
+        orderService.archiveOrder(id);
+        return ResponseEntity.noContent().build();
+    }
+
     private static class OrderSummaryResponse {
         @JsonProperty private final String orderCode;
         @JsonProperty private final String customerName;

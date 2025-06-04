@@ -23,8 +23,22 @@
         </div>
     </footer>
 
-    <!-- Common Scripts -->
-    <script src="/js/utils.js"></script>
-    <script src="/js/components.js"></script>
+    <!-- Page-specific scripts will be injected here -->
+    <th:block th:replace="${scripts}">
+    <th:block th:if="${#strings.equals(title, 'Shop')}">
+        <script src="/js/products.js"></script>
+    </th:block>
+    <th:block th:if="${#strings.equals(title, 'Product Details')}">
+        <script src="/js/product.js"></script>
+    </th:block>
+    <th:block th:if="${#strings.equals(title, 'Shopping Cart')}">
+        <script src="/js/cart.js"></script>
+    </th:block>
+    <th:block th:if="${#strings.equals(title, 'Checkout')}">
+        <script src="/js/checkout.js"></script>
+    </th:block>
+    <th:block th:if="${#strings.equals(title, 'Track Order')}">
+        <script src="/js/track.js"></script>
+    </th:block>
 </body>
 </html>

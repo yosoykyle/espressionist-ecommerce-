@@ -137,13 +137,7 @@ export const orderApi = {
 
 // Admin API calls
 export const adminApi = {
-    login: (credentials) => fetchApi('/api/admin/login', {
-        method: 'POST',
-        body: JSON.stringify(credentials)
-    }),
-    logout: () => fetchApi('/api/admin/logout', {
-        method: 'POST'
-    }),
+    // Login/Logout are handled by Spring Security forms
     getCurrent: () => fetchApi('/api/admin/current'),
     getAll: () => fetchApi('/api/admin/list'),
     create: (adminData) => fetchApi('/api/admin/create', {
@@ -156,5 +150,24 @@ export const adminApi = {
     }),
     delete: (id) => fetchApi('/api/admin/delete/' + id, {
         method: 'DELETE'
+    })
+};
+
+// Cart API calls
+export const cartApi = {
+    getItems: () => fetchApi('/api/cart'),
+    addItem: (productId, quantity) => fetchApi('/api/cart/add', {
+        method: 'POST',
+        body: JSON.stringify({ productId, quantity })
+    }),
+    updateQuantity: (productId, quantity) => fetchApi('/api/cart/update', {
+        method: 'PUT',
+        body: JSON.stringify({ productId, quantity })
+    }),
+    removeItem: (productId) => fetchApi(`/api/cart/remove/${productId}`, {
+        method: 'DELETE'
+    }),
+    clear: () => fetchApi('/api/cart/clear', {
+        method: 'POST'
     })
 };

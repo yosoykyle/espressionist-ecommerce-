@@ -4,81 +4,20 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/success.css">
 </head>
-<body th:replace="fragments/layout :: layout('Order Confirmation', ~{::main})">
+<body th:replace="fragments/layout :: layout('Order Confirmation', ~{::main}, ~{::scripts})">
     <main>
-        <!-- Success Section -->
-        <section class="success-section">
-            <div class="container">
-                <!-- Success Message (shown when order is found) -->
-                <div class="success-container" id="success-container" th:if="${order != null}">
-                    <div class="success-icon">
-                        <i class="fas fa-check-circle"></i>
+        <div class="container mt-5">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Order Placed Successfully!</h2>
+                    <div id="orderDetails">
+                        <p>Your order number is: <span th:text="${orderId}"></span></p>
+                        <p>Track your order: <a th:href="@{'/track?orderId=' + ${orderId}}">Click here</a></p>
                     </div>
-                    
-                    <h1 class="success-title">Thank you for your order!</h1>
-                    
-                    <div class="order-details">
-                        <div class="tracking-info">
-                            <h2>Your Tracking Code</h2>
-                            <div class="tracking-code" th:text="${order.code}"></div>
-                        </div>
-                        
-                        <div class="order-summary">
-                            <div class="summary-item">
-                                <span class="label">Total Amount:</span>
-                                <span class="value">₱<span th:text="${order.totalWithVat}"></span></span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="label">Items:</span>
-                                <span class="value">
-                                    <ul>
-                                        <li th:each="item : ${order.items}">
-                                            <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span>
-                                        </li>
-                                    </ul>
-                                </span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="label">Order Date:</span>
-                                <span class="value" th:text="${order.orderDate}"></span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="label">Estimated Delivery:</span>
-                                <span class="value">3–5 days within PH</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="success-message">
-                        <p>We've received your order and will begin processing it right away.</p>
-                        <p>You will receive an email confirmation shortly.</p>
-                    </div>
-                    
-                    <div class="success-actions">
-                        <a th:href="@{'/order-status/' + ${order.code}}" class="btn-track">Track My Order</a>
-                        <a th:href="@{/}" class="btn-shop">Return to Shop</a>
-                    </div>
-                </div>
-                
-                <!-- Fallback Message (shown when order is not found) -->
-                <div class="fallback-container" id="fallback-container" th:if="${order == null}">
-                    <div class="fallback-icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    
-                    <h1 class="fallback-title">Oops! We couldn't find your order.</h1>
-                    
-                    <div class="fallback-message">
-                        <p>The order ID you're looking for doesn't exist or has been removed.</p>
-                        <p>If you believe this is an error, please contact our customer support.</p>
-                    </div>
-                    
-                    <div class="fallback-actions">
-                        <a th:href="@{/}" class="btn-shop">Return to Shop</a>
-                    </div>
+                    <a href="/products" class="btn btn-primary mt-3">Continue Shopping</a>
                 </div>
             </div>
-        </section>
+        </div>
     </main>
 </body>
 </html>

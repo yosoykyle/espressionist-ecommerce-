@@ -98,6 +98,10 @@
   --transition-medium: 0.3s ease;
   --transition-slow: 0.5s ease;
 
+  /* Z-Index System */
+  --z-index-sticky: 10;
+  --z-index-toast: 100;
+
   /* Z-index layers */
   --z-index-dropdown: 100;
   --z-index-sticky: 200;
