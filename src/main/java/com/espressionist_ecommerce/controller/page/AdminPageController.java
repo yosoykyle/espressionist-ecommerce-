@@ -49,6 +49,6 @@ public class AdminPageController {
 
     @GetMapping("/login")
     public String login() {
-        return "admin/login";
+        return "login";
     }
 }
