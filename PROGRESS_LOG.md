@@ -473,3 +473,11 @@ Note: These changes significantly improve the security posture and code quality 
 - Simplified and consolidated template structure for easier maintenance and student readability.
 - Updated documentation and comments for clarity.
 ---
+### **June 9, 2025**
+
+#### **Frontend Template Refactoring & Consistency Improvements**
+- Refactored the admin login page to use the unified layout fragment (`fragments/layout :: layout`) for consistent structure and styling across all pages.
+- Removed the old `admin-login.html` and replaced it with `login.html`, ensuring all admin login functionality, CSRF protection, and error handling remain intact.
+- Cleaned up redundant HTML tags and standardized the markup for easier maintenance.
+- Verified that the admin login page now inherits global styles, navigation, and footer, aligning with the rest of the application.
+---

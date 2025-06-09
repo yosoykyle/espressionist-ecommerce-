@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head :: head(title='Order Confirmation')">
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/success.css">
-</head>
-<body th:replace="fragments/layout :: layout('Order Confirmation', ~{::main}, ~{::scripts})">
-    <main>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="fragments/layout :: layout('Success', ~{::main})">
+<main>
+    <head th:replace="fragments/head :: head(title='Order Confirmation')">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="/css/success.css">
+    </head>
+    <body>
         <div class="container mt-5">
             <div class="card">
                 <div class="card-body">
@@ -18,6 +19,6 @@
                 </div>
             </div>
         </div>
-    </main>
-</body>
+    </body>
+</main>
 </html>

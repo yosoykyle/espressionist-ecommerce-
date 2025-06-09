@@ -1,10 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head :: head('Product Details')">
-    <title>Product Details | Espressionist</title>
-</head>
-<body th:replace="fragments/layout :: layout('Product Details', ~{::main})">
-    <main>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="fragments/layout :: layout('Product Details', ~{::main})">
+<main>
 
     <!-- Product Details Section -->
     <section class="product-details">
@@ -43,5 +40,5 @@
         </div>
     </section>
     <!-- All closing tags and scripts are handled by the layout fragment -->
-</body>
+</main>
 </html>
