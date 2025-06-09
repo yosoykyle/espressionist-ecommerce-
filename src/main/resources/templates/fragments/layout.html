@@ -24,7 +24,9 @@
     </footer>
 
     <!-- Page-specific scripts will be injected here -->
-    <th:block th:replace="${scripts}">
+    <th:block th:if="${scripts != null}">
+        <th:block th:replace="${scripts}"></th:block>
+    </th:block>
     <th:block th:if="${#strings.equals(title, 'Shop')}">
         <script src="/js/products.js"></script>
     </th:block>

@@ -1,71 +1,66 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head :: head(title='Track Order')">
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/track.css">
-</head>
-<body th:replace="fragments/layout :: layout('Track Order', ~{::main})">
-    <main>
-        <!-- Track Order Section -->
-        <section class="track-section">
-            <div class="container">
-                <h1 class="page-title">Track Your Order</h1>
-                
-                <div class="track-container">
-                    <div class="tracking-form-container">
-                        <form th:action="@{/order-status}" method="get" class="tracking-form">
-                            <label for="orderCode">Enter your tracking code:</label>
-                            <input type="text" id="orderCode" name="orderCode" th:value="${orderCode}" required/>
-                            <button type="submit" class="btn btn-primary">Track Order</button>
-                        </form>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="fragments/layout :: layout('Track Order', ~{::main})">
+<main>
+    <!-- Track Order Section -->
+    <section class="track-section">
+        <div class="container">
+            <h1 class="page-title">Track Your Order</h1>
+            
+            <div class="track-container">
+                <div class="tracking-form-container">
+                    <form th:action="@{/order-status}" method="get" class="tracking-form">
+                        <label for="orderCode">Enter your tracking code:</label>
+                        <input type="text" id="orderCode" name="orderCode" th:value="${orderCode}" required/>
+                        <button type="submit" class="btn btn-primary">Track Order</button>
+                    </form>
+                    
+                    <!-- Order Status Info -->
+                    <div class="tracking-info" th:if="${order != null}">
+                        <div class="order-header">
+                            <h2>Order Status</h2>
+                            <div class="status-badge" th:classappend="'status-' + ${#strings.toLowerCase(order.status)}" th:text="${order.status}"></div>
+                        </div>
                         
-                        <!-- Order Status Info -->
-                        <div class="tracking-info" th:if="${order != null}">
-                            <div class="order-header">
-                                <h2>Order Status</h2>
-                                <div class="status-badge" th:classappend="'status-' + ${#strings.toLowerCase(order.status)}" th:text="${order.status}"></div>
+                        <div class="order-details">
+                            <div class="details-section">
+                                <h3>Order Information</h3>
+                                <div class="details-row">
+                                    <span class="label">Order Date:</span>
+                                    <span class="value" th:text="${order.orderDate}"></span>
+                                </div>
+                                <div class="details-row">
+                                    <span class="label">Total Amount:</span>
+                                    <span class="value">₱<span th:text="${order.totalWithVat}"></span></span>
+                                </div>
                             </div>
                             
-                            <div class="order-details">
-                                <div class="details-section">
-                                    <h3>Order Information</h3>
-                                    <div class="details-row">
-                                        <span class="label">Order Date:</span>
-                                        <span class="value" th:text="${order.orderDate}"></span>
-                                    </div>
-                                    <div class="details-row">
-                                        <span class="label">Total Amount:</span>
-                                        <span class="value">₱<span th:text="${order.totalWithVat}"></span></span>
-                                    </div>
-                                </div>
-                                
-                                <div class="details-section">
-                                    <h3>Items</h3>
-                                    <ul class="order-items">
-                                        <li th:each="item : ${order.items}">
-                                            <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="details-section">
-                                    <h3>Shipping Information</h3>
-                                    <div class="details-row">
-                                        <span class="label">Address:</span>
-                                        <span class="value" th:text="${order.shippingAddress}"></span>
-                                    </div>
+                            <div class="details-section">
+                                <h3>Items</h3>
+                                <ul class="order-items">
+                                    <li th:each="item : ${order.items}">
+                                        <span th:text="${item.productName}"></span> x <span th:text="${item.quantity}"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="details-section">
+                                <h3>Shipping Information</h3>
+                                <div class="details-row">
+                                    <span class="label">Address:</span>
+                                    <span class="value" th:text="${order.shippingAddress}"></span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Error Message -->
-                        <div class="tracking-info error" th:if="${order == null && orderCode != null}">
-                            <p>Order not found. Please check your code and try again.</p>
-                        </div>
+                    </div>
+                    
+                    <!-- Error Message -->
+                    <div class="tracking-info error" th:if="${order == null && orderCode != null}">
+                        <p>Order not found. Please check your code and try again.</p>
                     </div>
                 </div>
             </div>
-        </section>
-    </main>
-</body>
+        </div>
+    </section>
+</main>
 </html>
