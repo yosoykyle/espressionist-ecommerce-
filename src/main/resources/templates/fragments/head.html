@@ -7,13 +7,12 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${title} + ' | Espressionist'">Espressionist</title>
     <!-- Common styles -->
-    <link rel="stylesheet" href="/css/variables.css">
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/all.min.css">
-    
+    <link rel="stylesheet" th:href="@{/css/variables.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
     <!-- Common scripts -->
-    <script src="/js/utils.js"></script>
-    <script src="/js/api.js"></script>
-    <script src="/js/components.js"></script>
+    <script th:src="@{/js/utils.js}"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/components.js}"></script>
 </head>
 </html>
