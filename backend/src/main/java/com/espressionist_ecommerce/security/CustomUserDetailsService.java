@@ -20,7 +20,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Admin admin = adminRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + username));
-        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_ADMIN");
+
+        // Dynamically create authority based on the admin's role
+        // Spring Security's hasRole() check implicitly adds "ROLE_" prefix,
+        // so authorities should be stored as "ROLE_ROLENAME".
+        // If admin.getRole().name() is "SUPER_ADMIN", authority string will be "ROLE_SUPER_ADMIN"
+        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + admin.getRole().name());
+
         return new org.springframework.security.core.userdetails.User(
                 admin.getUsername(),
                 admin.getPassword(),

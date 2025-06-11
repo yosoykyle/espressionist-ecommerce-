@@ -1,8 +1,12 @@
 package com.espressionist_ecommerce.controller;
 
+import com.espressionist_ecommerce.dto.AdminCreationRequestDTO;
 import com.espressionist_ecommerce.dto.AdminDTO;
 import com.espressionist_ecommerce.service.AdminService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import com.espressionist_ecommerce.dto.PasswordUpdateRequestDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -19,8 +23,16 @@ public class AdminController {
     }
 
     @PostMapping
-    public ResponseEntity<AdminDTO> createAdmin(@RequestBody AdminDTO adminDTO) {
-        return ResponseEntity.ok(adminService.createAdmin(adminDTO));
+    public ResponseEntity<AdminDTO> createAdmin(@Valid @RequestBody AdminCreationRequestDTO adminCreationRequestDTO) {
+        AdminDTO createdAdmin = adminService.createAdmin(adminCreationRequestDTO);
+        // Return 201 Created for successful creation
+        return new ResponseEntity<>(createdAdmin, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/me/password")
+    public ResponseEntity<Void> updateOwnPassword(@Valid @RequestBody PasswordUpdateRequestDTO passwordUpdateRequestDTO) {
+        adminService.updateOwnPassword(passwordUpdateRequestDTO);
+        return ResponseEntity.ok().build(); // Or ResponseEntity.noContent().build()
     }
 
     @PutMapping("/{id}")
