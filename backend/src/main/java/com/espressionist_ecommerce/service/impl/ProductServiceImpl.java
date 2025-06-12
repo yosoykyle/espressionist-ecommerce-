@@ -31,11 +31,12 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         try {
-            Path dirPath = Paths.get(uploadDir);
-            if (!Files.exists(dirPath)) {
-                Files.createDirectories(dirPath);
+            // Save to static/products directory for Spring Boot static serving
+            Path staticDir = Paths.get("src/main/resources/static/products");
+            if (!Files.exists(staticDir)) {
+                Files.createDirectories(staticDir);
             }
-            Path filePath = dirPath.resolve(fileName);
+            Path filePath = staticDir.resolve(fileName);
             file.transferTo(filePath.toFile());
             product.setImage(fileName);
             productRepository.save(product);
