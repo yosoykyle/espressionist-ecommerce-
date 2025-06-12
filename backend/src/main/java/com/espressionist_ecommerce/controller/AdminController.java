@@ -29,11 +29,6 @@ public class AdminController {
         return new ResponseEntity<>(createdAdmin, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/me/password")
-    public ResponseEntity<Void> updateOwnPassword(@Valid @RequestBody PasswordUpdateRequestDTO passwordUpdateRequestDTO) {
-        adminService.updateOwnPassword(passwordUpdateRequestDTO);
-        return ResponseEntity.ok().build(); // Or ResponseEntity.noContent().build()
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<AdminDTO> updateAdmin(@PathVariable Long id, @RequestBody AdminDTO adminDTO) {

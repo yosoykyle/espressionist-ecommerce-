@@ -2,7 +2,6 @@ package com.espressionist_ecommerce.service.impl;
 
 import com.espressionist_ecommerce.dto.AdminCreationRequestDTO;
 import com.espressionist_ecommerce.dto.AdminDTO;
-import com.espressionist_ecommerce.dto.PasswordUpdateRequestDTO;
 import com.espressionist_ecommerce.entity.Admin;
 import com.espressionist_ecommerce.repository.AdminRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,27 +27,6 @@ public class AdminServiceImpl implements AdminService {
         this.adminRepository = adminRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @Override
-    public void updateOwnPassword(PasswordUpdateRequestDTO passwordUpdateRequestDTO) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (username == null) {
-            // This should ideally not happen if the endpoint is secured
-            throw new RuntimeException("Authenticated user not found in security context.");
-        }
-
-        Admin admin = adminRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + username)); // Or a more generic exception
-
-        if (!passwordEncoder.matches(passwordUpdateRequestDTO.getCurrentPassword(), admin.getPassword())) {
-            // TODO: Throw a specific custom exception like InvalidCurrentPasswordException
-            throw new RuntimeException("Current password does not match.");
-        }
-
-        admin.setPassword(passwordEncoder.encode(passwordUpdateRequestDTO.getNewPassword()));
-        adminRepository.save(admin);
-        // Optionally, could log this action or send a notification
     }
 
     @Override

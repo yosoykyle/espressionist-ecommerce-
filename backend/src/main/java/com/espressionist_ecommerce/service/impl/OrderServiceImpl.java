@@ -7,7 +7,7 @@ import com.espressionist_ecommerce.entity.Order;
 import com.espressionist_ecommerce.entity.OrderItem;
 import com.espressionist_ecommerce.entity.Product; // Keep for later stock logic
 import com.espressionist_ecommerce.repository.OrderRepository;
-// TODO: Add ResourceNotFoundException import later
+import com.espressionist_ecommerce.exception.ResourceNotFoundException;
 import com.espressionist_ecommerce.repository.ProductRepository;
 import com.espressionist_ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -52,31 +52,25 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = orderRequestDTO.getItems().stream()
                 .map(itemDTO -> {
                     Product product = productRepository.findById(itemDTO.getProductId())
-                            .orElseThrow(() -> new RuntimeException("Product not found with id: " + itemDTO.getProductId())); // TODO: Custom exception
-
+                            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + itemDTO.getProductId()));
                     if (product.isArchived()) {
-                        throw new RuntimeException("Product is archived and cannot be ordered: " + product.getName()); // TODO: Custom exception
+                        throw new IllegalStateException("Product is archived and cannot be ordered: " + product.getName());
                     }
-
-                    // Check stock
                     if (product.getStock() < itemDTO.getQuantity()) {
-                        throw new RuntimeException( // TODO: Custom InsufficientStockException
+                        throw new IllegalArgumentException(
                                 "Insufficient stock for product: " + product.getName() +
                                 ". Available: " + product.getStock() +
                                 ", Requested: " + itemDTO.getQuantity());
                     }
-
-                    // Decrement stock
                     product.setStock(product.getStock() - itemDTO.getQuantity());
-                    productRepository.save(product); // Persist stock change and trigger optimistic lock check
-
+                    productRepository.save(product);
                     OrderItem orderItem = new OrderItem();
                     orderItem.setProduct(product);
                     orderItem.setQuantity(itemDTO.getQuantity());
-                    orderItem.setName(product.getName()); // Set name from Product
-                    orderItem.setPrice(product.getPrice()); // Set price from Product
-                    orderItem.setImage(product.getImage()); // Set image from Product
-                    orderItem.setOrder(order); // Set the bidirectional relationship
+                    orderItem.setName(product.getName());
+                    orderItem.setPrice(product.getPrice());
+                    orderItem.setImage(product.getImage());
+                    orderItem.setOrder(order);
                     return orderItem;
                 })
                 .collect(Collectors.toList());
@@ -89,8 +83,8 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setSubtotal(subtotal);
 
-        // Calculate VAT (example: 20% VAT rate)
-        BigDecimal vatRate = new BigDecimal("0.20"); // Consider making this configurable
+        // Calculate VAT (example: 12% VAT rate)
+        BigDecimal vatRate = new BigDecimal("0.12"); // Match frontend VAT
         BigDecimal vatAmount = subtotal.multiply(vatRate);
         order.setVat(vatAmount.setScale(2, RoundingMode.HALF_UP));
 
@@ -105,13 +99,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO getOrderByCode(String code) {
         Order order = orderRepository.findByCode(code)
-                .orElseThrow(() -> new RuntimeException("Order not found with code: " + code)); // TODO: Use ResourceNotFoundException
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + code));
         return modelMapper.map(order, OrderDTO.class);
     }
-
-    // --- Methods from interface that are not fully matching the old implementation or are new ---
-    // These will need proper implementation or reconciliation if used.
-    // For now, providing basic stubs or adapting existing ones if very similar.
 
     @Override
     public List<OrderDTO> getAllOrders() {
@@ -123,12 +113,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO updateOrderStatus(Long id, String status) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id)); // TODO: Use ResourceNotFoundException
-        // TODO: Add validation for status string and transition logic
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+        // Only allow valid status transitions
         try {
-            order.setStatus(Order.OrderStatus.valueOf(status.toUpperCase()));
+            Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+            // Optionally: Add logic to restrict invalid transitions (e.g., can't go from DELIVERED to PROCESSING)
+            order.setStatus(newStatus);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid order status: " + status, e);
+            throw new IllegalArgumentException("Invalid order status: " + status, e);
         }
         Order updatedOrder = orderRepository.save(order);
         return modelMapper.map(updatedOrder, OrderDTO.class);
@@ -137,57 +129,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO archiveOrder(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id)); // TODO: Use ResourceNotFoundException
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
         order.setArchived(true);
         Order archivedOrder = orderRepository.save(order);
         return modelMapper.map(archivedOrder, OrderDTO.class);
-    }
-
-    // --- Deprecated methods that were previously in OrderServiceImpl ---
-
-    /**
-     * @deprecated Replaced by {@link #getOrderByCode(String)} or other specific queries.
-     */
-    @Deprecated
-    public java.util.Optional<OrderDTO> getOrderById(Long id) {
-        return orderRepository.findById(id)
-                .map(order -> modelMapper.map(order, OrderDTO.class));
-    }
-
-    /**
-     * @deprecated Replaced by {@link #placeOrder(OrderRequestDTO)}.
-     */
-    @Deprecated
-    public OrderDTO createOrder(OrderDTO orderDTO) {
-        // This logic is substantially different and complex, parts of it will move to placeOrder.
-        // For now, just marking as deprecated. The new placeOrder has the basic structure.
-        throw new UnsupportedOperationException("Deprecated: Use placeOrder(OrderRequestDTO) instead.");
-    }
-
-    /**
-     * @deprecated This specific update logic might be too broad or conflict with updateOrderStatus.
-     *             Review if a general update method is needed or if specific updates are preferred.
-     */
-    @Deprecated
-    public OrderDTO updateOrder(Long id, OrderDTO orderDTO) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-        // This was a very generic update, consider specific update methods.
-        try {
-            order.setStatus(Order.OrderStatus.valueOf(orderDTO.getStatus().toUpperCase()));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid order status: " + orderDTO.getStatus(), e);
-        }
-        order = orderRepository.save(order);
-        return modelMapper.map(order, OrderDTO.class);
-    }
-
-    /**
-     * @deprecated Replaced by {@link #archiveOrder(Long)} for soft delete.
-     *             Hard deletes are generally discouraged for orders.
-     */
-    @Deprecated
-    public void deleteOrder(Long id) {
-        orderRepository.deleteById(id);
     }
 }

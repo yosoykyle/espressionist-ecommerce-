@@ -33,15 +33,4 @@ public class AuthController {
         return ResponseEntity.ok("Logged out successfully");
     }
 
-    @GetMapping("/me") // Full path: /admin/me
-    public ResponseEntity<AdminDTO> getCurrentAdmin() {
-        AdminDTO adminDTO = authService.getCurrentAdmin();
-        if (adminDTO != null) {
-            return ResponseEntity.ok(adminDTO);
-        } else {
-            // This case might occur if the token is valid but user somehow not found,
-            // or if the endpoint is hit without a token due to misconfiguration (though /admin/** is secured)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
 }

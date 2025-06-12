@@ -81,7 +81,7 @@ This checklist is based on the frontend requirements and documentation. Follow e
 
 ## 10. Testing & Validation
 - [x] Write unit and integration tests for services and controllers
-- [ ] Test all endpoints with the frontend
+- [x] Test all endpoints with the frontend
 
 ## 11. Deployment
 - [ ] Use Docker Compose for local development (MariaDB)

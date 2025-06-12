@@ -1,6 +1,5 @@
 package com.espressionist_ecommerce.service.impl;
 
-import com.espressionist_ecommerce.dto.AdminDTO;
 import com.espressionist_ecommerce.dto.LoginRequestDTO;
 import com.espressionist_ecommerce.dto.JwtResponse;
 import com.espressionist_ecommerce.entity.Admin;
@@ -77,20 +76,5 @@ public class AuthServiceImpl implements AuthService {
         // For this implementation, we'll assume client-side token removal.
         // Logging can be added here if desired.
         System.out.println("User logged out. Token (if blocklisting implemented): " + token);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public AdminDTO getCurrentAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-            // Or throw an exception if an admin must be authenticated
-            return null;
-        }
-
-        String username = authentication.getName();
-        Admin admin = adminRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Authenticated admin user not found in database: " + username));
-        return modelMapper.map(admin, AdminDTO.class);
     }
 }
