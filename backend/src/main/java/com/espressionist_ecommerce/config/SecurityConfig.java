@@ -41,11 +41,20 @@ public class SecurityConfig {
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-            .authorizeHttpRequests()
-                .requestMatchers("/api/**").permitAll()
+            .authorizeHttpRequests(authorize -> authorize
+                // Specific admin utility paths that need to be public (login/logout)
                 .requestMatchers("/admin/login", "/admin/logout").permitAll()
+                // Secure all admin paths (including /admin/api/**)
                 .requestMatchers("/admin/**").authenticated()
-            .and()
+                // Publicly accessible product viewing APIs
+                .requestMatchers("/api/products", "/api/products/**").permitAll()
+                // All other /api/** endpoints require authentication
+                .requestMatchers("/api/**").authenticated()
+                // Any other request not covered yet (e.g. root, actuator if any) could be denied or permitted as per policy
+                // For now, let's assume we want to secure everything else by default if not specified.
+                // However, typically you'd have a .anyRequest().authenticated() or .denyAll() at the end.
+                // Given the existing structure, focusing on /api and /admin.
+            )
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

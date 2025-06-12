@@ -1,9 +1,11 @@
 package com.espressionist_ecommerce.service;
 
 import com.espressionist_ecommerce.dto.AdminDTO;
+import com.espressionist_ecommerce.dto.LoginRequestDTO;
+import com.espressionist_ecommerce.dto.JwtResponse;
 
 public interface AuthService {
-    String login(String username, String password);
-    void logout(String token);
+    JwtResponse login(LoginRequestDTO loginRequestDTO);
+    void logout(String token); // Basic logout, actual stateless JWT logout is complex
     AdminDTO getCurrentAdmin();
 }

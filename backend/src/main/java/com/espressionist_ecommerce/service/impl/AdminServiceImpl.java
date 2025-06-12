@@ -1,8 +1,13 @@
 package com.espressionist_ecommerce.service.impl;
 
+import com.espressionist_ecommerce.dto.AdminCreationRequestDTO;
 import com.espressionist_ecommerce.dto.AdminDTO;
+import com.espressionist_ecommerce.dto.PasswordUpdateRequestDTO;
 import com.espressionist_ecommerce.entity.Admin;
 import com.espressionist_ecommerce.repository.AdminRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.espressionist_ecommerce.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -12,11 +17,39 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class AdminServiceImpl implements AdminService {
     private final AdminRepository adminRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
+
+    // Updated constructor to be explicitly defined for PasswordEncoder injection
+    public AdminServiceImpl(AdminRepository adminRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
+        this.adminRepository = adminRepository;
+        this.modelMapper = modelMapper;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public void updateOwnPassword(PasswordUpdateRequestDTO passwordUpdateRequestDTO) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (username == null) {
+            // This should ideally not happen if the endpoint is secured
+            throw new RuntimeException("Authenticated user not found in security context.");
+        }
+
+        Admin admin = adminRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + username)); // Or a more generic exception
+
+        if (!passwordEncoder.matches(passwordUpdateRequestDTO.getCurrentPassword(), admin.getPassword())) {
+            // TODO: Throw a specific custom exception like InvalidCurrentPasswordException
+            throw new RuntimeException("Current password does not match.");
+        }
+
+        admin.setPassword(passwordEncoder.encode(passwordUpdateRequestDTO.getNewPassword()));
+        adminRepository.save(admin);
+        // Optionally, could log this action or send a notification
+    }
 
     @Override
     public List<AdminDTO> getAllAdmins() {
@@ -26,8 +59,24 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public AdminDTO createAdmin(AdminDTO adminDTO) {
-        Admin admin = modelMapper.map(adminDTO, Admin.class);
+    public AdminDTO createAdmin(AdminCreationRequestDTO adminCreationRequestDTO) {
+        Admin admin = new Admin();
+        admin.setUsername(adminCreationRequestDTO.getUsername());
+        admin.setEmail(adminCreationRequestDTO.getEmail());
+        // Password encoding
+        admin.setPassword(passwordEncoder.encode(adminCreationRequestDTO.getPassword()));
+        // Role conversion - ensure Admin.Role enum can handle this string
+        // It's generally safer to have a method or check for valid role strings
+        try {
+            admin.setRole(Admin.Role.valueOf(adminCreationRequestDTO.getRole().toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            // Handle invalid role string, e.g., throw a specific exception
+            // For now, rethrowing as a runtime exception or setting a default
+            // This should be improved with proper error handling (e.g., custom validation exception)
+            throw new RuntimeException("Invalid role: " + adminCreationRequestDTO.getRole(), e);
+        }
+        admin.setArchived(false); // Default for new admins
+
         admin = adminRepository.save(admin);
         return modelMapper.map(admin, AdminDTO.class);
     }
@@ -35,12 +84,18 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminDTO updateAdmin(Long id, AdminDTO adminDTO) {
         Admin admin = adminRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+                .orElseThrow(() -> new RuntimeException("Admin not found")); // Consider custom exception
         admin.setUsername(adminDTO.getUsername());
         admin.setEmail(adminDTO.getEmail());
-        admin.setRole(Admin.Role.valueOf(adminDTO.getRole()));
+        // Assuming role updates are handled carefully and validated if necessary
+        // Passwords are not updated via this method for security (use a dedicated change password flow)
+        try {
+            admin.setRole(Admin.Role.valueOf(adminDTO.getRole().toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid role: " + adminDTO.getRole(), e);
+        }
         admin.setArchived(Boolean.TRUE.equals(adminDTO.getArchived()));
-        admin.setLastLogin(adminDTO.getLastLogin());
+        admin.setLastLogin(adminDTO.getLastLogin()); // Consider if this should be settable via API
         admin = adminRepository.save(admin);
         return modelMapper.map(admin, AdminDTO.class);
     }
