@@ -59,6 +59,7 @@ public class Order {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean archived = false;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)

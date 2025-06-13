@@ -53,3 +53,22 @@ export interface Admin {
   createdAt: string
   updatedAt: string
 }
+
+// Stores that fetch from backend API
+import { productService, orderService, adminUserService } from "./api-service";
+
+export const productStore = {
+  getAll: async () => productService.getAllProducts(),
+  getById: async (id: string) => productService.getProductById(id),
+};
+export const orderStore = {
+  getAll: async () => orderService.getAllOrders ? orderService.getAllOrders() : [], // fallback for user vs admin
+};
+export const adminStore = {
+  getAll: async () => adminUserService.getAllAdmins(),
+};
+
+export async function initializeData() {
+  // Optionally prefetch and cache data here if needed
+  // For now, this is a no-op since stores fetch live from backend
+}

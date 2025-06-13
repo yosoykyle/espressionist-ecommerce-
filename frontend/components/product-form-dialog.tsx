@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import { productStore, type Product } from "@/lib/data-store"
+import { adminProductService } from "@/lib/api-service"
 
 interface ProductFormDialogProps {
   product: Product | null
@@ -75,7 +75,7 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!validateForm()) return
@@ -91,27 +91,19 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
     }
 
     try {
-      if (product) {
-        // Update existing product
-        productStore.update(product.id, productData)
-        toast({
-          title: "Product Updated",
-          description: `${productData.name} has been updated successfully.`,
-        })
-      } else {
-        // Create new product
-        productStore.create(productData)
-        toast({
-          title: "Product Created",
-          description: `${productData.name} has been created successfully.`,
-        })
-      }
-
+      // Use API service for create or update
+      await (product
+        ? adminProductService.saveProduct({ ...productData, id: product.id })
+        : adminProductService.saveProduct(productData))
+      toast({
+        title: product ? "Product Updated" : "Product Created",
+        description: `${productData.name} has been ${product ? "updated" : "created"} successfully.`,
+      })
       onSave()
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to save product. Please try again.",
+        description: error?.message || "Failed to save product. Please try again.",
         variant: "destructive",
       })
     }
@@ -144,8 +136,10 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
         <DialogHeader>
           <DialogTitle>{product ? "Edit Product" : "Add New Product"}</DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <p id="product-form-description" className="sr-only">
+          {product ? "Edit the product details." : "Fill out the form to add a new product."}
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4" aria-describedby="product-form-description">
           <div>
             <Label htmlFor="name">Product Name *</Label>
             <Input
@@ -190,6 +184,8 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
           <div>
             <Label htmlFor="category">Category *</Label>
             <Select
+              id="category"
+              name="category"
               value={formData.category}
               onValueChange={(value) => {
                 setFormData((prev) => ({ ...prev, category: value }))

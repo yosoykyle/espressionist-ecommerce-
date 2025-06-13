@@ -36,7 +36,7 @@ public class AdminDataSeeder implements CommandLineRunner {
             defaultAdmin.setRole(Admin.Role.SUPER_ADMIN);
 
             // Encode the password
-            String hashedPassword = passwordEncoder.encode("password123"); // Using a slightly more complex default
+            String hashedPassword = passwordEncoder.encode("password"); // Using a slightly more complex default
             defaultAdmin.setPassword(hashedPassword);
 
             // Timestamps createdAt and updatedAt should be handled automatically by @CreationTimestamp and @UpdateTimestamp

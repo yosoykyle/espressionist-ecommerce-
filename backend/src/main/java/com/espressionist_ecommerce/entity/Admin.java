@@ -29,6 +29,7 @@ public class Admin {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean archived = false;
 
     @Column(name = "last_login")

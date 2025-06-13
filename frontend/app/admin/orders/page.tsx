@@ -13,6 +13,7 @@ import { AdminLayout } from "@/components/admin-layout"
 import { useToast } from "@/hooks/use-toast"
 import { orderStore, initializeData, type Order } from "@/lib/data-store"
 import { OrderDetailsDialog } from "@/components/order-details-dialog"
+import { authService } from "@/lib/api-service"
 
 const statusColors = {
   Pending: "bg-yellow-100 text-yellow-800",
@@ -34,7 +35,7 @@ export default function AdminOrdersPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("admin-logged-in")
+    const isLoggedIn = authService.isLoggedIn()
     if (!isLoggedIn) {
       router.push("/admin")
     } else {
@@ -44,10 +45,9 @@ export default function AdminOrdersPage() {
     }
   }, [router])
 
-  const loadOrders = () => {
-    const allOrders = orderStore
-      .getAll()
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const loadOrders = async () => {
+    const allOrders = await orderStore.getAll()
+    allOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     setOrders(allOrders)
   }
 

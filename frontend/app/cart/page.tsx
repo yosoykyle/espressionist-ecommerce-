@@ -13,12 +13,31 @@ import { useEffect, useState } from "react"
 export default function CartPage() {
   const { items, updateQuantity, removeItem, total } = useCart()
   const [stockWarnings, setStockWarnings] = useState<string[]>([])
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Fetch all products from backend on mount
+    async function fetchProducts() {
+      setLoading(true)
+      try {
+        const allProducts = await productStore.getAll()
+        setProducts(allProducts)
+      } catch (e) {
+        setProducts([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [])
 
   useEffect(() => {
     // Check for stock issues
+    if (loading) return
     const warnings: string[] = []
     items.forEach((item) => {
-      const product = productStore.getById(item.id)
+      const product = products.find((p) => p.id === item.id)
       if (!product) {
         warnings.push(`${item.name} is no longer available`)
       } else if (product.archived) {
@@ -30,15 +49,15 @@ export default function CartPage() {
       }
     })
     setStockWarnings(warnings)
-  }, [items])
+  }, [items, products, loading])
 
   const getMaxQuantity = (itemId: string) => {
-    const product = productStore.getById(itemId)
+    const product = products.find((p) => p.id === itemId)
     return product ? product.stock : 0
   }
 
   const isItemAvailable = (itemId: string) => {
-    const product = productStore.getById(itemId)
+    const product = products.find((p) => p.id === itemId)
     return product && !product.archived && product.stock > 0
   }
 
@@ -53,6 +72,14 @@ export default function CartPage() {
             <Link href="/products">Start Shopping</Link>
           </Button>
         </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <span>Loading cart...</span>
       </div>
     )
   }

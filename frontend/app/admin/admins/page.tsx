@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast"
 import { adminStore, initializeData, type Admin } from "@/lib/data-store"
 import { AdminFormDialog } from "@/components/admin-form-dialog"
 import { ConfirmDialog } from "@/components/confirm-dialog"
+import { authService } from "@/lib/api-service"
+import { adminUserService } from "@/lib/api-service"
 
 export default function AdminAdminsPage() {
   const router = useRouter()
@@ -25,25 +27,18 @@ export default function AdminAdminsPage() {
   const [archiveAdmin, setArchiveAdmin] = useState<Admin | null>(null)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("admin-logged-in")
-    const currentAdminData = localStorage.getItem("current-admin")
-
+    const isLoggedIn = authService.isLoggedIn()
     if (!isLoggedIn) {
       router.push("/admin")
     } else {
       setIsAuthenticated(true)
-      if (currentAdminData) {
-        setCurrentAdmin(JSON.parse(currentAdminData))
-      }
       initializeData()
       loadAdmins()
     }
   }, [router])
 
-  const loadAdmins = () => {
-    const allAdmins = adminStore
-      .getActive() // Only get active (non-archived) admins
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const loadAdmins = async () => {
+    const allAdmins = await adminStore.getAll()
     setAdmins(allAdmins)
   }
 
@@ -77,14 +72,20 @@ export default function AdminAdminsPage() {
     setArchiveAdmin(admin)
   }
 
-  const confirmArchive = () => {
+  const confirmArchive = async () => {
     if (archiveAdmin) {
-      const success = adminStore.archive(archiveAdmin.id)
-      if (success) {
-        loadAdmins()
+      try {
+        await adminUserService.deleteAdmin(archiveAdmin.id)
+        await loadAdmins()
         toast({
           title: "Admin Archived",
           description: `${archiveAdmin.username} has been archived.`,
+        })
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error?.message || "Failed to archive admin.",
+          variant: "destructive",
         })
       }
       setArchiveAdmin(null)

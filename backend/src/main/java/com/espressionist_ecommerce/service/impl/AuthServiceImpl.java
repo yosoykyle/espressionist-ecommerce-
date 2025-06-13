@@ -77,4 +77,9 @@ public class AuthServiceImpl implements AuthService {
         // Logging can be added here if desired.
         System.out.println("User logged out. Token (if blocklisting implemented): " + token);
     }
+
+    @Override
+    public com.espressionist_ecommerce.dto.AdminDTO getCurrentAdmin() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }

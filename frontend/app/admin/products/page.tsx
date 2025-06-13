@@ -12,6 +12,8 @@ import { AdminLayout } from "@/components/admin-layout"
 import { useToast } from "@/hooks/use-toast"
 import { productStore, initializeData, type Product } from "@/lib/data-store"
 import { ProductFormDialog } from "@/components/product-form-dialog"
+import { authService } from "@/lib/api-service"
+import { adminProductService } from "@/lib/api-service"
 
 export default function AdminProductsPage() {
   const router = useRouter()
@@ -24,7 +26,7 @@ export default function AdminProductsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("admin-logged-in")
+    const isLoggedIn = authService.isLoggedIn()
     if (!isLoggedIn) {
       router.push("/admin")
     } else {
@@ -34,8 +36,8 @@ export default function AdminProductsPage() {
     }
   }, [router])
 
-  const loadProducts = () => {
-    const allProducts = productStore.getAll()
+  const loadProducts = async () => {
+    const allProducts = await productStore.getAll()
     setProducts(allProducts)
   }
 
@@ -47,13 +49,19 @@ export default function AdminProductsPage() {
     return matchesSearch && matchesArchived
   })
 
-  const handleArchiveToggle = (product: Product) => {
-    const updated = productStore.update(product.id, { archived: !product.archived })
-    if (updated) {
-      loadProducts()
+  const handleArchiveToggle = async (product: Product) => {
+    try {
+      await adminProductService.archiveProduct(product.id, !product.archived)
+      await loadProducts()
       toast({
         title: product.archived ? "Product Restored" : "Product Archived",
         description: `${product.name} has been ${product.archived ? "restored" : "archived"}.`,
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to update product archive status.",
+        variant: "destructive",
       })
     }
   }

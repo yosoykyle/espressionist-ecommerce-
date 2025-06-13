@@ -1,19 +1,18 @@
 package com.espressionist_ecommerce.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.espressionist_ecommerce.dto.AdminCreationRequestDTO;
 import com.espressionist_ecommerce.dto.AdminDTO;
 import com.espressionist_ecommerce.entity.Admin;
 import com.espressionist_ecommerce.repository.AdminRepository;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import com.espressionist_ecommerce.service.AdminService;
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -41,20 +40,15 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = new Admin();
         admin.setUsername(adminCreationRequestDTO.getUsername());
         admin.setEmail(adminCreationRequestDTO.getEmail());
-        // Password encoding
         admin.setPassword(passwordEncoder.encode(adminCreationRequestDTO.getPassword()));
-        // Role conversion - ensure Admin.Role enum can handle this string
-        // It's generally safer to have a method or check for valid role strings
+        // Map user-friendly role to enum
+        String roleString = adminCreationRequestDTO.getRole().replace(" ", "_").toUpperCase();
         try {
-            admin.setRole(Admin.Role.valueOf(adminCreationRequestDTO.getRole().toUpperCase()));
+            admin.setRole(Admin.Role.valueOf(roleString));
         } catch (IllegalArgumentException e) {
-            // Handle invalid role string, e.g., throw a specific exception
-            // For now, rethrowing as a runtime exception or setting a default
-            // This should be improved with proper error handling (e.g., custom validation exception)
             throw new RuntimeException("Invalid role: " + adminCreationRequestDTO.getRole(), e);
         }
-        admin.setArchived(false); // Default for new admins
-
+        admin.setArchived(false);
         admin = adminRepository.save(admin);
         return modelMapper.map(admin, AdminDTO.class);
     }
@@ -85,5 +79,10 @@ public class AdminServiceImpl implements AdminService {
         admin.setArchived(true);
         admin = adminRepository.save(admin);
         return modelMapper.map(admin, AdminDTO.class);
+    }
+
+    @Override
+    public void updateOwnPassword(com.espressionist_ecommerce.dto.PasswordUpdateRequestDTO passwordUpdateRequestDTO) {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

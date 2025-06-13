@@ -1,25 +1,27 @@
 package com.espressionist_ecommerce.service.impl;
 
-import com.espressionist_ecommerce.dto.OrderDTO;
-import com.espressionist_ecommerce.dto.OrderItemDTO;
-import com.espressionist_ecommerce.dto.OrderRequestDTO;
-import com.espressionist_ecommerce.entity.Order;
-import com.espressionist_ecommerce.entity.OrderItem;
-import com.espressionist_ecommerce.entity.Product; // Keep for later stock logic
-import com.espressionist_ecommerce.repository.OrderRepository;
-import com.espressionist_ecommerce.exception.ResourceNotFoundException;
-import com.espressionist_ecommerce.repository.ProductRepository;
-import com.espressionist_ecommerce.service.OrderService;
-import lombok.RequiredArgsConstructor;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime; // For setting order date
-import java.util.List;
-import java.util.UUID; // For generating a unique order code
-import java.util.stream.Collectors;
+
+import com.espressionist_ecommerce.dto.OrderDTO;
+import com.espressionist_ecommerce.dto.OrderRequestDTO;
+import com.espressionist_ecommerce.entity.Order;
+import com.espressionist_ecommerce.entity.OrderItem;
+import com.espressionist_ecommerce.entity.Product;
+import com.espressionist_ecommerce.exception.ResourceNotFoundException;
+import com.espressionist_ecommerce.repository.OrderRepository;
+import com.espressionist_ecommerce.repository.ProductRepository; // For setting order date
+import com.espressionist_ecommerce.service.OrderService;
+
+import lombok.RequiredArgsConstructor; // For generating a unique order code
 
 @Service
 @RequiredArgsConstructor

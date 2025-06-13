@@ -185,6 +185,15 @@ export default function OrderSuccessPage() {
             <Link href="/products">Continue Shopping</Link>
           </Button>
         </div>
+
+        {/* Note about backend-powered order details */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500">
+            NOTE: This page currently loads order data from localStorage after checkout.
+            <br />
+            For full backend persistence, consider fetching order details from the backend using the order code.
+          </p>
+        </div>
       </div>
     </div>
   )

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { adminStore, type Admin } from "@/lib/data-store"
+import { adminUserService } from "@/lib/api"
 
 interface AdminFormDialogProps {
   admin: Admin | null
@@ -52,7 +53,7 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
     setErrors({})
   }, [admin, open])
 
-  const validateForm = () => {
+  const validateForm = async () => {
     const newErrors: Record<string, string> = {}
 
     if (!formData.username.trim()) newErrors.username = "Username is required"
@@ -82,7 +83,7 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
     }
 
     // Check for duplicate username/email
-    const existingAdmins = adminStore.getAll()
+    const existingAdmins = await adminStore.getAll()
     const duplicateUsername = existingAdmins.find(
       (a) => a.username === formData.username && (!admin || a.id !== admin.id),
     )
@@ -95,44 +96,34 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validateForm()) return
+    if (!(await validateForm())) return
 
     const adminData: any = {
       username: formData.username.trim(),
       email: formData.email.trim(),
       role: formData.role as Admin["role"],
     }
-
-    // Only include password if it's provided
     if (formData.password) {
       adminData.password = formData.password
     }
 
     try {
-      if (admin) {
-        // Update existing admin
-        adminStore.update(admin.id, adminData)
-        toast({
-          title: "Admin Updated",
-          description: `${adminData.username} has been updated successfully.`,
-        })
-      } else {
-        // Create new admin
-        adminStore.create(adminData)
-        toast({
-          title: "Admin Created",
-          description: `${adminData.username} has been created successfully.`,
-        })
-      }
-
+      // Use API service for create or update
+      await (admin
+        ? adminUserService.saveAdmin({ ...adminData, id: admin.id })
+        : adminUserService.saveAdmin(adminData))
+      toast({
+        title: admin ? "Admin Updated" : "Admin Created",
+        description: `${adminData.username} has been ${admin ? "updated" : "created"} successfully.`,
+      })
       onSave()
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to save admin. Please try again.",
+        description: error?.message || "Failed to save admin. Please try again.",
         variant: "destructive",
       })
     }
@@ -211,8 +202,9 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
           </div>
 
           <div>
-            <Label htmlFor="role">Role *</Label>
+            <Label>Role *</Label>
             <Select
+              name="role"
               value={formData.role}
               onValueChange={(value) => {
                 setFormData((prev) => ({ ...prev, role: value }))

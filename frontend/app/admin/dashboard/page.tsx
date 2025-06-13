@@ -21,7 +21,7 @@ export default function AdminDashboard() {
   })
 
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       console.log("Checking authentication...") // Debug log
 
       const isLoggedIn = authService.isLoggedIn()
@@ -38,20 +38,20 @@ export default function AdminDashboard() {
 
       // Initialize data and calculate stats
       try {
-        initializeData()
+        await initializeData()
 
-        const products = productStore.getAll()
-        const orders = orderStore.getAll()
-        const admins = adminStore.getAll()
+        const products = await productStore.getAll()
+        const orders = await orderStore.getAll()
+        const admins = await adminStore.getAll()
 
-        const revenue = orders
-          .filter((order) => order.status === "Delivered")
-          .reduce((sum, order) => sum + order.total, 0)
+        const revenue = Array.isArray(orders)
+          ? orders.filter((order) => order.status === "Delivered").reduce((sum, order) => sum + order.total, 0)
+          : 0
 
         setStats({
-          totalProducts: products.filter((p) => !p.archived).length,
-          totalOrders: orders.length,
-          activeAdmins: admins.filter((a) => a.status === "Active").length,
+          totalProducts: Array.isArray(products) ? products.filter((p) => !p.archived).length : 0,
+          totalOrders: Array.isArray(orders) ? orders.length : 0,
+          activeAdmins: Array.isArray(admins) ? admins.filter((a) => a.status === "Active").length : 0,
           revenue: revenue,
         })
       } catch (error) {

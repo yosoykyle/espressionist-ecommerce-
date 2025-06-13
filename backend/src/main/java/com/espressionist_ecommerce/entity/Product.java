@@ -34,6 +34,7 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean archived = false;
 
     @Column(name = "created_at")

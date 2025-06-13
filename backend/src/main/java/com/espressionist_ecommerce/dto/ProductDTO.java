@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Data
 public class ProductDTO {
@@ -16,7 +14,7 @@ public class ProductDTO {
 
     @NotNull(message = "Price is required")
     @PositiveOrZero(message = "Price must be zero or positive")
-    private BigDecimal price;
+    private Double price; // Accept as Double for easier JSON mapping from frontend
 
     @NotBlank(message = "Category is required")
     private String category;
@@ -31,6 +29,5 @@ public class ProductDTO {
     private String description;
 
     private Boolean archived; // Typically set by service logic, not direct input for true/false
-    private LocalDateTime createdAt; // Output only
-    private LocalDateTime updatedAt; // Output only
+    // Remove createdAt and updatedAt from input DTO, only output in response DTO if needed
 }
