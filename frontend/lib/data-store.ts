@@ -55,10 +55,10 @@ export interface Admin {
 }
 
 // Stores that fetch from backend API
-import { productService, orderService, adminUserService } from "./api-service";
+import { productService, orderService, adminUserService, adminProductService } from "./api-service";
 
 export const productStore = {
-  getAll: async () => productService.getAllProducts(),
+  getAll: async () => adminProductService.getAllProducts(),
   getById: async (id: string) => productService.getProductById(id),
 };
 export const orderStore = {

@@ -1,9 +1,7 @@
 {
-  "/cart/page": "app/cart/page.js",
-  "/products/page": "app/products/page.js",
-  "/page": "app/page.js",
-  "/admin/page": "app/admin/page.js",
   "/admin/dashboard/page": "app/admin/dashboard/page.js",
-  "/checkout/page": "app/checkout/page.js",
-  "/order-status/page": "app/order-status/page.js"
+  "/admin/products/page": "app/admin/products/page.js",
+  "/admin/admins/page": "app/admin/admins/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/cart/page": "app/cart/page.js"
 }

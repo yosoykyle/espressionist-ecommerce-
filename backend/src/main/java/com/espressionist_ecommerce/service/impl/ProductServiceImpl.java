@@ -49,7 +49,11 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDTO> getAllProducts() {
         // Return all products, including archived
         return productRepository.findAll().stream()
-                .map(product -> modelMapper.map(product, ProductDTO.class))
+                .map(product -> {
+                    ProductDTO dto = modelMapper.map(product, ProductDTO.class);
+                    dto.setArchived(product.isArchived());
+                    return dto;
+                })
                 .toList();
     }
 
@@ -57,7 +61,11 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDTO> getAllActiveProducts() {
         return productRepository.findAll().stream()
                 .filter(product -> !product.isArchived())
-                .map(product -> modelMapper.map(product, ProductDTO.class))
+                .map(product -> {
+                    ProductDTO dto = modelMapper.map(product, ProductDTO.class);
+                    dto.setArchived(product.isArchived());
+                    return dto;
+                })
                 .toList();
     }
 

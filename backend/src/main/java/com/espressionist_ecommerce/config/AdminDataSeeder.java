@@ -1,13 +1,14 @@
 package com.espressionist_ecommerce.config;
 
-import com.espressionist_ecommerce.entity.Admin;
-import com.espressionist_ecommerce.repository.AdminRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional; // Recommended for DB operations
+import org.springframework.transaction.annotation.Transactional;
+
+import com.espressionist_ecommerce.entity.Admin;
+import com.espressionist_ecommerce.repository.AdminRepository; // Recommended for DB operations
 
 @Component
 public class AdminDataSeeder implements CommandLineRunner {
@@ -36,7 +37,7 @@ public class AdminDataSeeder implements CommandLineRunner {
             defaultAdmin.setRole(Admin.Role.SUPER_ADMIN);
 
             // Encode the password
-            String hashedPassword = passwordEncoder.encode("password"); // Using a slightly more complex default
+            String hashedPassword = passwordEncoder.encode("password12345678"); // Using a slightly more complex default
             defaultAdmin.setPassword(hashedPassword);
 
             // Timestamps createdAt and updatedAt should be handled automatically by @CreationTimestamp and @UpdateTimestamp

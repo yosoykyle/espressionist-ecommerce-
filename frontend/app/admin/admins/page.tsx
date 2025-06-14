@@ -25,6 +25,7 @@ export default function AdminAdminsPage() {
   const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [archiveAdmin, setArchiveAdmin] = useState<Admin | null>(null)
+  const [showArchived, setShowArchived] = useState(false)
 
   useEffect(() => {
     const isLoggedIn = authService.isLoggedIn()
@@ -47,7 +48,8 @@ export default function AdminAdminsPage() {
       admin.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
       admin.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       admin.role.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
+    const matchesArchived = showArchived ? admin.archived : !admin.archived
+    return matchesSearch && matchesArchived
   })
 
   const handleEdit = (admin: Admin) => {
@@ -110,10 +112,19 @@ export default function AdminAdminsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Admin Management</h1>
             <p className="text-gray-600">Manage administrator accounts and permissions</p>
           </div>
-          <Button onClick={handleCreate} className="bg-brand-primary hover:bg-brand-primary/90">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Admin
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleCreate} className="bg-brand-primary hover:bg-brand-primary/90">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Admin
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowArchived(!showArchived)}
+              className="ml-2"
+            >
+              {showArchived ? "Hide Archived" : "Show Archived"}
+            </Button>
+          </div>
         </div>
 
         {/* Search */}
@@ -134,13 +145,14 @@ export default function AdminAdminsPage() {
         {/* Admins List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAdmins.map((admin) => (
-            <Card key={admin.id}>
+            <Card key={admin.id} className={admin.archived ? "opacity-60" : ""}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">{admin.username}</CardTitle>
                   <div className="flex items-center space-x-2">
                     <Badge variant="outline">{admin.role}</Badge>
                     {currentAdmin && admin.id === currentAdmin.id && <Badge variant="default">You</Badge>}
+                    {admin.archived && <Badge variant="destructive">Archived</Badge>}
                   </div>
                 </div>
               </CardHeader>

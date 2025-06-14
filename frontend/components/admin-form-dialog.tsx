@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { adminStore, type Admin } from "@/lib/data-store"
-import { adminUserService } from "@/lib/api"
+import { adminUserService } from "@/lib/api-service"
 
 interface AdminFormDialogProps {
   admin: Admin | null
@@ -68,14 +68,14 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
     if (!admin) {
       // New admin requires password
       if (!formData.password) newErrors.password = "Password is required"
-      else if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters"
+      else if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters (required by system)"
 
       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = "Passwords do not match"
       }
     } else if (formData.password) {
       // Existing admin with password change
-      if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters"
+      if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters (required by system)"
 
       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = "Passwords do not match"
