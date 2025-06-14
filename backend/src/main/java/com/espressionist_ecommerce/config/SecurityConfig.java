@@ -39,23 +39,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .cors(cors -> cors.disable())  // Allow CORS
+            .csrf(csrf -> csrf.disable())  // Disable CSRF for API endpoints
             .authorizeHttpRequests(authorize -> authorize
-                // Specific admin utility paths that need to be public (login/logout)
+                // Admin authentication endpoints (public)
                 .requestMatchers("/admin/login", "/admin/logout").permitAll()
-                // Secure all admin paths (including /admin/api/**)
-                .requestMatchers("/admin/**").authenticated()
-                // Publicly accessible product viewing APIs
-                .requestMatchers("/api/products", "/api/products/**").permitAll()
-                // All other /api/** endpoints require authentication
+                
+                // Public product endpoints
+                .requestMatchers(
+                    "/api/products", 
+                    "/api/products/**", 
+                    "/api/products/*/image"
+                ).permitAll()
+                
+                // Public order endpoints
+                .requestMatchers(
+                    "/api/checkout",
+                    "/api/checkout/**",  // Allow all checkout-related endpoints
+                    "/api/order-status/*"
+                ).permitAll()
+                
+                // Admin-only endpoints
+                .requestMatchers("/admin/**", "/admin/api/**").authenticated()
+                
+                // Any other API endpoints require authentication
                 .requestMatchers("/api/**").authenticated()
-                // Any other request not covered yet (e.g. root, actuator if any) could be denied or permitted as per policy
-                // For now, let's assume we want to secure everything else by default if not specified.
-                // However, typically you'd have a .anyRequest().authenticated() or .denyAll() at the end.
-                // Given the existing structure, focusing on /api and /admin.
+                
+                // Default policy for anything else
+                .anyRequest().authenticated()
             )
-            .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+            
         return http.build();
     }
 }

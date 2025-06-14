@@ -55,7 +55,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                   ...item,
                   name: product.name,
                   price: product.price,
-                  image: product.image,
+                  image: typeof product.image === "string" ? product.image : "",
                   stock: product.stock,
                   // Ensure quantity doesn't exceed current stock
                   quantity: Math.min(item.quantity, product.stock),

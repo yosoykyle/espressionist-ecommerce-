@@ -1,10 +1,8 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import React from "react"
 import Image from "next/image"
+import type { CartItem } from "@/components/cart-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,6 +12,8 @@ import { useCart } from "@/components/cart-provider"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
 import { orderService, productService } from "@/lib/api-service"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCart()
@@ -162,8 +162,20 @@ export default function CheckoutPage() {
     }
   }
 
+  // Move navigation out of render phase
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push("/cart")
+    }
+  }, [items.length, router])
+
+  // Defensive check: ensure items is always an array before mapping
+  if (!Array.isArray(items)) {
+    console.error("Cart items is not an array!", items)
+    return <div className="text-red-500">Cart error: items is not an array. Please clear your cart and try again.</div>
+  }
+
   if (items.length === 0) {
-    router.push("/cart")
     return null
   }
 
@@ -304,22 +316,27 @@ export default function CheckoutPage() {
             <CardContent className="space-y-4">
               {/* Items */}
               <div className="space-y-3">
-                {items.map((item) => (
-                  <div key={item.id} className="flex items-center space-x-3">
-                    <Image
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      width={50}
-                      height={50}
-                      className="rounded object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.name}</p>
-                      <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                {items.map((item) => {
+                  // Ensure image is a valid string URL
+                  const imagePath = (typeof item.image === 'string' && item.image) || '/placeholder.svg';
+                  
+                  return (
+                    <div key={item.id} className="flex items-center space-x-3">
+                      <Image
+                        src={imagePath}
+                        alt={item.name}
+                        width={50}
+                        height={50}
+                        className="rounded object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{item.name}</p>
+                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                      </div>
+                      <p className="text-sm font-semibold">₱{(item.price * item.quantity).toFixed(2)}</p>
                     </div>
-                    <p className="text-sm font-semibold">₱{(item.price * item.quantity).toFixed(2)}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <hr />
