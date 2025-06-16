@@ -14,8 +14,14 @@ public class ProductImageUploadController {
     private final ProductService productService;
 
     @PostMapping("/upload-image")
-    public ResponseEntity<ProductDTO> uploadProductImage(@RequestParam Long productId, @RequestParam("file") MultipartFile file) {
-        ProductDTO updatedProduct = productService.uploadProductImage(productId, file);
-        return ResponseEntity.ok(updatedProduct);
+    public ResponseEntity<?> uploadProductImage(@RequestParam Long productId, @RequestParam("file") MultipartFile file) {
+        try {
+            ProductDTO updatedProduct = productService.uploadProductImage(productId, file);
+            return ResponseEntity.ok(updatedProduct);
+        } catch (Exception e) {
+            // Log the error and return a detailed message
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Image upload failed: " + e.getMessage());
+        }
     }
 }

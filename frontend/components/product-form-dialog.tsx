@@ -32,6 +32,8 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
     image: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [uploading, setUploading] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   useEffect(() => {
     if (product) {
@@ -77,21 +79,49 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!validateForm()) return
-
-    const productData = {
-      name: formData.name.trim(),
-      price: Number(formData.price),
-      category: formData.category,
-      stock: Number(formData.stock),
-      description: formData.description.trim(),
-      image: formData.image || "/placeholder.svg?height=300&width=300",
-      archived: false,
-    }
-
+    setUploading(true)
+    let imageFilename = formData.image
     try {
-      // Use API service for create or update
+      // If a file is selected, upload it first
+      if (selectedFile) {
+        if (product) {
+          // Editing existing product, upload with productId
+          imageFilename = await adminProductService.uploadProductImage(product.id, selectedFile)
+        } else {
+          // Creating new product: create product first, then upload image
+          const tempProductData = {
+            name: formData.name.trim(),
+            price: Number(formData.price),
+            category: formData.category,
+            stock: Number(formData.stock),
+            description: formData.description.trim(),
+            image: '',
+            archived: false,
+          }
+          const created = await adminProductService.saveProduct(tempProductData)
+          imageFilename = await adminProductService.uploadProductImage(created.id, selectedFile)
+          // Update product with image filename
+          await adminProductService.saveProduct({ ...created, image: imageFilename })
+          toast({
+            title: "Product Created",
+            description: `${tempProductData.name} has been created successfully.`,
+          })
+          onSave()
+          setUploading(false)
+          return
+        }
+      }
+      // Save or update product with image filename
+      const productData = {
+        name: formData.name.trim(),
+        price: Number(formData.price),
+        category: formData.category,
+        stock: Number(formData.stock),
+        description: formData.description.trim(),
+        image: imageFilename || "/placeholder.svg?height=300&width=300",
+        archived: false,
+      }
       await (product
         ? adminProductService.saveProduct({ ...productData, id: product.id })
         : adminProductService.saveProduct(productData))
@@ -106,6 +136,8 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
         description: error?.message || "Failed to save product. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -120,8 +152,8 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      // In a real app, you would upload the file to a server
-      // For now, we'll use a placeholder
+      setSelectedFile(file)
+      // Show preview (optional, can be improved)
       const reader = new FileReader()
       reader.onload = (event) => {
         setFormData((prev) => ({ ...prev, image: event.target?.result as string }))
@@ -231,8 +263,8 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90">
-              {product ? "Update Product" : "Create Product"}
+            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90" disabled={uploading}>
+              {uploading ? "Uploading..." : product ? "Update Product" : "Create Product"}
             </Button>
           </div>
         </form>

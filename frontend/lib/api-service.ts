@@ -206,6 +206,28 @@ export const adminProductService = {
   },
 
   /**
+   * Upload product image
+   * Calls POST /admin/api/products/upload-image
+   */
+  uploadProductImage: async (productId: string, file: File): Promise<string> => {
+    const jwt = getJwt();
+    const formData = new FormData();
+    formData.append("productId", productId);
+    formData.append("file", file);
+    const headers: Record<string, string> = {};
+    if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
+    const response = await fetch("/admin/api/products/upload-image", {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+    if (!response.ok) throw new Error(await extractError(response));
+    const data = await response.json();
+    // The backend returns the updated product, return the image filename
+    return data.image;
+  },
+
+  /**
    * Archive product
    * Calls POST /admin/products/archive/{productId}
    */

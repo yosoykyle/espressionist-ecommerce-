@@ -35,3 +35,9 @@ build/
 .env
 frontend/node_modules/
 
+frontend/node_modules/@babel/runtime/helpers/applyDecs2301.js
+frontend/.next/cache/webpack/server-development/1.pack.gz
+frontend/.next/static/chunks/app/admin/admins/loading.js
+frontend/.next/cache/webpack/client-development/1.pack.gz
+frontend/.next/static/webpack/621f14c86bb24d42.webpack.hot-update.json
+frontend/.next/static/webpack/app/layout.e334121390f1378d.hot-update.js

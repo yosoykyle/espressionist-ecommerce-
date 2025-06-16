@@ -1,6 +1,7 @@
 package com.espressionist_ecommerce.service.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,31 +18,41 @@ import com.espressionist_ecommerce.repository.ProductRepository;
 import com.espressionist_ecommerce.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
+    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
 
     @Override
     public ProductDTO uploadProductImage(Long productId, MultipartFile file) {
+        logger.debug("Starting uploadProductImage for productId: {}", productId);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         try {
-            // Save to static/products directory for Spring Boot static serving
-            Path staticDir = Paths.get("src/main/resources/static/products");
+            String uploadDir = System.getProperty("user.dir") + "/uploads/products";
+            Path staticDir = Paths.get(uploadDir);
             if (!Files.exists(staticDir)) {
                 Files.createDirectories(staticDir);
             }
             Path filePath = staticDir.resolve(fileName);
-            file.transferTo(filePath.toFile());
+            logger.debug("Saving product image to: {}", filePath.toAbsolutePath());
+            try (InputStream in = file.getInputStream()) {
+                Files.copy(in, filePath, REPLACE_EXISTING);
+            }
             product.setImage(fileName);
             productRepository.save(product);
             return modelMapper.map(product, ProductDTO.class);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to upload image", e);
+        } catch (Exception e) {
+            logger.error("Failed to upload image for productId {}: {}", productId, e.getMessage(), e);
+            throw new RuntimeException("Failed to upload image: " + e.getMessage(), e);
         }
     }
 

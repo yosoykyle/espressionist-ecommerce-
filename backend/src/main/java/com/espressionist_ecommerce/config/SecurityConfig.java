@@ -52,12 +52,15 @@ public class SecurityConfig {
                     "/api/products/*/image"
                 ).permitAll()
                 
-                // Public order endpoints
+                // Public order endpoints (must be before /api/**)
                 .requestMatchers(
                     "/api/checkout",
-                    "/api/checkout/**",  // Allow all checkout-related endpoints
+                    "/api/checkout/**",
                     "/api/order-status/*"
                 ).permitAll()
+                
+                // Allow static uploads
+                .requestMatchers("/uploads/**").permitAll()
                 
                 // Admin-only endpoints
                 .requestMatchers("/admin/**", "/admin/api/**").authenticated()
