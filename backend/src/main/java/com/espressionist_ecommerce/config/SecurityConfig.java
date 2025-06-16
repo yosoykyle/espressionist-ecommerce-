@@ -1,5 +1,7 @@
 package com.espressionist_ecommerce.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,7 +41,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.disable())  // Allow CORS
+            .cors(withDefaults()) // Enable CORS using withDefaults()
             .csrf(csrf -> csrf.disable())  // Disable CSRF for API endpoints
             .authorizeHttpRequests(authorize -> authorize
                 // Admin authentication endpoints (public)

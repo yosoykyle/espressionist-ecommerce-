@@ -22,10 +22,13 @@ public class EspressionistEcommerceApplication {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                    .allowedOrigins("http://localhost:8080", "http://127.0.0.1:8080")
+                    .allowedOrigins(
+                        "http://localhost:8080",
+                        "http://127.0.0.1:8080",
+                        "https://friendly-disco-p7rrgvp7ppqfrwjv-3000.app.github.dev"
+                    )
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                    .allowedHeaders("*")
-                    .allowCredentials(true);
+                    .allowedHeaders("*");
             }
         };
     }

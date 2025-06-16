@@ -11,6 +11,7 @@ import { useCart } from "@/components/cart-provider"
 import { useToast } from "@/hooks/use-toast"
 import { productService } from "@/lib/api-service"
 import type { Product } from "@/lib/data-store"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const categories = ["All", "Coffee & Tea", "Art & Merch", "Gift Set", "Voucher"]
 
@@ -19,6 +20,7 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const { addItem } = useCart()
   const { toast } = useToast()
 
@@ -80,7 +82,7 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="container mx-auto px-2 sm:px-4 lg:px-8 py-8">
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Our Products</h1>
@@ -128,9 +130,9 @@ export default function ProductsPage() {
       ) : (
         <>
           {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {filteredProducts.map((product) => (
-              <Card key={product.id} className="group hover:shadow-lg transition-shadow">
+              <Card key={product.id} className="group hover:shadow-lg transition-shadow cursor-pointer rounded-2xl border border-gray-200 bg-white" style={{ minHeight: 420, maxWidth: 340, margin: '0 auto' }} onClick={() => setSelectedProduct(product)}>
                 <CardContent className="p-4">
                   <div className="relative mb-4">
                     <Image
@@ -138,7 +140,8 @@ export default function ProductsPage() {
                       alt={product.name}
                       width={300}
                       height={300}
-                      className="w-full h-48 object-cover rounded-lg"
+                      className="w-full h-44 sm:h-48 object-cover rounded-xl border"
+                      style={{ background: '#f3f3f3' }}
                     />
                     {product.stock === 0 && (
                       <Badge variant="destructive" className="absolute top-2 right-2">
@@ -146,25 +149,23 @@ export default function ProductsPage() {
                       </Badge>
                     )}
                   </div>
-
                   <div className="space-y-2">
                     <Badge variant="secondary" className="text-xs">
                       {product.category}
                     </Badge>
-                    <h3 className="font-semibold text-lg">{product.name}</h3>
-                    <p className="text-sm text-gray-600">{product.description}</p>
+                    <h3 className="font-semibold text-lg truncate">{product.name}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xl font-bold text-brand-primary">₱{product.price}</span>
                       <span className="text-sm text-gray-500">Stock: {product.stock}</span>
                     </div>
                   </div>
                 </CardContent>
-
                 <CardFooter className="p-4 pt-0">
                   <Button
-                    onClick={() => handleAddToCart(product)}
+                    onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
                     disabled={product.stock === 0}
-                    className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:opacity-50"
+                    className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:opacity-50 rounded-xl"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
@@ -192,6 +193,45 @@ export default function ProductsPage() {
           )}
         </>
       )}
+
+      {/* Product Details Dialog */}
+      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+        <DialogContent className="max-w-lg rounded-2xl p-0 overflow-hidden">
+          {selectedProduct && (
+            <>
+              <DialogHeader className="p-6 pb-2 bg-gray-50">
+                <DialogTitle className="text-2xl font-bold">{selectedProduct.name}</DialogTitle>
+              </DialogHeader>
+              <div className="mb-4 px-6 pt-4">
+                <Image
+                  src={selectedProduct.image && !selectedProduct.image.startsWith('http') && !selectedProduct.image.startsWith('/placeholder') ? `/uploads/products/${selectedProduct.image}` : (selectedProduct.image || "/placeholder.svg")}
+                  alt={selectedProduct.name}
+                  width={400}
+                  height={400}
+                  className="w-full h-64 object-cover rounded-xl border"
+                  style={{ background: '#f3f3f3' }}
+                />
+              </div>
+              <div className="px-6 pb-4">
+                <Badge variant="secondary" className="mb-2">{selectedProduct.category}</Badge>
+                <p className="mb-2 text-gray-700 whitespace-pre-line">{selectedProduct.description}</p>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xl font-bold text-brand-primary">₱{selectedProduct.price}</span>
+                  <span className="text-sm text-gray-500">Stock: {selectedProduct.stock}</span>
+                </div>
+                <Button
+                  onClick={() => { handleAddToCart(selectedProduct); setSelectedProduct(null); }}
+                  disabled={selectedProduct.stock === 0}
+                  className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:opacity-50 rounded-xl"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {selectedProduct.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

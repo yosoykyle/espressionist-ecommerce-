@@ -100,21 +100,17 @@ export default function CheckoutPage() {
 
       // Create order object
       const orderData = {
-        code: orderCode,
-        status: "Pending" as const,
-        date: new Date().toISOString(),
         items: items.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
+          productId: item.id,
           quantity: item.quantity,
-          image: item.image,
         })),
-        customer: formData,
-        subtotal: total,
-        vat: vat,
-        total: totalWithVat,
-        archived: false,
+        customerName: formData.name,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        customerAddress: formData.address,
+        customerCity: formData.city,
+        customerPostalCode: formData.postalCode,
+        customerNotes: formData.notes,
       }
 
       // Place order
@@ -317,9 +313,12 @@ export default function CheckoutPage() {
               {/* Items */}
               <div className="space-y-3">
                 {items.map((item) => {
-                  // Ensure image is a valid string URL
-                  const imagePath = (typeof item.image === 'string' && item.image) || '/placeholder.svg';
-                  
+                  let imagePath = '/placeholder.svg';
+                  if (typeof item.image === 'string' && item.image) {
+                    imagePath = item.image.startsWith('http') || item.image.startsWith('/uploads/')
+                      ? item.image
+                      : `/uploads/products/${item.image}`;
+                  }
                   return (
                     <div key={item.id} className="flex items-center space-x-3">
                       <Image

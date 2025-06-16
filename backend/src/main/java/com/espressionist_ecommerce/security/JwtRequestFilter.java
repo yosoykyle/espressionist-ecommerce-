@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.util.AntPathMatcher;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,30 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private UserDetailsService userDetailsService;
+
+    private static final String[] PUBLIC_ENDPOINTS = {
+        "/api/checkout",
+        "/api/checkout/**",
+        "/api/products",
+        "/api/products/**",
+        "/api/products/*/image",
+        "/api/order-status/*",
+        "/uploads/**",
+        "/admin/login",
+        "/admin/logout"
+    };
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        for (String pattern : PUBLIC_ENDPOINTS) {
+            if (pathMatcher.match(pattern, path)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

@@ -132,7 +132,7 @@ export default function AdminProductsPage() {
               <CardContent className="p-4">
                 <div className="relative mb-4">
                   <Image
-                    src={product.image || "/placeholder.svg"}
+                    src={product.image ? `/uploads/products/${product.image}` : "/placeholder.svg"}
                     alt={product.name}
                     width={300}
                     height={200}

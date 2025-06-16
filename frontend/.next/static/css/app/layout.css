@@ -897,14 +897,17 @@ video {
 .h-40 {
   height: 10rem;
 }
-.h-48 {
-  height: 12rem;
+.h-44 {
+  height: 11rem;
 }
 .h-5 {
   height: 1.25rem;
 }
 .h-6 {
   height: 1.5rem;
+}
+.h-64 {
+  height: 16rem;
 }
 .h-7 {
   height: 1.75rem;
@@ -1326,11 +1329,17 @@ video {
 .whitespace-nowrap {
   white-space: nowrap;
 }
+.whitespace-pre-line {
+  white-space: pre-line;
+}
 .break-words {
   overflow-wrap: break-word;
 }
 .rounded {
   border-radius: 0.25rem;
+}
+.rounded-2xl {
+  border-radius: 1rem;
 }
 .rounded-\[2px\] {
   border-radius: 2px;
@@ -1349,6 +1358,9 @@ video {
 }
 .rounded-sm {
   border-radius: calc(var(--radius) - 4px);
+}
+.rounded-xl {
+  border-radius: 0.75rem;
 }
 .rounded-t-\[10px\] {
   border-top-left-radius: 10px;
@@ -1576,6 +1588,10 @@ video {
 .px-5 {
   padding-left: 1.25rem;
   padding-right: 1.25rem;
+}
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 .px-8 {
   padding-left: 2rem;
@@ -2906,6 +2922,10 @@ video {
     display: flex;
   }
 
+  .sm\:h-48 {
+    height: 12rem;
+  }
+
   .sm\:w-\[400px\] {
     width: 400px;
   }
@@ -2958,6 +2978,11 @@ video {
 
   .sm\:rounded-lg {
     border-radius: var(--radius);
+  }
+
+  .sm\:px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   .sm\:px-6 {
@@ -3108,6 +3133,12 @@ video {
 
   .xl\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1536px) {
+
+  .\32xl\:grid-cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 .\[\&\:has\(\[aria-selected\]\)\]\:bg-accent:has([aria-selected]) {

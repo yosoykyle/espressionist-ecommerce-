@@ -81,7 +81,7 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }
               {order.items.map((item) => (
                 <div key={item.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                   <Image
-                    src={item.image || "/placeholder.svg"}
+                    src={item.image ? `/uploads/products/${item.image}` : "/placeholder.svg"}
                     alt={item.name}
                     width={50}
                     height={50}
