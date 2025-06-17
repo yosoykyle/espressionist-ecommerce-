@@ -133,24 +133,28 @@ export default function OrderStatusPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {orderData.items.map((item) => (
-                      <div key={item.id} className="flex items-center space-x-3">
-                        <Image
-                          src={item.image || "/placeholder.svg"}
-                          alt={item.name}
-                          width={50}
-                          height={50}
-                          className="rounded object-cover"
-                        />
-                        <div className="flex-1">
-                          <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-gray-500">
-                            ₱{item.price} × {item.quantity}
-                          </p>
+                    {Array.isArray(orderData.items) && orderData.items.length > 0 ? (
+                      orderData.items.map((item, idx) => (
+                        <div key={item?.id || idx} className="flex items-center space-x-3">
+                          <Image
+                            src={item?.image || "/placeholder.svg"}
+                            alt={item?.name || "Product image"}
+                            width={50}
+                            height={50}
+                            className="rounded object-cover"
+                          />
+                          <div className="flex-1">
+                            <p className="font-medium">{item?.name || "Unnamed Product"}</p>
+                            <p className="text-sm text-gray-500">
+                              ₱{item?.price ?? 0} × {item?.quantity ?? 0}
+                            </p>
+                          </div>
+                          <p className="font-semibold">₱{((item?.price ?? 0) * (item?.quantity ?? 0)).toFixed(2)}</p>
                         </div>
-                        <p className="font-semibold">₱{(item.price * item.quantity).toFixed(2)}</p>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No items found in this order.</p>
+                    )}
 
                     <hr />
 

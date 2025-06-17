@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { Menu, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/components/cart-provider"
 
@@ -69,6 +69,10 @@ export function Navbar() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                {/* Visually hidden SheetTitle for accessibility */}
+                <span className="sr-only">
+                  <SheetTitle>Navigation Menu</SheetTitle>
+                </span>
                 <div className="flex flex-col space-y-4 mt-8">
                   <div className="text-xl font-logo text-brand-primary mb-4">espressionist</div>
                   {navLinks.map((link) => (
