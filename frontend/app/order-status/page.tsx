@@ -42,7 +42,20 @@ export default function OrderStatusPage() {
       const order = await orderService.getOrderStatus(orderCode.toUpperCase())
 
       if (order) {
-        setOrderData(order)
+        // Map flat customer fields to nested customer object if needed
+        const mappedOrder = {
+          ...order,
+          customer: order.customer || {
+            name: order.customerName,
+            email: order.customerEmail,
+            phone: order.customerPhone,
+            address: order.customerAddress,
+            city: order.customerCity,
+            postalCode: order.customerPostalCode,
+            notes: order.customerNotes,
+          },
+        }
+        setOrderData(mappedOrder)
         setError("")
       } else {
         setOrderData(null)
@@ -137,7 +150,7 @@ export default function OrderStatusPage() {
                       orderData.items.map((item, idx) => (
                         <div key={item?.id || idx} className="flex items-center space-x-3">
                           <Image
-                            src={item?.image || "/placeholder.svg"}
+                            src={item?.image ? `/uploads/products/${item.image}` : "/placeholder.svg"}
                             alt={item?.name || "Product image"}
                             width={50}
                             height={50}
@@ -184,19 +197,19 @@ export default function OrderStatusPage() {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="font-medium">{orderData.customer.name}</p>
-                      <p className="text-sm text-gray-600">{orderData.customer.email}</p>
-                      <p className="text-sm text-gray-600">{orderData.customer.phone}</p>
+                      <p className="font-medium">{orderData.customer?.name || "No name provided"}</p>
+                      <p className="text-sm text-gray-600">{orderData.customer?.email || "No email provided"}</p>
+                      <p className="text-sm text-gray-600">{orderData.customer?.phone || "No phone provided"}</p>
                     </div>
 
                     <div>
-                      <p className="text-sm text-gray-600">{orderData.customer.address}</p>
+                      <p className="text-sm text-gray-600">{orderData.customer?.address || "No address provided"}</p>
                       <p className="text-sm text-gray-600">
-                        {orderData.customer.city}, {orderData.customer.postalCode}
+                        {orderData.customer?.city || "No city"}, {orderData.customer?.postalCode || "No postal code"}
                       </p>
                     </div>
 
-                    {orderData.customer.notes && (
+                    {orderData.customer?.notes && (
                       <div>
                         <p className="font-medium text-sm">Order Notes:</p>
                         <p className="text-sm text-gray-600">{orderData.customer.notes}</p>

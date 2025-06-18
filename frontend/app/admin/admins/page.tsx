@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Search, Plus, Edit, Trash2 } from "lucide-react"
+import { Search, Plus, Edit, Trash2, ArchiveRestore } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,6 +25,7 @@ export default function AdminAdminsPage() {
   const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [archiveAdmin, setArchiveAdmin] = useState<Admin | null>(null)
+  const [restoreAdmin, setRestoreAdmin] = useState<Admin | null>(null)
   const [showArchived, setShowArchived] = useState(false)
 
   useEffect(() => {
@@ -94,6 +95,30 @@ export default function AdminAdminsPage() {
     }
   }
 
+  const handleRestore = (admin: Admin) => {
+    setRestoreAdmin(admin)
+  }
+
+  const confirmRestore = async () => {
+    if (restoreAdmin) {
+      try {
+        await adminUserService.restoreAdmin(restoreAdmin.id)
+        await loadAdmins()
+        toast({
+          title: "Admin Restored",
+          description: `${restoreAdmin.username} has been restored.`,
+        })
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error?.message || "Failed to restore admin.",
+          variant: "destructive",
+        })
+      }
+      setRestoreAdmin(null)
+    }
+  }
+
   const handleSave = () => {
     loadAdmins()
     setIsDialogOpen(false)
@@ -145,17 +170,21 @@ export default function AdminAdminsPage() {
         {/* Admins List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAdmins.map((admin) => (
-            <Card key={admin.id} className={admin.archived ? "opacity-60" : ""}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{admin.username}</CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="outline">{admin.role}</Badge>
-                    {currentAdmin && admin.id === currentAdmin.id && <Badge variant="default">You</Badge>}
-                    {admin.archived && <Badge variant="destructive">Archived</Badge>}
-                  </div>
-                </div>
-              </CardHeader>
+            <Card key={admin.id}>
+             <CardHeader>
+  <div className="flex items-start justify-between gap-2">
+        <CardTitle className="text-lg flex-1 min-w-0">{admin.username}</CardTitle>
+        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+          <Badge variant="outline" className="text-xs">{admin.role}</Badge>
+          {currentAdmin && admin.id === currentAdmin.id && (
+            <Badge variant="default" className="text-xs">You</Badge>
+          )}
+          {admin.archived && (
+            <Badge variant="destructive" className="text-xs">Archived</Badge>
+          )}
+        </div>
+      </div>
+    </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div>
@@ -175,20 +204,34 @@ export default function AdminAdminsPage() {
                 </div>
 
                 <div className="flex gap-2 mt-4">
-                  <Button variant="outline" size="sm" onClick={() => handleEdit(admin)} className="flex-1">
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleArchive(admin)}
-                    disabled={currentAdmin && admin.id === currentAdmin.id}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Archive
-                  </Button>
+                  {!admin.archived ? (
+                    <>
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(admin)} className="flex-1">
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleArchive(admin)}
+                        disabled={currentAdmin && admin.id === currentAdmin.id}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-1"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Archive
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRestore(admin)}
+                      className="flex-1"
+                    >
+                      <ArchiveRestore className="h-4 w-4 mr-1" />
+                      Restore
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -209,6 +252,13 @@ export default function AdminAdminsPage() {
           title="Archive Admin"
           description={`Are you sure you want to archive ${archiveAdmin?.username}? They will no longer be able to access the system.`}
           onConfirm={confirmArchive}
+        />
+        <ConfirmDialog
+          open={!!restoreAdmin}
+          onOpenChange={() => setRestoreAdmin(null)}
+          title="Restore Admin"
+          description={`Are you sure you want to restore ${restoreAdmin?.username}? They will regain access to the system.`}
+          onConfirm={confirmRestore}
         />
       </div>
     </AdminLayout>

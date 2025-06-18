@@ -44,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomerNotes(orderRequestDTO.getCustomerNotes());
 
         // Set initial order details
-        order.setCode(UUID.randomUUID().toString()); // Generate a unique order code
+        order.setCode(generateShortOrderCode()); // Generate a short, memorable order code
         order.setStatus(Order.OrderStatus.PENDING); // Default status
         order.setDate(LocalDateTime.now()); // Set current date/time
 
@@ -135,5 +135,18 @@ public class OrderServiceImpl implements OrderService {
         order.setArchived(true);
         Order archivedOrder = orderRepository.save(order);
         return modelMapper.map(archivedOrder, OrderDTO.class);
+    }
+
+    /**
+     * Generates a short order code starting with ESP and 6 random uppercase alphanumeric characters.
+     */
+    private String generateShortOrderCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder("ESP-");
+        for (int i = 0; i < 6; i++) {
+            int idx = (int) (Math.random() * chars.length());
+            sb.append(chars.charAt(idx));
+        }
+        return sb.toString();
     }
 }

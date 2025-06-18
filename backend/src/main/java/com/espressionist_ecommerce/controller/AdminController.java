@@ -54,4 +54,9 @@ public class AdminController {
     public ResponseEntity<AdminDTO> archiveAdmin(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.archiveAdmin(id));
     }
+
+    @PostMapping("/{id}/restore")
+    public ResponseEntity<AdminDTO> restoreAdmin(@PathVariable Long id) {
+        return ResponseEntity.ok(adminService.restoreAdmin(id));
+    }
 }

@@ -12,5 +12,6 @@ public interface AdminService {
     AdminDTO createAdmin(AdminCreationRequestDTO adminCreationRequestDTO);
     AdminDTO updateAdmin(Long id, AdminDTO adminDTO);
     AdminDTO archiveAdmin(Long id);
+    AdminDTO restoreAdmin(Long id);
     void updateOwnPassword(PasswordUpdateRequestDTO passwordUpdateRequestDTO);
 }

@@ -119,26 +119,31 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }
           </div>
 
           {/* Status Update */}
-          {!order.archived && (
-            <div className="flex items-center justify-between pt-4 border-t">
-              <span className="font-medium">Update Status:</span>
-              <Select
-                value={order.status}
-                onValueChange={(value) => onStatusChange(order.id, value as Order["status"])}
-              >
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Processing">Processing</SelectItem>
-                  <SelectItem value="Shipped">Shipped</SelectItem>
-                  <SelectItem value="Delivered">Delivered</SelectItem>
-                  <SelectItem value="Cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <div className="flex items-center justify-between pt-4 border-t">
+            <span className="font-medium">Update Status:</span>
+            <Select
+              value={order.status}
+              onValueChange={async (value) => {
+                onStatusChange(order.id, value as Order["status"]);
+                if (["Delivered", "Cancelled"].includes(value)) {
+                  // Archive order if status is Delivered or Cancelled
+                  const { adminOrderService } = await import("@/lib/api-service");
+                  await adminOrderService.archiveOrder(order.id, true);
+                }
+              }}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Processing">Processing</SelectItem>
+                <SelectItem value="Shipped">Shipped</SelectItem>
+                <SelectItem value="Delivered">Delivered</SelectItem>
+                <SelectItem value="Cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

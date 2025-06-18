@@ -82,6 +82,15 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public AdminDTO restoreAdmin(Long id) {
+        Admin admin = adminRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+        admin.setArchived(false);
+        admin = adminRepository.save(admin);
+        return modelMapper.map(admin, AdminDTO.class);
+    }
+
+    @Override
     public void updateOwnPassword(com.espressionist_ecommerce.dto.PasswordUpdateRequestDTO passwordUpdateRequestDTO) {
         throw new UnsupportedOperationException("Not implemented yet");
     }

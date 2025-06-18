@@ -264,12 +264,12 @@ export const adminOrderService = {
    */
   updateOrderStatus: async (id: string, status: Order["status"]): Promise<Order | null> => {
     const jwt = getJwt();
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch(`/admin/api/orders/${id}/status`, {
+    // Send status as query param, not in body
+    const response = await fetch(`/admin/api/orders/${id}/status?status=${encodeURIComponent(status)}`, {
       method: "PUT",
       headers,
-      body: JSON.stringify({ status }),
     });
     if (!response.ok) throw new Error(await extractError(response));
     return response.json();
@@ -332,6 +332,19 @@ export const adminUserService = {
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
     const response = await fetch(`/admin/api/admins/${id}/archive`, { method: "POST", headers });
+    if (!response.ok) throw new Error(await extractError(response));
+    return response.json();
+  },
+
+  /**
+   * Restore admin user
+   * Calls POST /admin/api/admins/{userId}/restore
+   */
+  restoreAdmin: async (id: string): Promise<Admin | null> => {
+    const jwt = getJwt();
+    const headers: Record<string, string> = {};
+    if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
+    const response = await fetch(`/admin/api/admins/${id}/restore`, { method: "POST", headers });
     if (!response.ok) throw new Error(await extractError(response));
     return response.json();
   },

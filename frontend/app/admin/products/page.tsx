@@ -128,7 +128,7 @@ export default function AdminProductsPage() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <Card key={product.id} className={`${product.archived ? "opacity-60" : ""}`}>
+            <Card key={product.id}>
               <CardContent className="p-4">
                 <div className="relative mb-4">
                   <Image

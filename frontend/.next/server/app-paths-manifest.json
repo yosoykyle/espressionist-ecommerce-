@@ -1,7 +1,11 @@
 {
-  "/cart/page": "app/cart/page.js",
-  "/checkout/page": "app/checkout/page.js",
+  "/admin/orders/page": "app/admin/orders/page.js",
+  "/admin/products/page": "app/admin/products/page.js",
   "/products/page": "app/products/page.js",
-  "/order-success/page": "app/order-success/page.js",
-  "/order-status/page": "app/order-status/page.js"
+  "/order-status/page": "app/order-status/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/dashboard/page": "app/admin/dashboard/page.js",
+  "/checkout/page": "app/checkout/page.js",
+  "/cart/page": "app/cart/page.js",
+  "/order-success/page": "app/order-success/page.js"
 }
