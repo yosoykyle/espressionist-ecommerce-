@@ -40,13 +40,15 @@ export default function AdminLoginPage() {
     try {
       console.log("Attempting login with:", credentials.username) // Debug log
 
-      const admin = await authService.login(credentials.username, credentials.password)
+      const loginSuccess = await authService.login(credentials.username, credentials.password)
 
-      if (admin) {
+      if (loginSuccess) {
+        // Fetch admin details after successful login
+        const admin = await authService.getCurrentAdmin()
         console.log("Login successful, admin:", admin) // Debug log
         toast({
           title: "Login Successful",
-          description: `Welcome back, ${admin.username}!`,
+          description: admin && admin.username ? `Welcome back, ${admin.username}!` : "Welcome back!",
         })
 
         // Small delay to ensure localStorage is written

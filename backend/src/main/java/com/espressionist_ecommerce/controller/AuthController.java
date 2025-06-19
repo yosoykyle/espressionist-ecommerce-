@@ -2,8 +2,6 @@ package com.espressionist_ecommerce.controller;
 
 import com.espressionist_ecommerce.dto.AdminDTO;
 import com.espressionist_ecommerce.dto.LoginRequestDTO;
-import com.espressionist_ecommerce.dto.AdminDTO;
-import com.espressionist_ecommerce.dto.LoginRequestDTO;
 import com.espressionist_ecommerce.dto.JwtResponse;
 import com.espressionist_ecommerce.service.AuthService;
 import jakarta.validation.Valid;
@@ -31,6 +29,18 @@ public class AuthController {
         }
         // Even if no token or invalid token, logout can be considered successful on client-side
         return ResponseEntity.ok("Logged out successfully");
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AdminDTO> getCurrentAdmin(org.springframework.security.core.Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        AdminDTO adminDTO = authService.getCurrentAdmin();
+        if (adminDTO == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(adminDTO);
     }
 
 }

@@ -43,9 +43,20 @@ export function Footer() {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-gray-600 hover:text-brand-primary transition-colors">
-                    {link.label}
-                  </Link>
+                  {link.label === "Admin" ? (
+                    <Link
+                      href={link.href}
+                      className="text-sm text-gray-600 hover:text-brand-primary transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <Link href={link.href} className="text-sm text-gray-600 hover:text-brand-primary transition-colors">
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

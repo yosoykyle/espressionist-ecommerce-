@@ -80,6 +80,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public com.espressionist_ecommerce.dto.AdminDTO getCurrentAdmin() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        String username = authentication.getName();
+        Admin admin = adminRepository.findByUsername(username).orElse(null);
+        if (admin == null) {
+            return null;
+        }
+        return modelMapper.map(admin, com.espressionist_ecommerce.dto.AdminDTO.class);
     }
 }
