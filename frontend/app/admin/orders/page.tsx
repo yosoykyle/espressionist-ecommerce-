@@ -14,6 +14,15 @@ import { orderStore, initializeData, type Order } from "@/lib/data-store"
 import { OrderDetailsDialog } from "@/components/order-details-dialog"
 import { authService } from "@/lib/api-service"
 import { adminOrderService } from "@/lib/api-service"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
 const statusColors = {
   Pending: "bg-yellow-100 text-yellow-800",
   Processing: "bg-blue-100 text-blue-800",
@@ -96,155 +105,139 @@ export default function AdminOrdersPage() {
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
-            <p className="text-gray-600">Manage customer orders and track deliveries</p>
+            <p className="text-gray-600">Track and manage customer orders</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setShowArchived(!showArchived)}
+          >
+            {showArchived ? "Show Active Orders" : "Show Archived Orders"}
+          </Button>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Search orders..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All Orders</SelectItem>
+              <SelectItem value="Pending">Pending</SelectItem>
+              <SelectItem value="Processing">Processing</SelectItem>
+              <SelectItem value="Shipped">Shipped</SelectItem>
+              <SelectItem value="Delivered">Delivered</SelectItem>
+              <SelectItem value="Cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Orders Table */}
+        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order Code</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead className="hidden lg:table-cell">Items</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead className="hidden md:table-cell">Date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredOrders.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                      No orders found.
+                      {(searchTerm || statusFilter !== "All") && (
+                        <Button
+                          variant="link"
+                          onClick={() => {
+                            setSearchTerm("")
+                            setStatusFilter("All")
+                          }}
+                          className="ml-2"
+                        >
+                          Clear filters
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredOrders.map((order) => (
+                    <TableRow key={order.id}>
+                      <TableCell>
+                        <div className="font-medium">{order.code}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{order.customer.name}</div>
+                        <div className="text-sm text-gray-500">{order.customer.email}</div>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <div className="flex items-center gap-2">
+                          <div className="relative w-8 h-8">
+                            <Image
+                              src={order.items[0].image ? `/uploads/products/${order.items[0].image}` : "/placeholder.svg"}
+                              alt={order.items[0].name}
+                              fill
+                              className="object-cover rounded"
+                              sizes="32px"
+                            />
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            {order.items.length > 1 ? `+${order.items.length - 1} more` : order.items[0].name}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge className={statusColors[order.status]}>
+                          {order.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        ₱{order.total.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-sm text-gray-500">
+                        {new Date(order.date).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewDetails(order)}
+                            className="flex items-center gap-2"
+                          >
+                            <Eye className="h-4 w-4" />
+                            <span className="hidden sm:inline">View</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
-        {/* Search and Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search orders by code, customer name, or email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select
-                value={statusFilter}
-                onValueChange={(value) => {
-                  // If not showing archived and user selects Delivered or Cancelled, auto-enable showArchived
-                  if (!showArchived && ["Delivered", "Cancelled"].includes(value)) {
-                    setShowArchived(true)
-                  }
-                  setStatusFilter(value)
-                }}
-              >
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {showArchived ? (
-                    <>
-                      <SelectItem value="All">All Status</SelectItem>
-                      <SelectItem value="Delivered">Delivered</SelectItem>
-                      <SelectItem value="Cancelled">Cancelled</SelectItem>
-                    </>
-                  ) : (
-                    <>
-                      <SelectItem value="All">All Status</SelectItem>
-                      <SelectItem value="Pending">Pending</SelectItem>
-                      <SelectItem value="Processing">Processing</SelectItem>
-                      <SelectItem value="Shipped">Shipped</SelectItem>
-                      <SelectItem value="Delivered">Delivered</SelectItem>
-                      <SelectItem value="Cancelled">Cancelled</SelectItem>
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
-              <Button variant="outline" onClick={() => setShowArchived(!showArchived)}>
-                {showArchived ? "Hide Archived" : "Show Archived"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-        {/* Orders List */}
-        <div className="space-y-4">
-          {filteredOrders.map((order) => (
-            <Card key={order.id}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-4">
-                    <div>
-                      <h3 className="font-semibold text-lg">{order.code}</h3>
-                      <p className="text-sm text-gray-600">
-                        {order.customer.name} • {order.customer.email}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(order.date).toLocaleDateString()} • ₱{order.total.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge className={statusColors[order.status]}>{order.status}</Badge>
-                    {order.archived && <Badge variant="secondary">Archived</Badge>}
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2 mb-4">
-                  {order.items.slice(0, 3).map((item) => (
-                    <Image
-                      key={item.id}
-                      src={item.image ? `/uploads/products/${item.image}` : "/placeholder.svg"}
-                      alt={item.name || "Product image"}
-                      width={40}
-                      height={40}
-                      className="rounded object-cover"
-                    />
-                  ))}
-                  {order.items.length > 3 && (
-                    <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-sm text-gray-600">
-                      +{order.items.length - 3}
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(order)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      View Details
-                    </Button>
-                  </div>
-                  {!order.archived && (
-                    <div className="flex items-center space-x-2">
-                      <label htmlFor={`status-${order.id}`} className="text-sm font-medium text-gray-700">
-                        Status:
-                      </label>
-                      <Select
-                        value={order.status}
-                        onValueChange={async (value) => {
-                          if (value !== order.status) {
-                            await handleStatusChange(order.id, value as Order["status"]);
-                            if (["Delivered", "Cancelled"].includes(value)) {
-                              await adminOrderService.archiveOrder(order.id, true);
-                              await loadOrders();
-                              toast({
-                                title: "Order Archived",
-                                description: `Order ${order.code} has been archived due to status '${value}'.`,
-                              });
-                            } else {
-                              await loadOrders();
-                            }
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="w-32" id={`status-${order.id}`}>
-                          <SelectValue value={order.status}>{order.status}</SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Pending">Pending</SelectItem>
-                          <SelectItem value="Processing">Processing</SelectItem>
-                          <SelectItem value="Shipped">Shipped</SelectItem>
-                          <SelectItem value="Delivered">Delivered</SelectItem>
-                          <SelectItem value="Cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        {filteredOrders.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-lg text-gray-600">{showArchived ? "No archived orders found." : "No orders found."}</p>
-          </div>
-        )}
+
         <OrderDetailsDialog
           order={selectedOrder}
           open={isDialogOpen}

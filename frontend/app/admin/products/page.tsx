@@ -14,6 +14,14 @@ import { productStore, initializeData, type Product } from "@/lib/data-store"
 import { ProductFormDialog } from "@/components/product-form-dialog"
 import { authService } from "@/lib/api-service"
 import { adminProductService } from "@/lib/api-service"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 export default function AdminProductsPage() {
   const router = useRouter()
@@ -89,110 +97,144 @@ export default function AdminProductsPage() {
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
             <p className="text-gray-600">Manage your café's product catalog</p>
           </div>
-          <Button onClick={handleCreate} className="bg-brand-primary hover:bg-brand-primary/90">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Product
-          </Button>
-        </div>
-
-        {/* Search and Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => setShowArchived(!showArchived)}
-                className="flex items-center gap-2"
-              >
-                {showArchived ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                {showArchived ? "Hide Archived" : "Show Archived"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <Card key={product.id}>
-              <CardContent className="p-4">
-                <div className="relative mb-4">
-                  <Image
-                    src={product.image ? `/uploads/products/${product.image}` : "/placeholder.svg"}
-                    alt={product.name}
-                    width={300}
-                    height={200}
-                    className="w-full h-40 object-cover rounded-lg"
-                  />
-                  {product.archived && (
-                    <Badge variant="secondary" className="absolute top-2 right-2">
-                      Archived
-                    </Badge>
-                  )}
-                  {product.stock === 0 && !product.archived && (
-                    <Badge variant="destructive" className="absolute top-2 right-2">
-                      Out of Stock
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Badge variant="outline" className="text-xs">
-                    {product.category}
-                  </Badge>
-                  <h3 className="font-semibold text-lg">{product.name}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-brand-primary">₱{product.price}</span>
-                    <span className="text-sm text-gray-500">Stock: {product.stock}</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 mt-4">
-                  <Button variant="outline" size="sm" onClick={() => handleEdit(product)} className="flex-1">
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleArchiveToggle(product)} className="flex-1">
-                    {product.archived ? (
-                      <>
-                        <ArchiveRestore className="h-4 w-4 mr-1" />
-                        Restore
-                      </>
-                    ) : (
-                      <>
-                        <Archive className="h-4 w-4 mr-1" />
-                        Archive
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-lg text-gray-600">
-              {showArchived ? "No archived products found." : "No products found."}
-            </p>
+          <div className="flex items-center gap-2 self-stretch sm:self-auto">
+            <Button
+              variant="outline"
+              onClick={() => setShowArchived(!showArchived)}
+              className="flex-1 sm:flex-none"
+            >
+              {showArchived ? (
+                <><Eye className="h-4 w-4 mr-2" /> Show Active</>
+              ) : (
+                <><EyeOff className="h-4 w-4 mr-2" /> Show Archived</>
+              )}
+            </Button>
+            <Button 
+              onClick={handleCreate} 
+              className="flex-1 sm:flex-none bg-brand-primary hover:bg-brand-primary/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Product
+            </Button>
           </div>
-        )}
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative max-w-md mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
+        {/* Products Table */}
+        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Image</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="hidden md:table-cell">Category</TableHead>
+                  <TableHead className="text-right">Price</TableHead>
+                  <TableHead className="text-center">Stock</TableHead>
+                  <TableHead className="hidden lg:table-cell">Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredProducts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                      No products found.
+                      {searchTerm && (
+                        <Button
+                          variant="link"
+                          onClick={() => setSearchTerm("")}
+                          className="ml-2"
+                        >
+                          Clear search
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        <div className="relative aspect-square w-16 overflow-hidden rounded-lg">
+                          <Image
+                            src={product.image && !product.image.startsWith('http') && !product.image.startsWith('/placeholder') 
+                              ? `/uploads/products/${product.image}` 
+                              : (product.image || "/placeholder.svg")}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{product.name}</div>
+                        <div className="text-sm text-gray-500 line-clamp-1">{product.description}</div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant="secondary">{product.category}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        ₱{product.price.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant={product.stock === 0 ? "destructive" : "outline"}>
+                          {product.stock}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <Badge variant={product.archived ? "destructive" : "default"}>
+                          {product.archived ? "Archived" : "Active"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleEdit(product)}
+                            title="Edit product"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleArchiveToggle(product)}
+                            title={product.archived ? "Restore product" : "Archive product"}
+                          >
+                            {product.archived ? (
+                              <ArchiveRestore className="h-4 w-4" />
+                            ) : (
+                              <Archive className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
 
         <ProductFormDialog
           product={selectedProduct}

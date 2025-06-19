@@ -14,6 +14,15 @@ import { AdminFormDialog } from "@/components/admin-form-dialog"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { authService } from "@/lib/api-service"
 import { adminUserService } from "@/lib/api-service"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Avatar } from "@/components/ui/avatar"
 
 export default function AdminAdminsPage() {
   const router = useRouter()
@@ -119,12 +128,6 @@ export default function AdminAdminsPage() {
     }
   }
 
-  const handleSave = () => {
-    loadAdmins()
-    setIsDialogOpen(false)
-    setSelectedAdmin(null)
-  }
-
   if (!isAuthenticated) {
     return <div>Loading...</div>
   }
@@ -132,120 +135,153 @@ export default function AdminAdminsPage() {
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Admin Management</h1>
-            <p className="text-gray-600">Manage administrator accounts and permissions</p>
+            <p className="text-gray-600">Manage system administrators and their roles</p>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={handleCreate} className="bg-brand-primary hover:bg-brand-primary/90">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Admin
-            </Button>
+          <div className="flex items-center gap-2 self-stretch sm:self-auto">
             <Button
               variant="outline"
               onClick={() => setShowArchived(!showArchived)}
-              className="ml-2"
+              className="flex-1 sm:flex-none"
             >
-              {showArchived ? "Hide Archived" : "Show Archived"}
+              {showArchived ? "Show Active" : "Show Archived"}
+            </Button>
+            <Button 
+              onClick={handleCreate}
+              className="flex-1 sm:flex-none bg-brand-primary hover:bg-brand-primary/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Admin
             </Button>
           </div>
         </div>
 
-        {/* Search */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search admins by username, email, or role..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Admins List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAdmins.map((admin) => (
-            <Card key={admin.id}>
-             <CardHeader>
-  <div className="flex items-start justify-between gap-2">
-        <CardTitle className="text-lg flex-1 min-w-0">{admin.username}</CardTitle>
-        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-          <Badge variant="outline" className="text-xs">{admin.role}</Badge>
-          {currentAdmin && admin.id === currentAdmin.id && (
-            <Badge variant="default" className="text-xs">You</Badge>
-          )}
-          {admin.archived && (
-            <Badge variant="destructive" className="text-xs">Archived</Badge>
-          )}
-        </div>
-      </div>
-    </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-medium">{admin.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Created</p>
-                    <p className="text-sm">{new Date(admin.createdAt).toLocaleDateString()}</p>
-                  </div>
-                  {admin.lastLogin && (
-                    <div>
-                      <p className="text-sm text-gray-500">Last Login</p>
-                      <p className="text-sm">{new Date(admin.lastLogin).toLocaleDateString()}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-2 mt-4">
-                  {!admin.archived ? (
-                    <>
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(admin)} className="flex-1">
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleArchive(admin)}
-                        disabled={currentAdmin && admin.id === currentAdmin.id}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-1"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Archive
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleRestore(admin)}
-                      className="flex-1"
-                    >
-                      <ArchiveRestore className="h-4 w-4 mr-1" />
-                      Restore
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Search Bar */}
+        <div className="relative max-w-md mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            type="text"
+            placeholder="Search admins..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
         </div>
 
-        {filteredAdmins.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-lg text-gray-600">No admins found.</p>
+        {/* Admins Table */}
+        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]"></TableHead>
+                  <TableHead>Username</TableHead>
+                  <TableHead className="hidden md:table-cell">Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead className="hidden lg:table-cell">Status</TableHead>
+                  <TableHead className="hidden lg:table-cell">Last Login</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAdmins.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                      No admins found.
+                      {searchTerm && (
+                        <Button
+                          variant="link"
+                          onClick={() => setSearchTerm("")}
+                          className="ml-2"
+                        >
+                          Clear search
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredAdmins.map((admin) => (
+                    <TableRow key={admin.id}>
+                      <TableCell>
+                        <Avatar>
+                          <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center font-medium">
+                            {admin.username.charAt(0).toUpperCase()}
+                          </div>
+                        </Avatar>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{admin.username}</div>
+                        <div className="md:hidden text-sm text-gray-500">{admin.email}</div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {admin.email}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={admin.role === "Super Admin" ? "default" : "secondary"}>
+                          {admin.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <Badge variant={admin.archived ? "destructive" : "outline"}>
+                          {admin.archived ? "Archived" : "Active"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell text-sm text-gray-500">
+                        {admin.lastLogin ? new Date(admin.lastLogin).toLocaleDateString() : "Never"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleEdit(admin)}
+                            title="Edit admin"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          {admin.archived ? (
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleRestore(admin)}
+                              title="Restore admin"
+                            >
+                              <ArchiveRestore className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleArchive(admin)}
+                              disabled={currentAdmin?.id === admin.id}
+                              title="Archive admin"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
-        )}
+        </div>
 
-        <AdminFormDialog admin={selectedAdmin} open={isDialogOpen} onOpenChange={setIsDialogOpen} onSave={handleSave} />
-
+        <AdminFormDialog
+          admin={selectedAdmin}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          onSave={() => {
+            loadAdmins()
+            setIsDialogOpen(false)
+            setSelectedAdmin(null)
+          }}
+        />
         <ConfirmDialog
           open={!!archiveAdmin}
           onOpenChange={() => setArchiveAdmin(null)}
