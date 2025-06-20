@@ -24,7 +24,7 @@ public class Product {
     private BigDecimal price;
 
     @Column(nullable = false)
-    private String category;
+    private String category; // Allowed values: "Coffee & Tea", "Art & Merch", "Gift Set", "Gear"
 
     private String image;
 

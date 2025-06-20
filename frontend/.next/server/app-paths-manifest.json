@@ -1,7 +1,4 @@
 {
-  "/(customer)/page": "app/(customer)/page.js",
-  "/admin/products/page": "app/admin/products/page.js",
   "/(customer)/products/page": "app/(customer)/products/page.js",
-  "/(customer)/cart/page": "app/(customer)/cart/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/(customer)/page": "app/(customer)/page.js"
 }

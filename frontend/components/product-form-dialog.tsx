@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import type { Product } from "@/lib/data-store"
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -19,7 +20,7 @@ interface ProductFormDialogProps {
   onSave: () => void
 }
 
-const categories = ["Coffee & Tea", "Art & Merch", "Gift Set", "Voucher"]
+const categories = ["Coffee & Tea", "Art & Merch", "Gift Set", "Gear"]
 
 export function ProductFormDialog({ product, open, onOpenChange, onSave }: ProductFormDialogProps) {
   const { toast } = useToast()
@@ -216,7 +217,6 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
           <div>
             <Label htmlFor="category">Category *</Label>
             <Select
-              id="category"
               name="category"
               value={formData.category}
               onValueChange={(value) => {

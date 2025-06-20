@@ -11,7 +11,7 @@ import type { Product } from "@/lib/data-store"
 import { ProductCard } from "@/components/product-card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-const categories = ["All", "Coffee & Tea", "Art & Merch", "Gift Set", "Voucher"]
+const categories = ["All", "Coffee & Tea", "Art & Merch", "Gift Set", "Gear"]
 
 export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -89,8 +89,8 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      {/* Search and Filters - No longer sticky */}
-      <div className="w-full border-b bg-white">
+      {/* Search and Filters - Sticky on scroll */}
+      <div className="sticky top-16 z-50 w-full border-b bg-white">
         <div className="py-4 shadow-sm space-y-4">
           {/* Search Bar */}
           <div className="relative max-w-md mx-auto">
