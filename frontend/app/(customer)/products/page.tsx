@@ -80,49 +80,46 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="container max-w-[1600px] mx-auto px-4 py-4 sm:py-6 lg:py-8 space-y-6">
+    <div className="container max-w-[1600px] mx-auto px-4 space-y-6">
       {/* Header - More compact on mobile */}
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-2 pt-4 sm:pt-6 lg:pt-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Our Products</h1>
         <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
           Discover our carefully curated selection of premium coffee, artisanal merchandise, and unique gift sets.
         </p>
       </div>
 
-      {/* Search and Filters - Better mobile layout */}
-      <div className="space-y-4 max-w-5xl mx-auto">
-        {/* Search Bar */}
-        <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-10"
-            aria-label="Search products"
-          />
-        </div>
-
-        {/* Category Filters - Scrollable on mobile */}
-        <ScrollArea className="w-full pb-4">
-          <div className="flex justify-start sm:justify-center gap-2 min-w-max px-2">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category)}
-                className={`
-                  ${selectedCategory === category ? "bg-brand-primary hover:bg-brand-primary/90" : ""}
-                  whitespace-nowrap px-4 h-9
-                `}
-                size="sm"
-              >
-                {category}
-              </Button>
-            ))}
+      {/* Search and Filters - No longer sticky */}
+      <div className="w-full border-b bg-white">
+        <div className="py-4 shadow-sm space-y-4">
+          {/* Search Bar */}
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9"
+            />
           </div>
-        </ScrollArea>
+
+          {/* Categories */}
+          <div className="overflow-x-auto scrollbar-none -mx-4 px-4 md:mx-0 md:px-0">
+            <div className="flex space-x-2 justify-start md:justify-center min-w-full pb-2 snap-x snap-mandatory md:max-w-2xl md:mx-auto">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  onClick={() => setSelectedCategory(category)}
+                  className="whitespace-nowrap px-4 py-2 rounded-lg snap-start min-w-[110px] text-sm"
+                >
+                  {category}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Loading State - More appealing spinner */}

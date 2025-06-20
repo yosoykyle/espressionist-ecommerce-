@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"components/order-details-dialog.tsx -> @/lib/api-service\":{\"id\":\"components/order-details-dialog.tsx -> @/lib/api-service\",\"files\":[]}}"
+self.__REACT_LOADABLE_MANIFEST="{}"
