@@ -89,8 +89,8 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      {/* Search and Filters - Sticky on scroll */}
-      <div className="sticky top-16 z-50 w-full border-b bg-white">
+      {/* Search and Filters - Now scrolls with content */}
+      <div className="w-full border-b bg-white">
         <div className="py-4 shadow-sm space-y-4">
           {/* Search Bar */}
           <div className="relative max-w-md mx-auto">

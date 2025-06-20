@@ -101,53 +101,53 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 			{/* Desktop Admin Interface */}
 			<div className="hidden md:block min-h-screen bg-gray-50">
 				{/* Admin Header - Always visible during page transitions */}
-				<header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-					<div className="px-4 sm:px-6 lg:px-8">
-						<div className="flex justify-between items-center h-16">
-							<div className="flex items-center space-x-4">
-								<Link
-									href="/admin/dashboard"
-									className="text-xl font-logo text-brand-primary"
-								>
-									espressionist admin
-								</Link>
-								{/* Horizontal Nav */}
-								<nav className="flex items-center space-x-2 ml-8">
-									{adminNavItems.map((item) => {
-										const isActive = pathname === item.href
-										return (
-											<Link
-												key={item.href}
-												href={item.href}
-												className={cn(
-													"flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-													isActive
-														? "bg-brand-primary text-white"
-														: "text-gray-700 hover:bg-gray-100"
-												)}
-											>
-												<item.icon className="h-4 w-4" />
-												<span>{item.title}</span>
-											</Link>
-										)
-									})}
-								</nav>
-							</div>
-							<div className="flex items-center space-x-4">
-								<Button asChild variant="ghost" size="sm">
-									<Link href="/">
-										<Home className="h-4 w-4 mr-2" />
-										View Site
-									</Link>
-								</Button>
-								<Button onClick={handleLogout} variant="outline" size="sm">
-									<LogOut className="h-4 w-4 mr-2" />
-									Logout
-								</Button>
-							</div>
-						</div>
-					</div>
-				</header>
+				<header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+  <div className="px-4 sm:px-6 lg:px-8">
+    <div className="flex justify-between items-center h-16">
+      <div className="flex items-center space-x-4">
+        <Link
+          href="/admin/dashboard"
+          className="text-xl font-logo text-brand-primary"
+        >
+          espressionist admin
+        </Link>
+        {/* Horizontal Nav */}
+        <nav className="flex items-center space-x-2 ml-8">
+          {adminNavItems.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-brand-primary text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                )}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.title}</span>
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
+      <div className="flex items-center space-x-4">
+        <Button asChild variant="ghost" size="sm">
+          <Link href="/">
+            <Home className="h-4 w-4 mr-2" />
+            View Site
+          </Link>
+        </Button>
+        <Button onClick={handleLogout} variant="outline" size="sm">
+          <LogOut className="h-4 w-4 mr-2" />
+          Logout
+        </Button>
+      </div>
+    </div>
+  </div>
+</header>
 				{/* Main Content - Wrapped in Suspense */}
 				<main className="flex-1 p-6">
 					<Suspense fallback={

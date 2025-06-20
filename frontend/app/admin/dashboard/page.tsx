@@ -51,7 +51,7 @@ export default function AdminDashboard() {
         setStats({
           totalProducts: Array.isArray(products) ? products.filter((p) => !p.archived).length : 0,
           totalOrders: Array.isArray(orders) ? orders.length : 0,
-          activeAdmins: Array.isArray(admins) ? admins.filter((a) => a.status === "Active").length : 0,
+          activeAdmins: Array.isArray(admins) ? admins.filter((a) => !a.archived).length : 0,
           revenue: revenue,
         })
       } catch (error) {
