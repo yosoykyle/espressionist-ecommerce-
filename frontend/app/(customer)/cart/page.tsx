@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useCart } from "@/components/cart-provider"
-import { productStore, type Product } from "@/lib/data-store"
+import type { Product } from "@/lib/data-store"
 import { useEffect, useState } from "react"
 
 export default function CartPage() {
@@ -17,13 +17,30 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Fetch all products from backend on mount
+    // Fetch all products from backend on mount using fetch
     async function fetchProducts() {
       setLoading(true)
       try {
-        const allProducts = await productStore.getAll()
-        setProducts(allProducts)
+        const res = await fetch("/api/products", {
+          method: "GET",
+          headers: {
+            "accept": "application/json"
+          }
+        })
+        console.log('Fetch response:', res)
+        if (!res.ok) throw new Error("Failed to fetch products")
+        const data = await res.json()
+        console.log('Fetched data:', data)
+        // Handle both array and object with products property
+        if (Array.isArray(data)) {
+          setProducts(data)
+        } else if (data.products && Array.isArray(data.products)) {
+          setProducts(data.products)
+        } else {
+          setProducts([])
+        }
       } catch (e) {
+        console.error('Error fetching products:', e)
         setProducts([])
       } finally {
         setLoading(false)
@@ -37,7 +54,8 @@ export default function CartPage() {
     if (loading) return
     const warnings: string[] = []
     items.forEach((item) => {
-      const product = products.find((p) => p.id === item.id)
+      // Compare IDs as numbers to avoid type mismatch
+      const product = products.find((p) => Number(p.id) === Number(item.id))
       if (!product) {
         warnings.push(`${item.name} is no longer available`)
       } else if (product.archived) {
@@ -52,12 +70,12 @@ export default function CartPage() {
   }, [items, products, loading])
 
   const getMaxQuantity = (itemId: string) => {
-    const product = products.find((p) => p.id === itemId)
+    const product = products.find((p) => Number(p.id) === Number(itemId))
     return product ? product.stock : 0
   }
 
   const isItemAvailable = (itemId: string) => {
-    const product = products.find((p) => p.id === itemId)
+    const product = products.find((p) => Number(p.id) === Number(itemId))
     return product && !product.archived && product.stock > 0
   }
 

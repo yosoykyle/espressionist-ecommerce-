@@ -14,12 +14,17 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/api/checkout")
-    public ResponseEntity<OrderDTO> placeOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO) {
-        // Assuming placeOrder now returns a DTO that is suitable for CREATED status
-        // And that the service handles the actual creation and returns the created order
-        OrderDTO createdOrder = orderService.placeOrder(orderRequestDTO);
-        // It's common to return 201 Created for successful resource creation
-        return new ResponseEntity<>(createdOrder, org.springframework.http.HttpStatus.CREATED);
+    public ResponseEntity<?> placeOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO) {
+        try {
+            OrderDTO createdOrder = orderService.placeOrder(orderRequestDTO);
+            return new ResponseEntity<>(createdOrder, org.springframework.http.HttpStatus.CREATED);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            // Product archived or out of stock
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            // Product not found
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
     @GetMapping("/api/orders/{code}")

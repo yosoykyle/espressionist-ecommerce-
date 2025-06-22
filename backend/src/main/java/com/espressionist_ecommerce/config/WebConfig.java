@@ -2,6 +2,7 @@ package com.espressionist_ecommerce.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -10,6 +11,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     private static final Logger logger = LoggerFactory.getLogger(WebConfig.class);
+
+    @Value("${app.cors.allowed-origin:http://localhost:3000}")
+    private String allowedOrigin;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -22,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Apply to all paths
-            .allowedOrigins("http://localhost:3000") // Frontend origin
+            .allowedOrigins(allowedOrigin) // Frontend origin from property
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
             .allowedHeaders("*")
             .allowCredentials(true);

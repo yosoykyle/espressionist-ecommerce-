@@ -25,11 +25,11 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
 
   return (
     <Card
-      className="max-w-sm mx-auto w-full flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
+      className="max-w-sm w-full flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
       onClick={handleClick}
     >
-      {/* Image Section */}
-      <div className="relative w-full h-48 sm:h-56 bg-gray-100 rounded-t-2xl overflow-hidden">
+      {/* Image Section - Reduced height for compactness */}
+      <div className="relative w-full h-36 min-[375px]:h-40 sm:h-48 bg-gray-100 rounded-t-2xl overflow-hidden">
         <Image
           src={
             product.image && !product.image.startsWith("http") && !product.image.startsWith("/placeholder")
@@ -38,8 +38,8 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
           }
           alt={product.name}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105 rounded-t-2xl"
+          sizes="(min-width: 375px) 50vw, (min-width: 640px) 33vw, (min-width: 1024px) 25vw, 20vw"
           priority
         />
         {product.stock === 0 && (
@@ -51,31 +51,31 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
         )}
       </div>
 
-      {/* Content Section */}
-      <CardContent className="flex-1 flex flex-col gap-2 p-4">
+      {/* Content Section - Reduced padding and gaps */}
+      <CardContent className="flex-1 flex flex-col gap-2 min-[375px]:gap-3 p-3 min-[375px]:p-4">
         <div className="flex items-start justify-between">
           <Badge variant="secondary" className="text-xs px-2 py-0.5">
             {product.category}
           </Badge>
-          <span className="text-base sm:text-lg font-bold text-[#f97316] whitespace-nowrap">
+          <span className="text-sm min-[375px]:text-base font-bold text-[#f97316] whitespace-nowrap">
             ₱{product.price.toLocaleString()}
           </span>
         </div>
-        <h3 className="font-semibold text-sm sm:text-base text-gray-900 leading-tight line-clamp-2 sm:line-clamp-2">
+        <h3 className="font-semibold text-sm min-[375px]:text-base text-gray-900 leading-tight line-clamp-2">
           {product.name}
         </h3>
-        <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 sm:line-clamp-3">
+        <p className="text-xs min-[375px]:text-sm text-gray-600 line-clamp-2">
           {product.description}
         </p>
-        <div className="text-xs sm:text-sm text-gray-500">
+        <div className="text-xs min-[375px]:text-sm text-gray-500">
           In Stock: {product.stock}
         </div>
       </CardContent>
 
-      {/* Action Section */}
-      <CardFooter className="p-4 pt-0">
+      {/* Action Section - Reduced padding and button height */}
+      <CardFooter className="p-3 pt-0 min-[375px]:p-4 min-[375px]:pt-0">
         <Button
-          className="w-full bg-[#f97316] hover:bg-[#ea680f] h-10 sm:h-11 text-sm sm:text-base gap-2 rounded-xl"
+          className="w-full bg-[#f97316] hover:bg-[#ea680f] h-9 min-[375px]:h-10 text-sm gap-2 rounded-xl"
           onClick={handleAddToCart}
           disabled={product.stock === 0}
         >

@@ -12,16 +12,27 @@ const ToastProvider = ToastPrimitives.Provider
 const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
->(({ className, ...props }, ref) => (
-  <ToastPrimitives.Viewport
-    ref={ref}
-    className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  // Use inline style to move to bottom for 375px+
+  const [is375Up, setIs375Up] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => setIs375Up(window.innerWidth >= 375);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return (
+    <ToastPrimitives.Viewport
+      ref={ref}
+      style={is375Up ? { top: 'auto', bottom: 0, right: 0, left: 'auto' } : { top: 0, bottom: 'auto', right: 'auto', left: 0 }}
+      className={cn(
+        "fixed z-[100] flex max-h-screen w-full flex-col-reverse p-4 md:max-w-[420px]",
+        className
+      )}
+      {...props}
+    />
+  );
+})
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(

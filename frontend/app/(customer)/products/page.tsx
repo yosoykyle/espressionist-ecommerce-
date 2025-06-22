@@ -134,7 +134,7 @@ export default function ProductsPage() {
       ) : (
         <>
           {/* Products Grid - Better responsive layout */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-2 min-[375px]:gap-3 sm:gap-4 lg:gap-6">
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}

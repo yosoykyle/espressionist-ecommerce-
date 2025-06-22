@@ -42,29 +42,31 @@ export default function OrderStatusPage() {
       const order = await orderService.getOrderStatus(orderCode.toUpperCase())
 
       if (order) {
-        // Map flat customer fields to nested customer object if needed
-        const mappedOrder = {
-          ...order,
-          customer: order.customer || {
-            name: order.customerName,
-            email: order.customerEmail,
-            phone: order.customerPhone,
-            address: order.customerAddress,
-            city: order.customerCity,
-            postalCode: order.customerPostalCode,
-            notes: order.customerNotes,
-          },
-        }
-        setOrderData(mappedOrder)
+        setOrderData(order)
         setError("")
       } else {
         setOrderData(null)
         setError("Order not found. Please check your order code and try again.")
       }
-    } catch (error) {
-      console.error("Error fetching order:", error)
+    } catch (error: any) {
       setOrderData(null)
-      setError("An error occurred while fetching the order. Please try again.")
+      let errorMsg = ''
+      if (typeof error === 'string') {
+        errorMsg = error
+      } else if (error instanceof Error) {
+        errorMsg = error.message
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        errorMsg = (error as any).message
+      } else if (error && typeof error === 'object' && 'statusText' in error) {
+        errorMsg = (error as any).statusText
+      }
+      if (errorMsg.includes('Order not found')) {
+        setError("Order not found. Please check your order code and try again.")
+        // Do not log expected 'Order not found' errors
+      } else {
+        setError("An error occurred while fetching the order. Please try again.")
+        console.error("Error fetching order:", error)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -87,7 +89,7 @@ export default function OrderStatusPage() {
             <form onSubmit={handleSearch} className="space-y-4">
               <div>
                 <Label htmlFor="orderCode">Order Code</Label>
-                <div className="flex space-x-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     id="orderCode"
                     value={orderCode}
@@ -95,7 +97,11 @@ export default function OrderStatusPage() {
                     placeholder="Enter your order code (e.g., ESP-123456)"
                     className="flex-1"
                   />
-                  <Button type="submit" disabled={isLoading} className="bg-brand-primary hover:bg-brand-primary/90">
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="bg-brand-primary hover:bg-brand-primary/90 w-full sm:w-auto"
+                  >
                     <Search className="h-4 w-4 mr-2" />
                     {isLoading ? "Searching..." : "Search"}
                   </Button>
@@ -128,7 +134,7 @@ export default function OrderStatusPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Order Date</p>
-                    <p className="font-semibold">{new Date(orderData.date).toLocaleDateString()}</p>
+                    <p className="font-semibold">{new Date(orderData.date).toLocaleDateString('en-US')}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Total Amount</p>
