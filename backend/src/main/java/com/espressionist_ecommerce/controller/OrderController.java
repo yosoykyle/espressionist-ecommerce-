@@ -3,6 +3,7 @@ package com.espressionist_ecommerce.controller;
 import com.espressionist_ecommerce.dto.OrderDTO;
 import com.espressionist_ecommerce.dto.OrderRequestDTO;
 import com.espressionist_ecommerce.service.OrderService;
+import com.espressionist_ecommerce.exception.ResourceNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
