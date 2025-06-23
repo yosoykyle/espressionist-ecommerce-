@@ -29,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
-    private static final String UPLOAD_DIR = "/workspaces/espressionist-ecommerce-/backend/uploads/products";
+    private static final String UPLOAD_DIR = "uploads/products";
 
     @Override
     public ProductDTO uploadProductImage(Long productId, MultipartFile file) {

@@ -203,22 +203,18 @@ export default function OrderStatusPage() {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="font-medium">{orderData.customer?.name || "No name provided"}</p>
-                      <p className="text-sm text-gray-600">{orderData.customer?.email || "No email provided"}</p>
-                      <p className="text-sm text-gray-600">{orderData.customer?.phone || "No phone provided"}</p>
+                      <p className="font-medium">{orderData.customerName || "No name provided"}</p>
+                      <p className="text-sm text-gray-600">{orderData.customerEmail || "No email provided"}</p>
+                      <p className="text-sm text-gray-600">{orderData.customerPhone || "No phone provided"}</p>
                     </div>
-
                     <div>
-                      <p className="text-sm text-gray-600">{orderData.customer?.address || "No address provided"}</p>
-                      <p className="text-sm text-gray-600">
-                        {orderData.customer?.city || "No city"}, {orderData.customer?.postalCode || "No postal code"}
-                      </p>
+                      <p className="text-sm text-gray-600">{orderData.customerAddress || "No address provided"}</p>
+                      <p className="text-sm text-gray-600">{orderData.customerCity || "No city"}, {orderData.customerPostalCode || "No postal code"}</p>
                     </div>
-
-                    {orderData.customer?.notes && (
+                    {orderData.customerNotes && (
                       <div>
                         <p className="font-medium text-sm">Order Notes:</p>
-                        <p className="text-sm text-gray-600">{orderData.customer.notes}</p>
+                        <p className="text-sm text-gray-600">{orderData.customerNotes}</p>
                       </div>
                     )}
                   </div>
