@@ -1,7 +1,8 @@
 {
-  "/(customer)/order-success/page": "app/(customer)/order-success/page.js",
-  "/(customer)/checkout/page": "app/(customer)/checkout/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/admin/products/page": "app/admin/products/page.js",
-  "/(customer)/order-status/page": "app/(customer)/order-status/page.js",
-  "/(customer)/cart/page": "app/(customer)/cart/page.js"
+  "/(customer)/cart/page": "app/(customer)/cart/page.js",
+  "/(customer)/checkout/page": "app/(customer)/checkout/page.js",
+  "/(customer)/page": "app/(customer)/page.js",
+  "/(customer)/order-success/page": "app/(customer)/order-success/page.js"
 }

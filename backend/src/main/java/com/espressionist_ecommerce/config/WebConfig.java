@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -16,7 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
     private String allowedOrigin;
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         // Serve files from /uploads/** URL, mapping to the uploads directory relative to backend working dir
         logger.info("[WebConfig] Serving /uploads/** from: uploads/ (relative to backend working directory)");
         registry.addResourceHandler("/uploads/**")
@@ -24,9 +25,10 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
+    public void addCorsMappings(@NonNull CorsRegistry registry) {
+        // Updated: Allow both localhost and LAN IP for frontend dev access
         registry.addMapping("/**") // Apply to all paths
-            .allowedOrigins(allowedOrigin) // Frontend origin from property
+            .allowedOrigins("http://localhost:3000", "http://192.168.1.25:3000") // Added LAN IP
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
             .allowedHeaders("*")
             .allowCredentials(true);

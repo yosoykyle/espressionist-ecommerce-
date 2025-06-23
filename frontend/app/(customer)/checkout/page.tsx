@@ -99,18 +99,20 @@ export default function CheckoutPage() {
       const orderCode = `ESP-${Date.now().toString().slice(-6)}`
 
       // Create order object
-      const orderData = {
+      const orderData: import('@/lib/data-store').CheckoutOrder = {
         items: items.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
         })),
-        customerName: formData.name,
-        customerEmail: formData.email,
-        customerPhone: formData.phone,
-        customerAddress: formData.address,
-        customerCity: formData.city,
-        customerPostalCode: formData.postalCode,
-        customerNotes: formData.notes,
+        customer: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          notes: formData.notes,
+        },
       }
 
       // Place order

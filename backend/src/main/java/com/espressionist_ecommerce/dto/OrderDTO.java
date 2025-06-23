@@ -11,13 +11,7 @@ public class OrderDTO {
     private String code;
     private String status;
     private LocalDateTime date;
-    private String customerName;
-    private String customerEmail;
-    private String customerPhone;
-    private String customerAddress;
-    private String customerCity;
-    private String customerPostalCode;
-    private String customerNotes;
+    private CustomerDTO customer;
     private BigDecimal subtotal;
     private BigDecimal vat;
     private BigDecimal total;

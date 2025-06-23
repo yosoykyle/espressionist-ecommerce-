@@ -7,7 +7,6 @@ import com.espressionist_ecommerce.repository.AdminRepository;
 import com.espressionist_ecommerce.security.JwtTokenUtil;
 import com.espressionist_ecommerce.service.AuthService;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,7 +26,6 @@ public class AuthServiceImpl implements AuthService {
     private final AdminRepository adminRepository;
     private final ModelMapper modelMapper;
 
-    @Autowired
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            UserDetailsService userDetailsService, // Spring's UserDetailsService
                            JwtTokenUtil jwtTokenUtil,

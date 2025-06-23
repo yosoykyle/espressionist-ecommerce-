@@ -72,7 +72,16 @@ export const orderService = {
    * Place an order
    * Calls POST /api/checkout
    */
-  placeOrder: async (orderData: Omit<Order, "id" | "createdAt" | "updatedAt">): Promise<Order> => {
+  placeOrder: async (orderData: {
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string;
+    customerAddress: string;
+    customerCity: string;
+    customerPostalCode: string;
+    customerNotes?: string;
+    items: { productId: number; quantity: number }[];
+  }): Promise<Order> => {
     // Do NOT send JWT for public checkout
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     const response = await fetch("/api/checkout", {

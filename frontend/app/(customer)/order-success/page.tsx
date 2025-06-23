@@ -22,20 +22,7 @@ export default function OrderSuccessPage() {
 
       if (savedOrder) {
         const order = JSON.parse(savedOrder) as Order
-        // Map flat customer fields to nested customer object if needed
-        const mappedOrder = {
-          ...order,
-          customer: order.customer || {
-            name: order.customerName,
-            email: order.customerEmail,
-            phone: order.customerPhone,
-            address: order.customerAddress,
-            city: order.customerCity,
-            postalCode: order.customerPostalCode,
-            notes: order.customerNotes,
-          },
-        }
-        setOrderData(mappedOrder)
+        setOrderData(order)
       } else {
         console.log("No saved order found") // Debug log
         // Redirect to home if no order data

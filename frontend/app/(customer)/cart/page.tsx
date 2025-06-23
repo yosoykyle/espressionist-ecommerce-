@@ -154,7 +154,7 @@ export default function CartPage() {
                         variant="outline"
                         size="icon"
                         onClick={() => removeItem(item.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 w-8 h-8 flex-shrink-0"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 w-8 h-8 flex-shrink-0 opacity-100"
                         aria-label="Remove item"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -240,7 +240,7 @@ export default function CartPage() {
                       variant="outline"
                       size="icon"
                       onClick={() => removeItem(item.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 w-8 h-8"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 w-8 h-8 opacity-100"
                       aria-label="Remove item"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -290,7 +290,9 @@ export default function CartPage() {
               </Button>
 
               {stockWarnings.length > 0 && (
-                <p className="text-sm text-red-600 text-center">Please resolve stock issues before checkout</p>
+                <p className="text-sm text-red-600 text-center">
+                  Out-of-stock items will be removed from your order at checkout.
+                </p>
               )}
 
               <Button asChild variant="outline" className="w-full">

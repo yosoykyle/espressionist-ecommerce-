@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.espressionist_ecommerce.dto.CustomerDTO;
 import com.espressionist_ecommerce.dto.OrderDTO;
 import com.espressionist_ecommerce.dto.OrderRequestDTO;
 import com.espressionist_ecommerce.entity.Order;
@@ -102,13 +102,37 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO getOrderByCode(String code) {
         Order order = orderRepository.findByCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + code));
-        return modelMapper.map(order, OrderDTO.class);
+        OrderDTO dto = modelMapper.map(order, OrderDTO.class);
+        // Manually map customer fields to nested CustomerDTO
+        CustomerDTO customer = new CustomerDTO();
+        customer.setName(order.getCustomerName());
+        customer.setEmail(order.getCustomerEmail());
+        customer.setPhone(order.getCustomerPhone());
+        customer.setAddress(order.getCustomerAddress());
+        customer.setCity(order.getCustomerCity());
+        customer.setPostalCode(order.getCustomerPostalCode());
+        customer.setNotes(order.getCustomerNotes());
+        dto.setCustomer(customer);
+        return dto;
     }
 
     @Override
     public List<OrderDTO> getAllOrders() {
         return orderRepository.findAll().stream()
-                .map(order -> modelMapper.map(order, OrderDTO.class))
+                .map(order -> {
+                    OrderDTO dto = modelMapper.map(order, OrderDTO.class);
+                    // Manually map customer fields to nested CustomerDTO
+                    CustomerDTO customer = new CustomerDTO();
+                    customer.setName(order.getCustomerName());
+                    customer.setEmail(order.getCustomerEmail());
+                    customer.setPhone(order.getCustomerPhone());
+                    customer.setAddress(order.getCustomerAddress());
+                    customer.setCity(order.getCustomerCity());
+                    customer.setPostalCode(order.getCustomerPostalCode());
+                    customer.setNotes(order.getCustomerNotes());
+                    dto.setCustomer(customer);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 

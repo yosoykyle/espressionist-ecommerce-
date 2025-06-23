@@ -1,6 +1,5 @@
 package com.espressionist_ecommerce.service.impl;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
