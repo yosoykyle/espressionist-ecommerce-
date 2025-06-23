@@ -115,119 +115,164 @@ export default function OrderStatusPage() {
 
         {/* Order Results */}
         {orderData && (
-          <div className="space-y-6">
-            {/* Order Header */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Order Details</CardTitle>
-                  <Badge className={statusColors[orderData.status as keyof typeof statusColors]}>
-                    {orderData.status}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Order Code</p>
-                    <p className="font-semibold">{orderData.code}</p>
+          <>
+            {/* Order Status Info Bento Box */}
+            {(() => {
+              const status = (orderData.status || "").toLowerCase();
+              if (status === "pending") {
+                return (
+                  <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-4 mb-4 flex items-center gap-3 text-sm text-yellow-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
+                    <span>Your order is pending. To request a cancellation, please email us at <a href="mailto:espressionist.ph@gmail.com" className="underline ml-1 text-yellow-900 hover:text-brand-primary">espressionist.ph@gmail.com</a>. We'll assist you as soon as possible.</span>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Order Date</p>
-                    <p className="font-semibold">{new Date(orderData.date).toLocaleDateString('en-US')}</p>
+                );
+              } else if (status === "processing") {
+                return (
+                  <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 mb-4 flex items-center gap-3 text-sm text-blue-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
+                    <span>Your order is now being prepared. We'll notify you once it's shipped.</span>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Total Amount</p>
-                    <p className="font-semibold text-brand-primary">₱{orderData.total.toFixed(2)}</p>
+                );
+              } else if (status === "shipped") {
+                return (
+                  <div className="rounded-lg bg-purple-50 border border-purple-200 p-4 mb-4 flex items-center gap-3 text-sm text-purple-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
+                    <span>Your order is on the way! You’ll receive it soon.</span>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                );
+              } else if (status === "delivered") {
+                return (
+                  <div className="rounded-lg bg-green-50 border border-green-200 p-4 mb-4 flex items-center gap-3 text-sm text-green-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
+                    <span>Your order has been delivered. Thank you for supporting Espressionist!</span>
+                  </div>
+                );
+              } else if (status === "cancelled") {
+                return (
+                  <div className="rounded-lg bg-red-50 border border-red-200 p-4 mb-4 flex items-center gap-3 text-sm text-red-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
+                    <span>Your order has been cancelled. If you have any questions, feel free to contact us at <a href="mailto:espressionist.ph@gmail.com" className="underline ml-1 text-red-900 hover:text-brand-primary">espressionist.ph@gmail.com</a>.</span>
+                  </div>
+                );
+              } else {
+                return null;
+              }
+            })()}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Order Items */}
+            <div className="space-y-6">
+              {/* Order Header */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Items Ordered</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Order Details</CardTitle>
+                    <Badge className={statusColors[orderData.status as keyof typeof statusColors]}>
+                      {orderData.status}
+                    </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {Array.isArray(orderData.items) && orderData.items.length > 0 ? (
-                      orderData.items.map((item, idx) => (
-                        <div key={item?.id || idx} className="flex items-center space-x-3">
-                          <Image
-                            src={item?.image ? `/uploads/products/${item.image}` : "/placeholder.svg"}
-                            alt={item?.name || "Product image"}
-                            width={50}
-                            height={50}
-                            className="rounded object-cover"
-                          />
-                          <div className="flex-1">
-                            <p className="font-medium">{item?.name || "Unnamed Product"}</p>
-                            <p className="text-sm text-gray-500">
-                              ₱{item?.price ?? 0} × {item?.quantity ?? 0}
-                            </p>
-                          </div>
-                          <p className="font-semibold">₱{((item?.price ?? 0) * (item?.quantity ?? 0)).toFixed(2)}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-500">No items found in this order.</p>
-                    )}
-
-                    <hr />
-
-                    <div className="space-y-1">
-                      <div className="flex justify-between">
-                        <span>Subtotal</span>
-                        <span>₱{orderData.subtotal.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>VAT (12%)</span>
-                        <span>₱{orderData.vat.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between font-semibold text-lg">
-                        <span>Total</span>
-                        <span className="text-brand-primary">₱{orderData.total.toFixed(2)}</span>
-                      </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Order Code</p>
+                      <p className="font-semibold">{orderData.code}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Order Date</p>
+                      <p className="font-semibold">{new Date(orderData.date).toLocaleDateString('en-US')}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Total Amount</p>
+                      <p className="font-semibold text-brand-primary">₱{orderData.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Shipping Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Shipping Information</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {orderData.customer ? (
-                      <>
-                        <div>
-                          <p className="font-medium">{orderData.customer.name || "No name provided"}</p>
-                          <p className="text-sm text-gray-600">{orderData.customer.email || "No email provided"}</p>
-                          <p className="text-sm text-gray-600">{orderData.customer.phone || "No phone provided"}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">{orderData.customer.address || "No address provided"}</p>
-                          <p className="text-sm text-gray-600">{orderData.customer.city || "No city"}, {orderData.customer.postalCode || "No postal code"}</p>
-                        </div>
-                        {orderData.customer.notes && (
-                          <div>
-                            <p className="font-medium text-sm">Order Notes:</p>
-                            <p className="text-sm text-gray-600">{orderData.customer.notes}</p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Order Items */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Items Ordered</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {Array.isArray(orderData.items) && orderData.items.length > 0 ? (
+                        orderData.items.map((item, idx) => (
+                          <div key={item?.id || idx} className="flex items-center space-x-3">
+                            <Image
+                              src={item?.image ? `/uploads/products/${item.image}` : "/placeholder.svg"}
+                              alt={item?.name || "Product image"}
+                              width={50}
+                              height={50}
+                              className="rounded object-cover"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium">{item?.name || "Unnamed Product"}</p>
+                              <p className="text-sm text-gray-500">
+                                ₱{item?.price ?? 0} × {item?.quantity ?? 0}
+                              </p>
+                            </div>
+                            <p className="font-semibold">₱{((item?.price ?? 0) * (item?.quantity ?? 0)).toFixed(2)}</p>
                           </div>
-                        )}
-                      </>
-                    ) : (
-                      <p className="text-sm text-red-600">Customer information is missing.</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                        ))
+                      ) : (
+                        <p className="text-gray-500">No items found in this order.</p>
+                      )}
+
+                      <hr />
+
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span>Subtotal</span>
+                          <span>₱{orderData.subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>VAT (12%)</span>
+                          <span>₱{orderData.vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between font-semibold text-lg">
+                          <span>Total</span>
+                          <span className="text-brand-primary">₱{orderData.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Shipping Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Shipping Information</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {orderData.customer ? (
+                        <>
+                          <div>
+                            <p className="font-medium">{orderData.customer.name || "No name provided"}</p>
+                            <p className="text-sm text-gray-600">{orderData.customer.email || "No email provided"}</p>
+                            <p className="text-sm text-gray-600">{orderData.customer.phone || "No phone provided"}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">{orderData.customer.address || "No address provided"}</p>
+                            <p className="text-sm text-gray-600">{orderData.customer.city || "No city"}, {orderData.customer.postalCode || "No postal code"}</p>
+                          </div>
+                          {orderData.customer.notes && (
+                            <div>
+                              <p className="font-medium text-sm">Order Notes:</p>
+                              <p className="text-sm text-gray-600">{orderData.customer.notes}</p>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-sm text-red-600">Customer information is missing.</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>

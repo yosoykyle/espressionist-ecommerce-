@@ -24,7 +24,16 @@ public class AdminOrderController {
     }
 
     @PostMapping("/{id}/archive")
-    public ResponseEntity<OrderDTO> archiveOrder(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.archiveOrder(id));
+    public ResponseEntity<OrderDTO> archiveOrder(@PathVariable Long id, @RequestParam boolean archived) {
+        return ResponseEntity.ok(orderService.archiveOrder(id, archived));
+    }
+
+    // Combined endpoint: update status and archived flag in one transaction
+    @PutMapping("/{id}/status-archive")
+    public ResponseEntity<OrderDTO> updateOrderStatusAndArchive(
+            @PathVariable Long id,
+            @RequestParam String status,
+            @RequestParam boolean archived) {
+        return ResponseEntity.ok(orderService.updateOrderStatusAndArchive(id, status, archived));
     }
 }

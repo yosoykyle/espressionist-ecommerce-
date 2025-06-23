@@ -153,12 +153,33 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO archiveOrder(Long id) {
+    public OrderDTO archiveOrder(Long id, boolean archived) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
-        order.setArchived(true);
-        Order archivedOrder = orderRepository.save(order);
-        return modelMapper.map(archivedOrder, OrderDTO.class);
+        order.setArchived(archived);
+        Order updatedOrder = orderRepository.save(order);
+        return modelMapper.map(updatedOrder, OrderDTO.class);
+    }
+
+    @Override
+    public OrderDTO archiveOrder(Long id) {
+        // For backward compatibility, default to archiving (set archived = true)
+        return archiveOrder(id, true);
+    }
+
+    @Override
+    public OrderDTO updateOrderStatusAndArchive(Long id, String status, boolean archived) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+        try {
+            Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+            order.setStatus(newStatus);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid order status: " + status, e);
+        }
+        order.setArchived(archived);
+        Order updatedOrder = orderRepository.save(order);
+        return modelMapper.map(updatedOrder, OrderDTO.class);
     }
 
     /**

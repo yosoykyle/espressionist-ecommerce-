@@ -289,7 +289,7 @@ export const adminOrderService = {
    * Calls POST /admin/orders/{orderId}/archive
    */
   archiveOrder: async (id: string, archived: boolean): Promise<Order | null> => {
-    const url = `/admin/api/orders/${id}/archive`;
+    const url = `/admin/api/orders/${id}/archive?archived=${archived}`;
     const jwt = getJwt();
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;

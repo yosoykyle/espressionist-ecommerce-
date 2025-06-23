@@ -124,11 +124,15 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }
             <Select
               value={order.status}
               onValueChange={async (value) => {
+                const prevStatus = order.status;
                 onStatusChange(order.id, value as Order["status"]);
+                const { adminOrderService } = await import("@/lib/api-service");
+                // Archive if status is Delivered or Cancelled
                 if (["Delivered", "Cancelled"].includes(value)) {
-                  // Archive order if status is Delivered or Cancelled
-                  const { adminOrderService } = await import("@/lib/api-service");
                   await adminOrderService.archiveOrder(order.id, true);
+                } else if (["Delivered", "Cancelled"].includes(prevStatus) && !["Delivered", "Cancelled"].includes(value)) {
+                  // Unarchive if status changed from archived to active
+                  await adminOrderService.archiveOrder(order.id, false);
                 }
               }}
             >

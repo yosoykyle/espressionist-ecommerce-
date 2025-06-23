@@ -10,4 +10,6 @@ public interface OrderService {
     List<OrderDTO> getAllOrders();
     OrderDTO updateOrderStatus(Long id, String status);
     OrderDTO archiveOrder(Long id);
+    OrderDTO archiveOrder(Long id, boolean archived);
+    OrderDTO updateOrderStatusAndArchive(Long id, String status, boolean archived);
 }
