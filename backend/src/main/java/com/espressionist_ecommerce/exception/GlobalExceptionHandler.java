@@ -1,5 +1,13 @@
 package com.espressionist_ecommerce.exception;
 
+/**
+ * Purpose: Handles global exceptions and validation errors, returning appropriate HTTP responses.
+ * This class uses Spring's @ControllerAdvice to handle exceptions across the whole application
+ * in one global handling component. It intercepts exceptions like MethodArgumentNotValidException
+ * for validation errors, and provides custom responses for optimistic locking failures and generic
+ * runtime exceptions.
+ */
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

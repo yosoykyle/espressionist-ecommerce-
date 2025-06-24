@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/**
+ * Purpose: Data Transfer Object for JWT authentication responses.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

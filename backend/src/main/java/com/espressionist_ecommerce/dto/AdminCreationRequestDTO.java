@@ -1,5 +1,11 @@
 package com.espressionist_ecommerce.dto;
 
+/**
+ * Purpose: Data Transfer Object for admin creation requests from the frontend.
+ * This class is used to receive and validate the data for creating a new admin user.
+ * It includes fields for username, email, role, and password, along with
+ * validation annotations to ensure the data meets the required criteria.
+ */
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,5 +1,7 @@
 package com.espressionist_ecommerce.entity;
 
+// Purpose: Entity class representing an admin user in the database, with fields for authentication and auditing.
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

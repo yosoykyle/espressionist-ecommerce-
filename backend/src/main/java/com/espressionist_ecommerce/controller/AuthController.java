@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.controller;
 
+/**
+ * Purpose: Handles admin authentication API requests such as login and logout.
+ */
+
 import com.espressionist_ecommerce.dto.AdminDTO;
 import com.espressionist_ecommerce.dto.LoginRequestDTO;
 import com.espressionist_ecommerce.dto.JwtResponse;

@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.controller;
 
+/**
+ * Purpose: Handles admin API requests for managing products (CRUD, archiving, restoring).
+ */
+
 import com.espressionist_ecommerce.dto.ProductDTO;
 import com.espressionist_ecommerce.service.ProductService;
 import jakarta.validation.Valid;

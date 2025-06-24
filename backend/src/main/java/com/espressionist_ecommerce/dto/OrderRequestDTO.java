@@ -1,5 +1,7 @@
 package com.espressionist_ecommerce.dto;
 
+// Purpose: Data Transfer Object for order placement requests from the frontend.
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

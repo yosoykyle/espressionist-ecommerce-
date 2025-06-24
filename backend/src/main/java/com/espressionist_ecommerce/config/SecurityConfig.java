@@ -19,6 +19,9 @@ import com.espressionist_ecommerce.security.JwtRequestFilter;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Purpose: Configures Spring Security, authentication, and JWT filter chain for the application.
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

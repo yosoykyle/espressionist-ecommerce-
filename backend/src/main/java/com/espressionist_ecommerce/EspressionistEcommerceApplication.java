@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce;
 
+/**
+ * Purpose: Main entry point for the Spring Boot application, enabling JPA auditing and CORS configuration.
+ */
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;

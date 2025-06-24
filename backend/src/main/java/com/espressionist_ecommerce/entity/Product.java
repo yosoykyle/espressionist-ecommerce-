@@ -1,5 +1,7 @@
 package com.espressionist_ecommerce.entity;
 
+// Purpose: Entity class representing a product in the database, including fields for product details and auditing.
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

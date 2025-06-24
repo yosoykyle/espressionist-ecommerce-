@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.controller;
 
+/**
+ * Purpose: Handles admin API requests for managing and viewing orders.
+ */
+
 import com.espressionist_ecommerce.dto.OrderDTO;
 import com.espressionist_ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;

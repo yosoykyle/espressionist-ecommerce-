@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.dto;
 
+/**
+ * Purpose: Data Transfer Object for password update requests from the frontend.
+ */
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;

@@ -1,5 +1,8 @@
 package com.espressionist_ecommerce.dto;
 
+/**
+ * Purpose: Data Transfer Object for customer information in orders.
+ */
 import lombok.Data;
 
 @Data

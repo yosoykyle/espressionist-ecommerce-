@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.service.impl;
 
+/**
+ * Purpose: Implementation of AuthService, handling authentication logic such as login and retrieving the current admin.
+ */
+
 import com.espressionist_ecommerce.dto.LoginRequestDTO;
 import com.espressionist_ecommerce.dto.JwtResponse;
 import com.espressionist_ecommerce.entity.Admin;

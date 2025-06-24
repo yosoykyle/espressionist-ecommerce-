@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.security;
 
+/**
+ * Purpose: Loads user-specific data for authentication, implementing Spring Security's UserDetailsService for Admins.
+ */
+
 import com.espressionist_ecommerce.entity.Admin;
 import com.espressionist_ecommerce.repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;

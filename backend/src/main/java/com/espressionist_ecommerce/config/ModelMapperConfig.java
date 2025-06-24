@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.config;
 
+/**
+ * Purpose: Configures ModelMapper bean and custom converters for DTO/entity mapping.
+ */
+
 import java.math.BigDecimal;
 
 import org.modelmapper.Converter;

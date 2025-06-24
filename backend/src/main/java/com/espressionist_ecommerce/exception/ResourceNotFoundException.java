@@ -1,5 +1,8 @@
 package com.espressionist_ecommerce.exception;
 
+/**
+ * Purpose: Custom exception thrown when a requested resource is not found in the application.
+ */
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException() {
         super();

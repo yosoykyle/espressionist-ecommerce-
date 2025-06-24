@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Purpose: Repository interface for Order entity, providing CRUD operations and custom queries for orders.
+ */
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByCode(String code);

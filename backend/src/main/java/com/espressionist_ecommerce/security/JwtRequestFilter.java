@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.security;
 
+/**
+ * Purpose: JWT authentication filter for processing and validating JWT tokens in HTTP requests.
+ */
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

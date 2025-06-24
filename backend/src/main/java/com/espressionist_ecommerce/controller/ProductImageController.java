@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.controller;
 
+/**
+ * Purpose: Serves product images from the server's file system to clients.
+ */
+
 import com.espressionist_ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;

@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.service;
 
+/**
+ * Purpose: Service interface for authentication operations such as login, logout, and retrieving the current admin.
+ */
+
 import com.espressionist_ecommerce.dto.AdminDTO;
 import com.espressionist_ecommerce.dto.LoginRequestDTO;
 import com.espressionist_ecommerce.dto.JwtResponse;

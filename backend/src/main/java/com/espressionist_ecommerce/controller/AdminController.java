@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.controller;
 
+/**
+ * Purpose: Handles admin API requests for managing admin users (CRUD, archiving, restoring, password updates).
+ */
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;

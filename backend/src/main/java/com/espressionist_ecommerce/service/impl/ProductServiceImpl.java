@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.service.impl;
 
+/**
+ * Purpose: Implementation of ProductService, managing product CRUD, archiving, and image upload logic.
+ */
+
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;

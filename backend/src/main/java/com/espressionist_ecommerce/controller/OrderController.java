@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.controller;
 
+/**
+ * Purpose: Handles order placement and retrieval API requests for customers.
+ */
+
 import com.espressionist_ecommerce.dto.OrderDTO;
 import com.espressionist_ecommerce.dto.OrderRequestDTO;
 import com.espressionist_ecommerce.service.OrderService;

@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Purpose: Entity class representing an order in the database, including order details, status, and auditing.
+ */
+
 @Entity
 @Table(name = "orders")
 @Data

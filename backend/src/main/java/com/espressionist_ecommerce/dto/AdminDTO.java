@@ -3,6 +3,9 @@ package com.espressionist_ecommerce.dto;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+/**
+ * Purpose: Data Transfer Object for admin user information.
+ */
 @Data
 public class AdminDTO {
     private Long id;

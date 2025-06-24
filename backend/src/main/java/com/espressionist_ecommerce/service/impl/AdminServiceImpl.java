@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.service.impl;
 
+/**
+ * Purpose: Implementation of AdminService, managing admin user CRUD operations and password updates.
+ */
+
 import java.util.List;
 import java.util.stream.Collectors;
 

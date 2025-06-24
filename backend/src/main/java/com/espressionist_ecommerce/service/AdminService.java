@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.service;
 
+/**
+ * Purpose: Service interface for managing admin users, including CRUD and password operations.
+ */
+
 import com.espressionist_ecommerce.dto.AdminDTO;
 import java.util.List;
 

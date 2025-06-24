@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.dto;
 
+/**
+ * Purpose: Data Transfer Object for login requests containing username and password.
+ */
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.controller;
 
+/**
+ * Purpose: Handles public product-related API requests such as listing products.
+ */
+
 import com.espressionist_ecommerce.dto.ProductDTO;
 import com.espressionist_ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;

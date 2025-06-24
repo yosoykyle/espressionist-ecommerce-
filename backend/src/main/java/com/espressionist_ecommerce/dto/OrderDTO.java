@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Purpose: Data Transfer Object for order data exchanged between backend and frontend.
+ */
 @Data
 public class OrderDTO {
     private Long id;

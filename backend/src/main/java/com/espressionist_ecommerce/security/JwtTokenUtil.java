@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.security;
 
+/*
+ Purpose: Utility class for generating, parsing, and validating JWT tokens for authentication.
+*/
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

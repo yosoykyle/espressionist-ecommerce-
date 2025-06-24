@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.controller;
 
+/**
+ * Purpose: Handles admin product image upload requests and delegates to ProductService.
+ */
+
 import com.espressionist_ecommerce.dto.ProductDTO;
 import com.espressionist_ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;

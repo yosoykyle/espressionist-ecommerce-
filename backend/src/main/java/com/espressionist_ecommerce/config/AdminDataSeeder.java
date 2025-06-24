@@ -1,5 +1,7 @@
 package com.espressionist_ecommerce.config;
 
+// Purpose: Seeds the database with initial admin data at application startup.
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

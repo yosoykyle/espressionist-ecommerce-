@@ -1,5 +1,7 @@
 package com.espressionist_ecommerce.dto;
 
+// Purpose: Data Transfer Object for order item details exchanged between backend and frontend.
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

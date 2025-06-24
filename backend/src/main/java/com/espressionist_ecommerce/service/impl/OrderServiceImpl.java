@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.service.impl;
 
+/**
+ * Purpose: Implementation of OrderService, managing order placement, status updates, and archiving logic.
+ */
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;

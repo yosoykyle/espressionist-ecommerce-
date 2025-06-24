@@ -1,5 +1,9 @@
 package com.espressionist_ecommerce.entity;
 
+/**
+ * Purpose: Entity class representing an item within an order, including product reference and quantity.
+ */
+
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
