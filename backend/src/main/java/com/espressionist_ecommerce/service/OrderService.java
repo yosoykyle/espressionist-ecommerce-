@@ -1,13 +1,8 @@
 package com.espressionist_ecommerce.service;
-
-/**
- * Purpose: Service interface for managing orders, including placement, status updates, and archiving.
- */
-
 import com.espressionist_ecommerce.dto.OrderDTO;
 import com.espressionist_ecommerce.dto.OrderRequestDTO;
 import java.util.List;
-
+// Purpose: Service interface for managing orders, including placing, retrieving, updating status, and archiving orders.
 public interface OrderService {
     OrderDTO placeOrder(OrderRequestDTO orderRequestDTO);
     OrderDTO getOrderByCode(String code);

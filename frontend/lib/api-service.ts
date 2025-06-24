@@ -1,14 +1,6 @@
 /**
- * API Service Layer
- *
- * This service layer provides an abstraction for API calls to the backend.
- * Currently using localStorage for data persistence, but designed to be easily
- * refactored to use real API endpoints from a Spring Boot backend.
- *
- * Future Implementation Notes:
- * - Replace localStorage operations with fetch() calls to the corresponding endpoints
- * - Add proper error handling for network requests
- * - Implement authentication for admin endpoints
+ * API Service Module
+ * Provides functions to interact with the backend API for both user-facing and admin functionalities.
  */
 
 import {
@@ -16,6 +8,7 @@ import {
   type Order,
   type Admin,
 } from "./data-store"
+import { fetchWithAuth } from "./fetch-wrapper";
 
 // JWT storage helper
 function getJwt(): string | null {
@@ -190,7 +183,7 @@ export const adminProductService = {
     const jwt = getJwt();
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch("/admin/api/products/all", { headers });
+    const response = await fetchWithAuth("/admin/api/products/all", { headers });
     if (!response.ok) throw new Error(await extractError(response));
     return response.json();
   },
@@ -205,7 +198,7 @@ export const adminProductService = {
     const jwt = getJwt();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch(url, {
+    const response = await fetchWithAuth(url, {
       method,
       headers,
       body: JSON.stringify(product),
@@ -225,7 +218,7 @@ export const adminProductService = {
     formData.append("file", file);
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch("/admin/api/products/upload-image", {
+    const response = await fetchWithAuth("/admin/api/products/upload-image", {
       method: "POST",
       headers,
       body: formData,
@@ -247,7 +240,7 @@ export const adminProductService = {
     const jwt = getJwt();
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch(url, { method: "POST", headers });
+    const response = await fetchWithAuth(url, { method: "POST", headers });
     if (!response.ok) return null;
     return response.json();
   },
@@ -262,7 +255,7 @@ export const adminOrderService = {
     const jwt = getJwt();
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch("/admin/api/orders", { headers });
+    const response = await fetchWithAuth("/admin/api/orders", { headers });
     if (!response.ok) throw new Error(await extractError(response));
     return response.json();
   },
@@ -275,8 +268,7 @@ export const adminOrderService = {
     const jwt = getJwt();
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    // Send status as query param, not in body
-    const response = await fetch(`/admin/api/orders/${id}/status?status=${encodeURIComponent(status)}`, {
+    const response = await fetchWithAuth(`/admin/api/orders/${id}/status?status=${encodeURIComponent(status)}`, {
       method: "PUT",
       headers,
     });
@@ -293,7 +285,7 @@ export const adminOrderService = {
     const jwt = getJwt();
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch(url, { method: "POST", headers });
+    const response = await fetchWithAuth(url, { method: "POST", headers });
     if (!response.ok) throw new Error(await extractError(response));
     return response.json();
   },
@@ -308,7 +300,7 @@ export const adminUserService = {
     const jwt = getJwt();
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch("/admin/api/admins", { headers });
+    const response = await fetchWithAuth("/admin/api/admins", { headers });
     if (!response.ok) throw new Error(await extractError(response));
     return response.json();
   },
@@ -323,7 +315,7 @@ export const adminUserService = {
     const jwt = getJwt();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch(url, {
+    const response = await fetchWithAuth(url, {
       method,
       headers,
       body: JSON.stringify(admin),
@@ -340,7 +332,7 @@ export const adminUserService = {
     const jwt = getJwt();
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch(`/admin/api/admins/${id}/archive`, { method: "POST", headers });
+    const response = await fetchWithAuth(`/admin/api/admins/${id}/archive`, { method: "POST", headers });
     if (!response.ok) throw new Error(await extractError(response));
     return response.json();
   },
@@ -353,7 +345,7 @@ export const adminUserService = {
     const jwt = getJwt();
     const headers: Record<string, string> = {};
     if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
-    const response = await fetch(`/admin/api/admins/${id}/restore`, { method: "POST", headers });
+    const response = await fetchWithAuth(`/admin/api/admins/${id}/restore`, { method: "POST", headers });
     if (!response.ok) throw new Error(await extractError(response));
     return response.json();
   },

@@ -76,13 +76,30 @@ export default function AdminOrdersPage() {
     return matchesSearch && matchesStatus && matchesArchived
   })
   const handleStatusChange = async (orderId: string, newStatus: Order["status"]) => {
-    const updated = await adminOrderService.updateOrderStatus(orderId, newStatus)
-    if (updated) {
-      loadOrders()
-      toast({
-        title: "Order Updated",
-        description: `Order status changed to ${newStatus}.`,
-      })
+    try {
+      const updated = await adminOrderService.updateOrderStatus(orderId, newStatus)
+      if (updated) {
+        loadOrders()
+        toast({
+          title: "Order Updated",
+          description: `Order status changed to ${newStatus}.`,
+        })
+      }
+    } catch (error: any) {
+      if (error?.message?.includes("Record has changed since last read")) {
+        toast({
+          title: "Order Updated Elsewhere",
+          description: "Order was updated by another admin. Reloading latest data...",
+          variant: "destructive",
+        });
+        loadOrders();
+      } else {
+        toast({
+          title: "Error",
+          description: error?.message || "Failed to update order.",
+          variant: "destructive",
+        });
+      }
     }
   }
   const handleArchiveToggle = async (order: Order) => {

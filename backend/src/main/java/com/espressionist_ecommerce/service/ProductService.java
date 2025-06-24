@@ -1,12 +1,7 @@
 package com.espressionist_ecommerce.service;
-
-/**
- * Purpose: Service interface for managing products, including CRUD, archiving, and image upload operations.
- */
-
 import com.espressionist_ecommerce.dto.ProductDTO;
 import java.util.List;
-
+// Purpose: Service interface for managing product operations, including CRUD, archiving, restoring, and image uploads.
 public interface ProductService {
     List<ProductDTO> getAllActiveProducts();
     ProductDTO getProductById(Long id);

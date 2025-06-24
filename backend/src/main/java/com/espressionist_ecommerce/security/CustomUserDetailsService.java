@@ -1,9 +1,4 @@
 package com.espressionist_ecommerce.security;
-
-/**
- * Purpose: Loads user-specific data for authentication, implementing Spring Security's UserDetailsService for Admins.
- */
-
 import com.espressionist_ecommerce.entity.Admin;
 import com.espressionist_ecommerce.repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +10,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.Collections;
 
+/**
+ * Purpose: Loads Admin details for authentication. All admins have the same permissions; role is for identification only.
+ */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
@@ -24,13 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Admin admin = adminRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + username));
-
-        // Dynamically create authority based on the admin's role
-        // Spring Security's hasRole() check implicitly adds "ROLE_" prefix,
-        // so authorities should be stored as "ROLE_ROLENAME".
-        // If admin.getRole().name() is "SUPER_ADMIN", authority string will be "ROLE_SUPER_ADMIN"
-        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + admin.getRole().name());
-
+        // All admins get the same authority for security purposes
+        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_ADMIN");
         return new org.springframework.security.core.userdetails.User(
                 admin.getUsername(),
                 admin.getPassword(),

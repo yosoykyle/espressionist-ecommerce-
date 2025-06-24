@@ -1,22 +1,19 @@
 package com.espressionist_ecommerce.controller;
-
-/**
- * Purpose: Handles admin authentication API requests such as login and logout.
- */
-
 import com.espressionist_ecommerce.dto.AdminDTO;
 import com.espressionist_ecommerce.dto.LoginRequestDTO;
 import com.espressionist_ecommerce.dto.JwtResponse;
 import com.espressionist_ecommerce.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus; // Added this import
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// Purpose: Handles authentication-related API requests such as login, logout, and retrieving the current admin.
 @RestController
-@RequestMapping("/admin") // Base path for admin-related authentication
+@RequestMapping("/admin")
 @RequiredArgsConstructor
+
 public class AuthController {
     private final AuthService authService;
 
@@ -34,8 +31,7 @@ public class AuthController {
         // Even if no token or invalid token, logout can be considered successful on client-side
         return ResponseEntity.ok("Logged out successfully");
     }
-
-    @GetMapping("/me")
+    @GetMapping("/me") // Full path: /admin/me
     public ResponseEntity<AdminDTO> getCurrentAdmin(org.springframework.security.core.Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { LayoutDashboard, Package, ShoppingCart, Users, LogOut, Home, Laptop } from "lucide-react"
 import { useEffect, useState, Suspense } from "react"
 import { authService } from "@/lib/api-service"
+import { useToast } from "@/hooks/use-toast"
 
 const adminNavItems = [
 	{
@@ -34,10 +35,11 @@ const adminNavItems = [
 ]
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-		const pathname = usePathname()
-		const router = useRouter()
-		const [isAuthenticated, setIsAuthenticated] = useState(false)
-	const isLoginPage = pathname === "/admin"
+  const pathname = usePathname()
+  const router = useRouter()
+  const { toast } = useToast()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const isLoginPage = pathname === "/admin"
 
   useEffect(() => {
     // Only run on client side
@@ -47,7 +49,19 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     if (!authService.isLoggedIn() && !isLoginPage) {
       router.push("/admin")
     } else if (!isLoginPage) {
-      setIsAuthenticated(true)
+      // Check for archived admin globally
+      authService.getCurrentAdmin().then((admin) => {
+        if (admin?.archived) {
+          authService.logout();
+          sessionStorage.setItem(
+            "archivedLogoutMsg",
+            "Your account is archived. Contact support at espressionist.ph@gmail.com."
+          );
+          router.push("/admin");
+        } else {
+          setIsAuthenticated(true)
+        }
+      })
     }
   }, [router, isLoginPage])
 

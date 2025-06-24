@@ -1,9 +1,4 @@
 package com.espressionist_ecommerce;
-
-/**
- * Purpose: Main entry point for the Spring Boot application, enabling JPA auditing and CORS configuration.
- */
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +6,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.lang.NonNull;
+
+
+/**
+ * Purpose: Main application class for the Espressionist E-commerce backend.
+ * This class initializes the Spring Boot application and configures CORS settings.
+ * It allows cross-origin requests from specified origins to enable communication with the frontend.
+ */ 
 
 @SpringBootApplication
 @EnableJpaAuditing
@@ -24,6 +26,8 @@ public class EspressionistEcommerceApplication {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
+            // Configures CORS mappings to allow cross-origin requests from specified origins.
+            // This method allows requests from the frontend development server and a specified production URL.
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/api/**")
                     .allowedOrigins(

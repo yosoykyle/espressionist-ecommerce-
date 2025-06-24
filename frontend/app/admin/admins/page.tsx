@@ -43,6 +43,18 @@ export default function AdminAdminsPage() {
       router.push("/admin")
     } else {
       setIsAuthenticated(true)
+      authService.getCurrentAdmin().then((admin) => {
+        setCurrentAdmin(admin)
+        if (admin?.archived) {
+          authService.logout();
+          toast({
+            title: "Account Archived",
+            description: "Your account is archived. Contact support at espressionist.ph@gmail.com.",
+            variant: "destructive",
+          });
+          router.push("/admin");
+        }
+      })
       initializeData()
       loadAdmins()
     }
@@ -257,7 +269,7 @@ export default function AdminAdminsPage() {
                               size="icon"
                               onClick={() => handleArchive(admin)}
                               disabled={currentAdmin?.id === admin.id}
-                              title="Archive admin"
+                              title={currentAdmin?.id === admin.id ? "You cannot archive your own account" : "Archive admin"}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

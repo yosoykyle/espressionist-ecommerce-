@@ -1,27 +1,23 @@
 package com.espressionist_ecommerce.config;
-
-/**
- * Purpose: Configures ModelMapper bean and custom converters for DTO/entity mapping.
- */
-
 import java.math.BigDecimal;
-
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import com.espressionist_ecommerce.dto.AdminCreationRequestDTO;
 import com.espressionist_ecommerce.dto.ProductDTO;
 import com.espressionist_ecommerce.entity.Admin;
 import com.espressionist_ecommerce.entity.Product;
 
 @Configuration
+// Purpose: Configuration class for ModelMapper, defining custom converters for specific DTO to Entity mappings.
+// This class sets up the ModelMapper bean and configures type mappings for Admin and Product entities
 public class ModelMapperConfig {
     @Bean
+    // Purpose: Provides a ModelMapper bean with custom converters for specific DTO to Entity mappings.
+    // This method configures the ModelMapper to handle conversions between DTOs and Entities, such
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
-
         // Admin Role Converter: String (DTO) -> Admin.Role (Entity)
         Converter<String, Admin.Role> roleConverter = context -> {
             String source = context.getSource();
@@ -35,7 +31,6 @@ public class ModelMapperConfig {
         };
         modelMapper.typeMap(AdminCreationRequestDTO.class, Admin.class)
                 .addMappings(mapper -> mapper.using(roleConverter).map(AdminCreationRequestDTO::getRole, Admin::setRole));
-
         // Product Price Converter: Double (DTO) <-> BigDecimal (Entity)
         Converter<Double, BigDecimal> doubleToBigDecimal = ctx -> ctx.getSource() == null ? null : BigDecimal.valueOf(ctx.getSource());
         Converter<BigDecimal, Double> bigDecimalToDouble = ctx -> ctx.getSource() == null ? null : ctx.getSource().doubleValue();
@@ -43,7 +38,6 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> mapper.using(doubleToBigDecimal).map(ProductDTO::getPrice, Product::setPrice));
         modelMapper.typeMap(Product.class, ProductDTO.class)
                 .addMappings(mapper -> mapper.using(bigDecimalToDouble).map(Product::getPrice, ProductDTO::setPrice));
-
         return modelMapper;
     }
 }

@@ -1,31 +1,42 @@
 package com.espressionist_ecommerce.dto;
-
-/**
- * Purpose: Data Transfer Object for admin creation requests from the frontend.
- * This class is used to receive and validate the data for creating a new admin user.
- * It includes fields for username, email, role, and password, along with
- * validation annotations to ensure the data meets the required criteria.
- */
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * Purpose: DTO for creating a new admin user, including validation for required fields.
+ * This class is used to encapsulate the data required to create a new admin user,
+ * ensuring that all necessary fields are provided and validated before processing.
+ */
+
 @Data
 public class AdminCreationRequestDTO {
-
+    /**
+     * Username of the admin user.
+     * Must be between 3 and 50 characters long.
+     */
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     private String username;
-
+    /**
+     * Email address of the admin user.
+     * Must be a valid email format.
+     */
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
-
+    /**
+     * Role of the admin user.
+     * Must be one of the predefined roles.
+     */
     @NotBlank(message = "Role is required")
     // Further validation for specific role values can be done via a custom validator or in the service layer
     private String role;
-
+    /**
+     * Password of the admin user.
+     * Must be between 8 and 100 characters long.
+     */
     @NotBlank(message = "Password is required")
     @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
     // Consider adding @Pattern for complexity if needed, e.g.,

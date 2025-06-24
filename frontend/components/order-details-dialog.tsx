@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { Order } from "@/lib/data-store"
+import { useToast } from "@/hooks/use-toast"
 
 interface OrderDetailsDialogProps {
   order: Order | null
@@ -22,7 +23,40 @@ const statusColors = {
 }
 
 export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }: OrderDetailsDialogProps) {
+  const { toast } = useToast();
   if (!order) return null
+
+  async function handleStatusChangeWithReload(value: string) {
+    if (!order) return;
+    const prevStatus = order.status;
+    try {
+      onStatusChange(order.id, value as Order["status"]);
+      const { adminOrderService } = await import("@/lib/api-service");
+      // Archive if status is Delivered or Cancelled
+      if (["Delivered", "Cancelled"].includes(value)) {
+        await adminOrderService.archiveOrder(order.id, true);
+      } else if (["Delivered", "Cancelled"].includes(prevStatus) && !["Delivered", "Cancelled"].includes(value)) {
+        // Unarchive if status changed from archived to active
+        await adminOrderService.archiveOrder(order.id, false);
+      }
+    } catch (error: any) {
+      if (error?.message?.includes("Record has changed since last read")) {
+        toast({
+          title: "Order Updated Elsewhere",
+          description: "Order was updated by another admin. Reloading latest data...",
+          variant: "destructive",
+        });
+        // Optionally, reload the page or close dialog
+        window.location.reload();
+      } else {
+        toast({
+          title: "Error",
+          description: error?.message || "Failed to update order.",
+          variant: "destructive",
+        });
+      }
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -43,7 +77,9 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }
             </div>
             <div>
               <p className="text-sm text-gray-500">Total Amount</p>
-              <p className="font-semibold text-brand-primary">₱{order.total.toFixed(2)}</p>
+              <p className="font-semibold text-brand-primary">
+                ₱{order.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
             </div>
           </div>
 
@@ -90,10 +126,12 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }
                   <div className="flex-1">
                     <p className="font-medium">{item.name}</p>
                     <p className="text-sm text-gray-500">
-                      ₱{item.price} × {item.quantity}
+                      ₱{item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} × {item.quantity}
                     </p>
                   </div>
-                  <p className="font-semibold">₱{(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-semibold">
+                    ₱{(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
                 </div>
               ))}
             </div>
@@ -104,16 +142,16 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>₱{order.subtotal.toFixed(2)}</span>
+                <span>₱{order.subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between">
                 <span>VAT (12%)</span>
-                <span>₱{order.vat.toFixed(2)}</span>
+                <span>₱{order.vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <hr />
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span className="text-brand-primary">₱{order.total.toFixed(2)}</span>
+                <span className="text-brand-primary">₱{order.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
           </div>
@@ -123,18 +161,7 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }
             <span className="font-medium">Update Status:</span>
             <Select
               value={order.status}
-              onValueChange={async (value) => {
-                const prevStatus = order.status;
-                onStatusChange(order.id, value as Order["status"]);
-                const { adminOrderService } = await import("@/lib/api-service");
-                // Archive if status is Delivered or Cancelled
-                if (["Delivered", "Cancelled"].includes(value)) {
-                  await adminOrderService.archiveOrder(order.id, true);
-                } else if (["Delivered", "Cancelled"].includes(prevStatus) && !["Delivered", "Cancelled"].includes(value)) {
-                  // Unarchive if status changed from archived to active
-                  await adminOrderService.archiveOrder(order.id, false);
-                }
-              }}
+              onValueChange={handleStatusChangeWithReload}
             >
               <SelectTrigger className="w-40">
                 <SelectValue />

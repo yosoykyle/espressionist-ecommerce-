@@ -1,7 +1,5 @@
 package com.espressionist_ecommerce.config;
-
 import static org.springframework.security.config.Customizer.withDefaults;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,27 +12,36 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import com.espressionist_ecommerce.security.JwtRequestFilter;
-
 import lombok.RequiredArgsConstructor;
 
-/**
- * Purpose: Configures Spring Security, authentication, and JWT filter chain for the application.
- */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+
+/**
+ * Purpose: Configures security settings for the application, including JWT authentication, CORS, and endpoint access control.
+ * This class sets up the security filter chain, defines public and protected endpoints, and integrates JWT authentication.
+ */
 public class SecurityConfig {
+    // Injecting JwtRequestFilter and UserDetailsService to handle JWT authentication and user details
     private final JwtRequestFilter jwtRequestFilter;
     private final UserDetailsService userDetailsService;
 
     @Bean
+    /**
+     * Password encoder bean for encoding passwords using BCrypt.
+     * This is used to securely store user passwords in the database.
+     */
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
+    /**
+     * Authentication manager bean for managing authentication processes.
+     * This configures the user details service and password encoder for authentication.
+     */
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
         builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -42,6 +49,10 @@ public class SecurityConfig {
     }
 
     @Bean
+    /**
+     * Security filter chain bean that configures HTTP security settings.
+     * This method sets up CORS, CSRF protection, endpoint access control, and session management.
+     */
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .cors(withDefaults()) // Enable CORS using withDefaults()
@@ -55,16 +66,13 @@ public class SecurityConfig {
                     "/api/order-status/*",
                     "/uploads/**"
                 ).permitAll()
-                
                 // Admin-only endpoints (authenticated)
                 .requestMatchers("/admin/**", "/admin/api/**").authenticated()
-                
                 // All other requests must be authenticated
                 .anyRequest().authenticated() 
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-            
         return http.build();
     }
 }

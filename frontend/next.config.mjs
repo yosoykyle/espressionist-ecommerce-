@@ -16,11 +16,13 @@ const nextConfig = {
       { source: '/uploads/:path*', destination: 'http://localhost:8080/uploads/:path*' },
     ];
   },
+  // IMPORTANT: If you connect to another network and your IP changes,
+  // update the IPs below to match your new local IP (find it with `ipconfig` or `ifconfig`).
   allowedDevOrigins: [
     'http://localhost:3000',
-    'http://192.168.1.25:3000', //change to your local IP if run needed npm run dev -- --hostname=0.0.0.0
+    'http://192.168.1.7:3000', // <-- Change this to your new IP if it changes
     'https://localhost:3000',
-    'https://192.168.1.25:3000',
+    'https://192.168.1.7:3000', // <-- Change this to your new IP if it changes
   ],
 }
 
