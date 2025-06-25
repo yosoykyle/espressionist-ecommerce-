@@ -18,4 +18,5 @@ public class AdminDTO {
     private LocalDateTime lastLogin;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String password; // Added for password update support
 }

@@ -62,8 +62,12 @@ public class AdminServiceImpl implements AdminService {
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
         admin.setUsername(adminDTO.getUsername());
         admin.setEmail(adminDTO.getEmail());
+        // Update password if provided and not empty
+        if (adminDTO.getPassword() != null && !adminDTO.getPassword().isEmpty()) {
+            admin.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
+        }
         try {
-            admin.setRole(Admin.Role.valueOf(adminDTO.getRole().toUpperCase()));
+            admin.setRole(Admin.Role.valueOf(adminDTO.getRole().replace(" ", "_").toUpperCase()));
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid role: " + adminDTO.getRole(), e);
         }
