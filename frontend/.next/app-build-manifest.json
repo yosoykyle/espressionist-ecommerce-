@@ -16,6 +16,16 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(customer)/page.js"
     ],
+    "/(customer)/products/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(customer)/products/loading.js"
+    ],
+    "/(customer)/products/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(customer)/products/page.js"
+    ],
     "/admin/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -36,21 +46,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/dashboard/page.js"
     ],
-    "/(customer)/cart/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(customer)/cart/page.js"
-    ],
-    "/(customer)/products/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(customer)/products/loading.js"
-    ],
-    "/(customer)/products/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(customer)/products/page.js"
-    ],
     "/admin/orders/loading": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -61,35 +56,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/orders/page.js"
     ],
-    "/admin/products/loading": [
+    "/(customer)/cart/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/products/loading.js"
+      "static/chunks/app/(customer)/cart/page.js"
     ],
-    "/admin/products/page": [
+    "/(customer)/checkout/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/products/page.js"
+      "static/chunks/app/(customer)/checkout/page.js"
     ],
-    "/admin/admins/loading": [
+    "/(customer)/order-success/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/admins/loading.js"
-    ],
-    "/admin/admins/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/admins/page.js"
-    ],
-    "/(customer)/order-status/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(customer)/order-status/loading.js"
-    ],
-    "/(customer)/order-status/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(customer)/order-status/page.js"
+      "static/chunks/app/(customer)/order-success/page.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",

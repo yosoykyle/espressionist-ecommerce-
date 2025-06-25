@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.espressionist_ecommerce.dto.CustomerDTO;
@@ -16,6 +17,7 @@ import com.espressionist_ecommerce.entity.Product;
 import com.espressionist_ecommerce.exception.ResourceNotFoundException;
 import com.espressionist_ecommerce.repository.OrderRepository;
 import com.espressionist_ecommerce.repository.ProductRepository;
+import com.espressionist_ecommerce.service.EmailService;
 import com.espressionist_ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +32,65 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
+    @Autowired
+    private EmailService emailService;
+
+    private void sendStatusEmail(Order order, Order.OrderStatus status) {
+        String subject;
+        StringBuilder emailText = new StringBuilder();
+        switch (status) {
+            case PENDING:
+                subject = "Order Placed - " + order.getCode();
+                emailText.append("Your order has been placed and is now pending.\n\n");
+                break;
+            case PROCESSING:
+                subject = "Order Processing - " + order.getCode();
+                emailText.append("Your order is now being processed.\n\n");
+                break;
+            case SHIPPED:
+                subject = "Order Shipped - " + order.getCode();
+                emailText.append("Your order has been shipped!\n\n");
+                break;
+            case DELIVERED:
+                subject = "Order Delivered - " + order.getCode();
+                emailText.append("Good news! Your order has been delivered.\n\n");
+                break;
+            case CANCELLED:
+                subject = "Order Cancelled - " + order.getCode();
+                emailText.append("Your order has been cancelled.\n\n");
+                break;
+            default:
+                subject = "Order Update - " + order.getCode();
+                emailText.append("Your order status has been updated.\n\n");
+        }
+        emailText.append("Order Code: ").append(order.getCode()).append("\n");
+        emailText.append("Order Date: ").append(order.getDate()).append("\n\n");
+        if (status == Order.OrderStatus.PENDING) {
+            emailText.append("Items:\n");
+            for (OrderItem item : order.getItems()) {
+                emailText.append("- ")
+                    .append(item.getName())
+                    .append(" (₱")
+                    .append(item.getPrice())
+                    .append(" x ")
+                    .append(item.getQuantity())
+                    .append(")\n");
+            }
+            emailText.append("\nSubtotal: ₱").append(order.getSubtotal());
+            emailText.append("\nVAT (12%): ₱").append(order.getVat());
+            emailText.append("\nTotal: ₱").append(order.getTotal());
+            emailText.append("\n\nShipping to: ")
+                .append(order.getCustomerName()).append(", ")
+                .append(order.getCustomerAddress()).append(", ")
+                .append(order.getCustomerCity()).append(", ")
+                .append(order.getCustomerPostalCode());
+            if (order.getCustomerNotes() != null && !order.getCustomerNotes().isEmpty()) {
+                emailText.append("\nNotes: ").append(order.getCustomerNotes());
+            }
+        }
+        emailText.append("\n\nThank you for shopping with us!\n");
+        emailService.sendOrderConfirmation(order.getCustomerEmail(), subject, emailText.toString());
+    }
 
     @Override
     public OrderDTO placeOrder(OrderRequestDTO orderRequestDTO) {
@@ -90,6 +151,7 @@ public class OrderServiceImpl implements OrderService {
         order.setTotal(total.setScale(2, RoundingMode.HALF_UP));   
         // Set archived status to false by default
         Order savedOrder = orderRepository.save(order);
+        sendStatusEmail(order, Order.OrderStatus.PENDING);
         return modelMapper.map(savedOrder, OrderDTO.class);
     }
     @Override
@@ -140,8 +202,8 @@ public class OrderServiceImpl implements OrderService {
         // Only allow valid status transitions
         try {
             Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
-            // Optionally: Add logic to restrict invalid transitions (e.g., can't go from DELIVERED to PROCESSING)
             order.setStatus(newStatus);
+            sendStatusEmail(order, newStatus);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid order status: " + status, e);
         }
