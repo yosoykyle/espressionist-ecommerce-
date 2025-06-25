@@ -10,7 +10,10 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "espressionist - coffee. canvas. culture.",
   description: "Modern café experience combining coffee, art, and culture in Santa Rosa, Philippines",
-  generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/espressionist.png', // Use your logo file here
+  },
 }
 
 export default function RootLayout({

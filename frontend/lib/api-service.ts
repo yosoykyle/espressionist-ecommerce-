@@ -84,6 +84,14 @@ export const orderService = {
     });
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) throw new Error("Unauthorized");
+      if (response.status === 409) {
+        // Custom error for stock conflict
+        const msg = await extractError(response);
+        const error = new Error(msg || "Stock conflict");
+        // @ts-ignore
+        error.isStockConflict = true;
+        throw error;
+      }
       throw new Error(await extractError(response));
     }
     return response.json();

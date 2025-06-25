@@ -138,13 +138,21 @@ export default function CheckoutPage() {
         console.log("Navigating to success page") // Debug log
         router.push("/order-success")
       }, 200)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error placing order:", error)
-      toast({
-        title: "Order Failed",
-        description: "There was an error processing your order. Please try again.",
-        variant: "destructive",
-      })
+      if (error?.isStockConflict || (typeof error?.message === "string" && error.message.includes("conflict"))) {
+        toast({
+          title: "Stock Conflict",
+          description: "The item stock changed while you were checking out. Please review your cart and try again.",
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Order Failed",
+          description: "There was an error processing your order. Please try again.",
+          variant: "destructive",
+        })
+      }
     } finally {
       setIsLoading(false)
     }
