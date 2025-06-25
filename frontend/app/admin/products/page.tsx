@@ -107,12 +107,15 @@ export default function AdminProductsPage() {
             <Button
               variant="outline"
               onClick={() => setShowArchived(!showArchived)}
-              className="flex-1 sm:flex-none"
             >
               {showArchived ? (
-                <><Eye className="h-4 w-4 mr-2" /> Show Active</>
+                <>
+                  <Eye className="h-4 w-4 mr-2" /> Show Active
+                </>
               ) : (
-                <><EyeOff className="h-4 w-4 mr-2" /> Show Archived</>
+                <>
+                  <EyeOff className="h-4 w-4 mr-2" /> Show Archived
+                </>
               )}
             </Button>
             <Button 

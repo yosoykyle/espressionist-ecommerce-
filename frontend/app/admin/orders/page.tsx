@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { Search, Eye } from "lucide-react"
+import { Search, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -80,6 +80,10 @@ export default function AdminOrdersPage() {
       const updated = await adminOrderService.updateOrderStatus(orderId, newStatus)
       if (updated) {
         loadOrders()
+        // Reset statusFilter if moving from Cancelled/Delivered to active
+        if (newStatus !== "Cancelled" && newStatus !== "Delivered") {
+          setStatusFilter("All")
+        }
         toast({
           title: "Order Updated",
           description: `Order status changed to ${newStatus}.`,
@@ -132,7 +136,15 @@ export default function AdminOrdersPage() {
             variant="outline"
             onClick={() => setShowArchived(!showArchived)}
           >
-            {showArchived ? "Show Active Orders" : "Show Archived Orders"}
+            {showArchived ? (
+              <>
+                <Eye className="h-4 w-4 mr-2" /> Show Active Orders
+              </>
+            ) : (
+              <>
+                <EyeOff className="h-4 w-4 mr-2" /> Show Archived Orders
+              </>
+            )}
           </Button>
         </div>
 

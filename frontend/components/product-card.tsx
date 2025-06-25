@@ -29,7 +29,7 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
       onClick={handleClick}
     >
       {/* Image Section - Reduced height for compactness */}
-      <div className="relative w-full h-36 min-[375px]:h-40 sm:h-48 bg-gray-100 rounded-t-2xl overflow-hidden">
+      <div className="relative aspect-square w-full bg-gray-100 rounded-t-2xl overflow-hidden">
         <Image
           src={
             product.image && !product.image.startsWith("http") && !product.image.startsWith("/placeholder")
@@ -38,7 +38,7 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
           }
           alt={product.name}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105 rounded-t-2xl"
+          className="object-contain transition-transform duration-300" // Removed p-2 for full image display
           sizes="(min-width: 375px) 50vw, (min-width: 640px) 33vw, (min-width: 1024px) 25vw, 20vw"
           priority
         />
@@ -50,7 +50,6 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
           </div>
         )}
       </div>
-
       {/* Content Section - Reduced padding and gaps */}
       <CardContent className="flex-1 flex flex-col gap-2 min-[375px]:gap-3 p-3 min-[375px]:p-4">
         <div className="flex items-start justify-between">

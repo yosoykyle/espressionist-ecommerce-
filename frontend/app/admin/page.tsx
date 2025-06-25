@@ -11,8 +11,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { authService } from "@/lib/api-service"
+import useIsMobile from "@/hooks/use-mobile"
 
 export default function AdminLoginPage() {
+  const isMobile = useIsMobile();
   const [credentials, setCredentials] = useState({ username: "", password: "" })
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -90,6 +92,17 @@ export default function AdminLoginPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (isMobile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full text-center space-y-6">
+          <h2 className="text-2xl font-bold text-brand-primary">Admin Portal</h2>
+          <p className="text-lg text-gray-700">Admin login is not available on mobile devices.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

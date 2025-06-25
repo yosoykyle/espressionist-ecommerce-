@@ -10,6 +10,7 @@ import { productService } from "@/lib/api-service"
 import type { Product } from "@/lib/data-store"
 import { ProductCard } from "@/components/product-card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { ProductDetailsDialog } from "@/components/product-details-dialog"
 
 const categories = ["All", "Coffee & Tea", "Art & Merch", "Gift Set", "Gear"]
 
@@ -81,6 +82,13 @@ export default function ProductsPage() {
 
   return (
     <div className="container max-w-[1600px] mx-auto px-4 space-y-6">
+      {/* Product Details Dialog */}
+      <ProductDetailsDialog
+        product={selectedProduct}
+        open={!!selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onAddToCart={handleAddToCart}
+      />
       {/* Header - More compact on mobile */}
       <div className="text-center space-y-2 pt-4 sm:pt-6 lg:pt-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Our Products</h1>
