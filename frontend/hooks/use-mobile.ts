@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from "react";
 
-export default function useIsMobile() {
+export function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      const widthIsMobile = window.innerWidth < 768;
+      const ua = navigator.userAgent || navigator.vendor;
+      const userAgentIsMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(ua);
+      setIsMobile(widthIsMobile || userAgentIsMobile);
     };
 
     // Initial check
