@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
         console.log("Login successful, admin:", admin) // Debug log
         if (admin && admin.archived) {
           // If archived, show banner, log out, and do not show welcome toast
-          setArchivedMsg("Your account is archived. Contact support at espressionist.ph@gmail.com.")
+          setArchivedMsg("Your account is archived. Contact support at vanceddotseti@gmail.com.")
           authService.logout()
           return
         }
@@ -109,10 +109,10 @@ export default function AdminLoginPage() {
             <CardContent>
               {archivedMsg && (
                 <div className="mb-4 p-3 rounded bg-red-100 text-red-800 border border-red-300 text-center font-medium">
-                  {archivedMsg.includes('espressionist.ph@gmail.com') ? (
+                  {archivedMsg.includes('vanceddotseti@gmail.com') ? (
                     <>
                       Your account is archived. Contact support at{' '}
-                      <a href="mailto:espressionist.ph@gmail.com" className="underline text-red-700 hover:text-red-900">espressionist.ph@gmail.com</a>.
+                      <a href="mailto:vanceddotseti@gmail.com" className="underline text-red-700 hover:text-red-900">vanceddotseti@gmail.com</a>.
                     </>
                   ) : (
                     archivedMsg

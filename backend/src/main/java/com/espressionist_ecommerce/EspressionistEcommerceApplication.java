@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.lang.NonNull;
+import org.springframework.beans.factory.annotation.Value;
+import jakarta.annotation.PostConstruct;
 
 
 /**
@@ -17,6 +19,13 @@ import org.springframework.lang.NonNull;
 @SpringBootApplication
 @EnableJpaAuditing
 public class EspressionistEcommerceApplication {
+    @Value("${spring.mail.username}")
+    private String mailUsername;
+
+    @PostConstruct
+    public void logMailUsername() {
+        System.out.println("Spring Mail Username at startup: " + mailUsername);
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(EspressionistEcommerceApplication.class, args);
@@ -25,6 +34,7 @@ public class EspressionistEcommerceApplication {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
+            
             @Override
             // Configures CORS mappings to allow cross-origin requests from specified origins.
             // This method allows requests from the frontend development server and a specified production URL.

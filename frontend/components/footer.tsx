@@ -69,8 +69,8 @@ export function Footer() {
               <p>109 Rizal Blvd</p>
               <p>Santa Rosa, Philippines</p>
               <p>0995 965 9332</p>
-              <a href="mailto:espressionist.ph@gmail.com" className="hover:text-brand-primary transition-colors">
-                espressionist.ph@gmail.com
+              <a href="mailto:vanceddotseti@gmail.com" className="hover:text-brand-primary transition-colors">
+                vanceddotseti@gmail.com
               </a>
             </div>
           </div>

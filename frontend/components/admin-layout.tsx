@@ -67,7 +67,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           authService.logout();
           sessionStorage.setItem(
             "archivedLogoutMsg",
-            "Your account is archived. Contact support at espressionist.ph@gmail.com."
+            "Your account is archived. Contact support at vanceddotseti@gmail.com."
           );
           router.push("/admin");
         } else {

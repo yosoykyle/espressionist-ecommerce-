@@ -49,7 +49,7 @@ export default function AdminAdminsPage() {
           authService.logout();
           toast({
             title: "Account Archived",
-            description: "Your account is archived. Contact support at espressionist.ph@gmail.com.",
+            description: "Your account is archived. Contact support at vanceddotseti@gmail.com.",
             variant: "destructive",
           });
           router.push("/admin");

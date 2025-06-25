@@ -303,7 +303,7 @@ export default function CheckoutPage() {
                       Processing Order...
                     </>
                   ) : (
-                    `Place Order - ₱${totalWithVat.toFixed(2)}`
+                    `Place Order - ₱${totalWithVat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                   )}
                 </Button>
               </form>
@@ -340,7 +340,7 @@ export default function CheckoutPage() {
                         <p className="text-sm font-medium truncate">{item.name}</p>
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
-                      <p className="text-sm font-semibold">₱{(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm font-semibold">₱{(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   );
                 })}
@@ -352,19 +352,19 @@ export default function CheckoutPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>₱{total.toFixed(2)}</span>
+                  <span>₱{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
 
                 <div className="flex justify-between">
                   <span>VAT (12%)</span>
-                  <span>₱{vat.toFixed(2)}</span>
+                  <span>₱{vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
 
                 <hr />
 
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span className="text-brand-primary">₱{totalWithVat.toFixed(2)}</span>
+                  <span className="text-brand-primary">₱{totalWithVat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               </div>
             </CardContent>

@@ -142,7 +142,7 @@ export default function CartPage() {
                       />
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1">{item.name}</h3>
-                        <p className="text-brand-primary font-semibold">₱{item.price}</p>
+                        <p className="text-brand-primary font-semibold">₱{item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         <p className="text-sm text-gray-500">Available: {maxQuantity}</p>
                         {!isAvailable && (
                           <p className="text-sm text-red-600 font-medium">
@@ -186,7 +186,7 @@ export default function CartPage() {
                         </Button>
                       </div>
                       <div>
-                        <p className="text-lg font-semibold text-brand-primary">₱{(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-lg font-semibold text-brand-primary">₱{(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                   </div>
@@ -203,7 +203,7 @@ export default function CartPage() {
 
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-semibold text-gray-900 truncate">{item.name}</h3>
-                      <p className="text-brand-primary font-semibold">₱{item.price}</p>
+                      <p className="text-brand-primary font-semibold">₱{item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                       <p className="text-sm text-gray-500">Available: {maxQuantity}</p>
                       {!isAvailable && (
                         <p className="text-sm text-red-600 font-medium">
@@ -247,7 +247,7 @@ export default function CartPage() {
                     </Button>
 
                     <div className="text-right min-w-[80px]">
-                      <p className="text-lg font-semibold">₱{(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-lg font-semibold">₱{(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -265,7 +265,7 @@ export default function CartPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>₱{total.toFixed(2)}</span>
+                <span>₱{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
 
               <div className="flex justify-between text-sm text-gray-600">
@@ -277,7 +277,7 @@ export default function CartPage() {
 
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span className="text-brand-primary">₱{total.toFixed(2)}</span>
+                <span className="text-brand-primary">₱{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
 
               <Button

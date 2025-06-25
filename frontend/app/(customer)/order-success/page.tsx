@@ -114,10 +114,10 @@ export default function OrderSuccessPage() {
                       <div className="flex-1">
                         <p className="font-medium">{item?.name || "Unnamed Product"}</p>
                         <p className="text-sm text-gray-500">
-                          ₱{item?.price ?? 0} × {item?.quantity ?? 0}
+                          ₱{(item?.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} × {item?.quantity ?? 0}
                         </p>
                       </div>
-                      <p className="font-semibold">₱{((item?.price ?? 0) * (item?.quantity ?? 0)).toFixed(2)}</p>
+                      <p className="font-semibold">₱{((item?.price ?? 0) * (item?.quantity ?? 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   ))
                 ) : (
@@ -129,15 +129,15 @@ export default function OrderSuccessPage() {
                 <div className="space-y-1">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>₱{orderData.subtotal.toFixed(2)}</span>
+                    <span>₱{orderData.subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>VAT (12%)</span>
-                    <span>₱{orderData.vat.toFixed(2)}</span>
+                    <span>₱{orderData.vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between font-semibold text-lg">
                     <span>Total</span>
-                    <span className="text-brand-primary">₱{orderData.total.toFixed(2)}</span>
+                    <span className="text-brand-primary">₱{orderData.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 </div>
               </div>

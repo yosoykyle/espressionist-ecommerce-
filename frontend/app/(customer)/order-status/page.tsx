@@ -123,7 +123,7 @@ export default function OrderStatusPage() {
                 return (
                   <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-4 mb-4 flex items-center gap-3 text-sm text-yellow-900">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
-                    <span>Your order is pending. To request a cancellation, please email us at <a href="mailto:espressionist.ph@gmail.com" className="underline ml-1 text-yellow-900 hover:text-brand-primary">espressionist.ph@gmail.com</a>. We'll assist you as soon as possible.</span>
+                    <span>Your order is pending. To request a cancellation, please email us at <a href="mailto:vanceddotseti@gmail.com" className="underline ml-1 text-yellow-900 hover:text-brand-primary">vanceddotseti@gmail.com</a>. We'll assist you as soon as possible.</span>
                   </div>
                 );
               } else if (status === "processing") {
@@ -151,7 +151,7 @@ export default function OrderStatusPage() {
                 return (
                   <div className="rounded-lg bg-red-50 border border-red-200 p-4 mb-4 flex items-center gap-3 text-sm text-red-900">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
-                    <span>Your order has been cancelled. If you have any questions, feel free to contact us at <a href="mailto:espressionist.ph@gmail.com" className="underline ml-1 text-red-900 hover:text-brand-primary">espressionist.ph@gmail.com</a>.</span>
+                    <span>Your order has been cancelled. If you have any questions, feel free to contact us at <a href="mailto:vanceddotseti@gmail.com" className="underline ml-1 text-red-900 hover:text-brand-primary">vanceddotseti@gmail.com</a>.</span>
                   </div>
                 );
               } else {
@@ -209,10 +209,10 @@ export default function OrderStatusPage() {
                             <div className="flex-1">
                               <p className="font-medium">{item?.name || "Unnamed Product"}</p>
                               <p className="text-sm text-gray-500">
-                                ₱{item?.price ?? 0} × {item?.quantity ?? 0}
+                                ₱{item?.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 0} × {item?.quantity ?? 0}
                               </p>
                             </div>
-                            <p className="font-semibold">₱{((item?.price ?? 0) * (item?.quantity ?? 0)).toFixed(2)}</p>
+                            <p className="font-semibold">₱{((item?.price ?? 0) * (item?.quantity ?? 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                           </div>
                         ))
                       ) : (

@@ -1,8 +1,9 @@
 package com.espressionist_ecommerce.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import com.espressionist_ecommerce.repository.ProductRepository;
 import com.espressionist_ecommerce.service.EmailService;
 import com.espressionist_ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
 
 /**
  * Purpose: Implementation of OrderService, handling order placement, retrieval, status updates, and archiving.
@@ -34,6 +36,19 @@ public class OrderServiceImpl implements OrderService {
     private final ModelMapper modelMapper;
     @Autowired
     private EmailService emailService;
+
+    private String formatCurrency(BigDecimal amount) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+        formatter.setMinimumFractionDigits(2);
+        formatter.setMaximumFractionDigits(2);
+        // Remove currency symbol, add Peso sign manually for consistency
+        String formatted = formatter.format(amount);
+        if (formatted.startsWith("₱")) {
+            return formatted;
+        } else {
+            return "₱" + formatted.replaceAll("[^0-9.,]", "");
+        }
+    }
 
     private void sendStatusEmail(Order order, Order.OrderStatus status) {
         String subject;
@@ -65,28 +80,27 @@ public class OrderServiceImpl implements OrderService {
         }
         emailText.append("Order Code: ").append(order.getCode()).append("\n");
         emailText.append("Order Date: ").append(order.getDate()).append("\n\n");
-        if (status == Order.OrderStatus.PENDING) {
-            emailText.append("Items:\n");
-            for (OrderItem item : order.getItems()) {
-                emailText.append("- ")
-                    .append(item.getName())
-                    .append(" (₱")
-                    .append(item.getPrice())
-                    .append(" x ")
-                    .append(item.getQuantity())
-                    .append(")\n");
-            }
-            emailText.append("\nSubtotal: ₱").append(order.getSubtotal());
-            emailText.append("\nVAT (12%): ₱").append(order.getVat());
-            emailText.append("\nTotal: ₱").append(order.getTotal());
-            emailText.append("\n\nShipping to: ")
-                .append(order.getCustomerName()).append(", ")
-                .append(order.getCustomerAddress()).append(", ")
-                .append(order.getCustomerCity()).append(", ")
-                .append(order.getCustomerPostalCode());
-            if (order.getCustomerNotes() != null && !order.getCustomerNotes().isEmpty()) {
-                emailText.append("\nNotes: ").append(order.getCustomerNotes());
-            }
+        // Always include items in the email
+        emailText.append("Items:\n");
+        for (OrderItem item : order.getItems()) {
+            emailText.append("- ")
+                .append(item.getName())
+                .append(" (")
+                .append(formatCurrency(item.getPrice()))
+                .append(" x ")
+                .append(item.getQuantity())
+                .append(")\n");
+        }
+        emailText.append("\nSubtotal: ").append(formatCurrency(order.getSubtotal()));
+        emailText.append("\nVAT (12%): ").append(formatCurrency(order.getVat()));
+        emailText.append("\nTotal: ").append(formatCurrency(order.getTotal()));
+        emailText.append("\n\nShipping to: ")
+            .append(order.getCustomerName()).append(", ")
+            .append(order.getCustomerAddress()).append(", ")
+            .append(order.getCustomerCity()).append(", ")
+            .append(order.getCustomerPostalCode());
+        if (order.getCustomerNotes() != null && !order.getCustomerNotes().isEmpty()) {
+            emailText.append("\nNotes: ").append(order.getCustomerNotes());
         }
         emailText.append("\n\nThank you for shopping with us!\n");
         emailService.sendOrderConfirmation(order.getCustomerEmail(), subject, emailText.toString());
@@ -151,7 +165,8 @@ public class OrderServiceImpl implements OrderService {
         order.setTotal(total.setScale(2, RoundingMode.HALF_UP));   
         // Set archived status to false by default
         Order savedOrder = orderRepository.save(order);
-        sendStatusEmail(order, Order.OrderStatus.PENDING);
+        // Send confirmation email only after saving, and use the savedOrder object
+        sendStatusEmail(savedOrder, Order.OrderStatus.PENDING);
         return modelMapper.map(savedOrder, OrderDTO.class);
     }
     @Override
@@ -203,7 +218,10 @@ public class OrderServiceImpl implements OrderService {
         try {
             Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
             order.setStatus(newStatus);
-            sendStatusEmail(order, newStatus);
+            // Only send status email if not resetting to PENDING (to avoid duplicate confirmation emails)
+            if (newStatus != Order.OrderStatus.PENDING) {
+                sendStatusEmail(order, newStatus);
+            }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid order status: " + status, e);
         }

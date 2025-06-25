@@ -101,7 +101,7 @@ export default function HomePage() {
               <div>
                 <h3 className="text-xl font-semibold mb-2">Contact</h3>
                 <p className="text-gray-600">Phone: 0995 965 9332</p>
-                <p className="text-gray-600">Email: espressionist.ph@gmail.com</p>
+                <p className="text-gray-600">Email: vanceddotseti@gmail.com</p>
               </div>
 
               <div>
