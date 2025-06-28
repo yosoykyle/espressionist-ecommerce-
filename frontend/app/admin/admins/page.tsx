@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Search, Plus, Edit, Trash2, ArchiveRestore } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AdminLayout } from "@/components/admin-layout"
 import { useToast } from "@/hooks/use-toast"
@@ -243,7 +243,10 @@ export default function AdminAdminsPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
-                        <Badge variant={admin.archived ? "destructive" : "outline"}>
+                        <Badge
+                          variant={admin.archived ? "destructive" : "outline"}
+                          className={currentAdmin && admin.id === currentAdmin.id && !admin.archived ? "bg-green-500 text-white" : ""}
+                        >
                           {admin.archived ? "Archived" : "Active"}
                         </Badge>
                       </TableCell>
