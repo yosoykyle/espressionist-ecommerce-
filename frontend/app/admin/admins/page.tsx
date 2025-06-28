@@ -45,15 +45,6 @@ export default function AdminAdminsPage() {
       setIsAuthenticated(true)
       authService.getCurrentAdmin().then((admin) => {
         setCurrentAdmin(admin)
-        if (admin?.archived) {
-          authService.logout();
-          toast({
-            title: "Account Archived",
-            description: "Your account is archived. Contact support at vanceddotseti@gmail.com.",
-            variant: "destructive",
-          });
-          router.push("/admin");
-        }
       })
       initializeData()
       loadAdmins()
@@ -140,6 +131,9 @@ export default function AdminAdminsPage() {
     }
   }
 
+  // RBAC helpers
+  const canManageAdmins = currentAdmin && (currentAdmin.role === "SUPER_ADMIN" || currentAdmin.role === "Super Admin")
+
   if (!isAuthenticated) {
     return <div>Loading...</div>
   }
@@ -158,12 +152,24 @@ export default function AdminAdminsPage() {
               variant="outline"
               onClick={() => setShowArchived(!showArchived)}
               className="flex-1 sm:flex-none"
+              disabled={!canManageAdmins}
             >
               {showArchived ? "Show Active" : "Show Archived"}
             </Button>
             <Button 
-              onClick={handleCreate}
+              onClick={() => {
+                if (!canManageAdmins) {
+                  toast({
+                    title: "Permission Denied",
+                    description: "You do not have permission to add admins.",
+                    variant: "destructive",
+                  })
+                  return
+                }
+                handleCreate()
+              }}
               className="flex-1 sm:flex-none bg-brand-primary hover:bg-brand-primary/90"
+              disabled={!canManageAdmins}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Admin
@@ -249,8 +255,19 @@ export default function AdminAdminsPage() {
                           <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => handleEdit(admin)}
+                            onClick={() => {
+                              if (!canManageAdmins) {
+                                toast({
+                                  title: "Permission Denied",
+                                  description: "You do not have permission to edit admins.",
+                                  variant: "destructive",
+                                })
+                                return
+                              }
+                              handleEdit(admin)
+                            }}
                             title="Edit admin"
+                            disabled={!canManageAdmins}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -258,8 +275,19 @@ export default function AdminAdminsPage() {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() => handleRestore(admin)}
+                              onClick={() => {
+                                if (!canManageAdmins) {
+                                  toast({
+                                    title: "Permission Denied",
+                                    description: "You do not have permission to restore admins.",
+                                    variant: "destructive",
+                                  })
+                                  return
+                                }
+                                handleRestore(admin)
+                              }}
                               title="Restore admin"
+                              disabled={!canManageAdmins}
                             >
                               <ArchiveRestore className="h-4 w-4" />
                             </Button>
@@ -267,8 +295,18 @@ export default function AdminAdminsPage() {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() => handleArchive(admin)}
-                              disabled={currentAdmin?.id === admin.id}
+                              onClick={() => {
+                                if (!canManageAdmins) {
+                                  toast({
+                                    title: "Permission Denied",
+                                    description: "You do not have permission to archive admins.",
+                                    variant: "destructive",
+                                  })
+                                  return
+                                }
+                                handleArchive(admin)
+                              }}
+                              disabled={!canManageAdmins || (currentAdmin?.id === admin.id)}
                               title={currentAdmin?.id === admin.id ? "You cannot archive your own account" : "Archive admin"}
                             >
                               <Trash2 className="h-4 w-4" />

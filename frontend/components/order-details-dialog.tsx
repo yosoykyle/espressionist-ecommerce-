@@ -12,6 +12,8 @@ interface OrderDetailsDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onStatusChange: (orderId: string, status: Order["status"]) => void
+  canUpdateOrder?: boolean
+  showToast?: (msg: string, variant?: "default" | "destructive") => void
 }
 
 const statusColors = {
@@ -22,11 +24,15 @@ const statusColors = {
   Cancelled: "bg-red-100 text-red-800",
 }
 
-export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }: OrderDetailsDialogProps) {
+export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange, canUpdateOrder = true, showToast }: OrderDetailsDialogProps) {
   const { toast } = useToast();
   if (!order) return null
 
   async function handleStatusChangeWithReload(value: string) {
+    if (!canUpdateOrder) {
+      if (showToast) showToast("You do not have permission to update order status.");
+      return;
+    }
     if (!order) return;
     try {
       const { adminOrderService } = await import("@/lib/api-service");
@@ -164,6 +170,7 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange }
               <Select
                 value={order.status}
                 onValueChange={handleStatusChangeWithReload}
+                disabled={!canUpdateOrder}
               >
                 <SelectTrigger className="w-40">
                   <SelectValue />

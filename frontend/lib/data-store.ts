@@ -46,7 +46,8 @@ export interface Admin {
   id: string
   username: string
   email: string
-  role: "Super Admin" | "Manager" | "Staff"
+  // Accept both DB and legacy role values for compatibility
+  role: "Super Admin" | "Manager" | "Staff" | "SUPER_ADMIN" | "MANAGER" | "STAFF"
   password?: string
   archived?: boolean
   lastLogin?: string

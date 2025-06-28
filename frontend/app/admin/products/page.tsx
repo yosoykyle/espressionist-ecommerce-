@@ -1,5 +1,8 @@
 "use client"
 
+import { authService } from "@/lib/api-service"
+import { adminProductService } from "@/lib/api-service"
+import type { Admin } from "@/lib/data-store"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -12,8 +15,6 @@ import { AdminLayout } from "@/components/admin-layout"
 import { useToast } from "@/hooks/use-toast"
 import { productStore, initializeData, type Product } from "@/lib/data-store"
 import { ProductFormDialog } from "@/components/product-form-dialog"
-import { authService } from "@/lib/api-service"
-import { adminProductService } from "@/lib/api-service"
 import {
   Table,
   TableBody,
@@ -23,7 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-export default function AdminProductsPage() {
+export function AdminProductsPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -32,6 +33,7 @@ export default function AdminProductsPage() {
   const [showArchived, setShowArchived] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [currentAdmin, setCurrentAdmin] = useState<Admin | null>(null)
 
   useEffect(() => {
     const isLoggedIn = authService.isLoggedIn()
@@ -39,6 +41,9 @@ export default function AdminProductsPage() {
       router.push("/admin")
     } else {
       setIsAuthenticated(true)
+      authService.getCurrentAdmin().then((admin) => {
+        setCurrentAdmin(admin)
+      })
       initializeData()
       loadProducts()
     }
@@ -90,6 +95,11 @@ export default function AdminProductsPage() {
     setSelectedProduct(null)
   }
 
+  // RBAC helpers
+  const canEditProduct = currentAdmin && ["SUPER_ADMIN", "MANAGER"].includes(currentAdmin.role)
+  const canArchiveProduct = canEditProduct
+  const canAddProduct = canEditProduct
+
   if (!isAuthenticated) {
     return <div>Loading...</div>
   }
@@ -119,8 +129,19 @@ export default function AdminProductsPage() {
               )}
             </Button>
             <Button 
-              onClick={handleCreate} 
+              onClick={() => {
+                if (!canAddProduct) {
+                  toast({
+                    title: "Permission Denied",
+                    description: "You do not have permission to add products.",
+                    variant: "destructive",
+                  })
+                  return
+                }
+                handleCreate()
+              }}
               className="flex-1 sm:flex-none bg-brand-primary hover:bg-brand-primary/90"
+              disabled={!canAddProduct}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Product
@@ -218,16 +239,38 @@ export default function AdminProductsPage() {
                           <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => handleEdit(product)}
+                            onClick={() => {
+                              if (!canEditProduct) {
+                                toast({
+                                  title: "Permission Denied",
+                                  description: "You do not have permission to edit products.",
+                                  variant: "destructive",
+                                })
+                                return
+                              }
+                              handleEdit(product)
+                            }}
                             title="Edit product"
+                            disabled={!canEditProduct}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => handleArchiveToggle(product)}
+                            onClick={() => {
+                              if (!canArchiveProduct) {
+                                toast({
+                                  title: "Permission Denied",
+                                  description: "You do not have permission to archive or restore products.",
+                                  variant: "destructive",
+                                })
+                                return
+                              }
+                              handleArchiveToggle(product)
+                            }}
                             title={product.archived ? "Restore product" : "Archive product"}
+                            disabled={!canArchiveProduct}
                           >
                             {product.archived ? (
                               <ArchiveRestore className="h-4 w-4" />
@@ -255,3 +298,5 @@ export default function AdminProductsPage() {
     </AdminLayout>
   )
 }
+
+export default AdminProductsPage

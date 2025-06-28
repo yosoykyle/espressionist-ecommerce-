@@ -11,8 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AdminLayout } from "@/components/admin-layout"
 import { useToast } from "@/hooks/use-toast"
 import { orderStore, initializeData, type Order } from "@/lib/data-store"
-import { OrderDetailsDialog } from "@/components/order-details-dialog"
 import { authService } from "@/lib/api-service"
+import { OrderDetailsDialog } from "@/components/order-details-dialog"
 import { adminOrderService } from "@/lib/api-service"
 import {
   Table,
@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import type { Admin } from "@/lib/data-store"
 
 const statusColors = {
   Pending: "bg-yellow-100 text-yellow-800",
@@ -40,19 +41,23 @@ export default function AdminOrdersPage() {
   const [showArchived, setShowArchived] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [currentAdmin, setCurrentAdmin] = useState<Admin | null>(null)
   useEffect(() => {
     const isLoggedIn = authService.isLoggedIn()
     if (!isLoggedIn) {
       router.push("/admin")
     } else {
       setIsAuthenticated(true)
+      authService.getCurrentAdmin().then((admin: Admin | null) => {
+        setCurrentAdmin(admin)
+      })
       initializeData()
       loadOrders()
     }
   }, [router])
   const loadOrders = async () => {
     const allOrders = await orderStore.getAll()
-    allOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    allOrders.sort((a: Order, b: Order) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     setOrders(allOrders)
   }
   const filteredOrders = orders.filter((order) => {
@@ -120,6 +125,8 @@ export default function AdminOrdersPage() {
     setSelectedOrder(order)
     setIsDialogOpen(true)
   }
+  // RBAC helpers
+  const canUpdateOrder = currentAdmin && ["SUPER_ADMIN", "MANAGER"].includes(currentAdmin.role)
   if (!isAuthenticated) {
     return <div>Loading...</div>
   }
@@ -236,7 +243,7 @@ export default function AdminOrdersPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
-                        <Badge className={statusColors[order.status]}>
+                        <Badge className={statusColors[order.status as keyof typeof statusColors]}>
                           {order.status}
                         </Badge>
                       </TableCell>
@@ -272,6 +279,8 @@ export default function AdminOrdersPage() {
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onStatusChange={handleStatusChange}
+          canUpdateOrder={!!canUpdateOrder}
+          showToast={(msg, variant = "destructive") => toast({ title: "Permission Denied", description: msg, variant })}
         />
       </div>
     </AdminLayout>
