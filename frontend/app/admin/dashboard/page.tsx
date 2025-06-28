@@ -45,7 +45,7 @@ export default function AdminDashboard() {
         const admins = await adminStore.getAll()
 
         const revenue = Array.isArray(orders)
-          ? orders.filter((order) => order.status === "Delivered").reduce((sum, order) => sum + order.total, 0)
+          ? orders.filter((order) => order.status?.toLowerCase() === "delivered").reduce((sum, order) => sum + order.total, 0)
           : 0
 
         setStats({
@@ -111,7 +111,9 @@ export default function AdminDashboard() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₱{stats.revenue.toFixed(2)}</div>
+              <div className="text-2xl font-bold">
+                ₱{stats.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
               <p className="text-xs text-muted-foreground">From delivered orders</p>
             </CardContent>
           </Card>

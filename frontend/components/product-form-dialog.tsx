@@ -165,100 +165,126 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{product ? "Edit Product" : "Add New Product"}</DialogTitle>
-        </DialogHeader>
-        <p id="product-form-description" className="sr-only">
-          {product ? "Edit the product details." : "Fill out the form to add a new product."}
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-4" aria-describedby="product-form-description">
-          <div>
-            <Label htmlFor="name">Product Name *</Label>
-            <Input
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className={errors.name ? "border-red-500" : ""}
-            />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+      <DialogContent className="max-w-2xl w-full p-0 border-none shadow-2xl rounded-2xl overflow-hidden">
+        <div className="bg-brand-primary/5 px-8 py-6 border-b">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-brand-primary">
+              {product ? "Edit Product" : "Add New Product"}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-gray-600 mt-1">
+            {product ? "Edit the product details." : "Fill out the form to add a new product."}
+          </p>
+        </div>
+        <form onSubmit={handleSubmit} className="px-8 py-8 space-y-6 bg-white" aria-describedby="product-form-description">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="price">Price (₱) *</Label>
+              <Label htmlFor="name">Product Name *</Label>
               <Input
-                id="price"
-                name="price"
-                type="number"
-                step="0.01"
-                value={formData.price}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
-                className={errors.price ? "border-red-500" : ""}
+                className={errors.name ? "border-red-500" : ""}
               />
-              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
-
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="price">Price (₱) *</Label>
+                <Input
+                  id="price"
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  className={errors.price ? "border-red-500" : ""}
+                />
+                {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+              </div>
+              <div>
+                <Label htmlFor="stock">Stock *</Label>
+                <Input
+                  id="stock"
+                  name="stock"
+                  type="number"
+                  value={formData.stock}
+                  onChange={handleInputChange}
+                  className={errors.stock ? "border-red-500" : ""}
+                />
+                {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock}</p>}
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="stock">Stock *</Label>
-              <Input
-                id="stock"
-                name="stock"
-                type="number"
-                value={formData.stock}
+              <Label htmlFor="category">Category *</Label>
+              <Select
+                name="category"
+                value={formData.category}
+                onValueChange={(value) => {
+                  setFormData((prev) => ({ ...prev, category: value }))
+                  if (errors.category) {
+                    setErrors((prev) => ({ ...prev, category: "" }))
+                  }
+                }}
+              >
+                <SelectTrigger className={errors.category ? "border-red-500" : ""}>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
+            </div>
+            <div>
+              <Label htmlFor="description">Description *</Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={formData.description}
                 onChange={handleInputChange}
-                className={errors.stock ? "border-red-500" : ""}
+                rows={3}
+                className={errors.description ? "border-red-500" : ""}
               />
-              {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock}</p>}
+              {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
             </div>
           </div>
-
-          <div>
-            <Label htmlFor="category">Category *</Label>
-            <Select
-              name="category"
-              value={formData.category}
-              onValueChange={(value) => {
-                setFormData((prev) => ({ ...prev, category: value }))
-                if (errors.category) {
-                  setErrors((prev) => ({ ...prev, category: "" }))
-                }
-              }}
-            >
-              <SelectTrigger className={errors.category ? "border-red-500" : ""}>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+            <div>
+              <Label htmlFor="image">Product Image</Label>
+              <Input id="image" name="image" type="file" accept="image/*" onChange={handleFileChange} />
+              <p className="text-sm text-gray-500 mt-1">Upload an image for the product</p>
+            </div>
+            {formData.image && (
+              <div className="flex items-center gap-2">
+                <img
+                  src={(() => {
+                    if (formData.image.startsWith('data:')) {
+                      // base64 preview from upload
+                      return formData.image;
+                    } else if (formData.image.startsWith('http') || formData.image.startsWith('/')) {
+                      // full URL or absolute path
+                      return formData.image;
+                    } else if (formData.image) {
+                      // filename from DB
+                      return `/uploads/products/${formData.image}`;
+                    } else {
+                      return "/placeholder.svg";
+                    }
+                  })()}
+                  alt="Preview"
+                  className="h-24 w-24 object-cover rounded border"
+                />
+              </div>
+            )}
           </div>
-
-          <div>
-            <Label htmlFor="description">Description *</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={3}
-              className={errors.description ? "border-red-500" : ""}
-            />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
-          </div>
-
-          <div>
-            <Label htmlFor="image">Product Image</Label>
-            <Input id="image" name="image" type="file" accept="image/*" onChange={handleFileChange} />
-            <p className="text-sm text-gray-500 mt-1">Upload an image for the product</p>
-          </div>
-
           <div className="flex gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancel

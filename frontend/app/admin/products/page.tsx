@@ -189,7 +189,13 @@ export default function AdminProductsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="font-medium">{product.name}</div>
-                        <div className="text-sm text-gray-500 line-clamp-1">{product.description}</div>
+                        <div className="text-sm text-gray-500 line-clamp-1">
+                          {product.archived
+                            ? (product.description.length > 30
+                                ? product.description.slice(0, 30) + "..."
+                                : product.description)
+                            : product.description}
+                        </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <Badge variant="secondary">{product.category}</Badge>
