@@ -133,6 +133,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    // Restores an archived product by its ID, setting archived to false
+    // Maps the updated product back to ProductDTO
     public ProductDTO restoreProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
@@ -142,6 +144,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    // Archives a product by its ID, setting archived to true
+    // Maps the updated product back to ProductDTO
     public ProductDTO archiveProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));

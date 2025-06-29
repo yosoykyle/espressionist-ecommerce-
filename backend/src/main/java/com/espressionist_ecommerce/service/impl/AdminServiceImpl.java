@@ -24,9 +24,9 @@ public class AdminServiceImpl implements AdminService {
     private final PasswordEncoder passwordEncoder;
     // Updated constructor to be explicitly defined for PasswordEncoder injection
     public AdminServiceImpl(AdminRepository adminRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
-        this.adminRepository = adminRepository;
-        this.modelMapper = modelMapper;
-        this.passwordEncoder = passwordEncoder;
+        this.adminRepository = adminRepository; // Injecting AdminRepository for database operations
+        this.modelMapper = modelMapper; // Injecting ModelMapper for DTO to Entity mapping
+        this.passwordEncoder = passwordEncoder; // Injecting PasswordEncoder for password hashing   
     }
 
     @Override

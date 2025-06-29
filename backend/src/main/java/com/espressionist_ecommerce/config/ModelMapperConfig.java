@@ -23,21 +23,39 @@ public class ModelMapperConfig {
             String source = context.getSource();
             if (source == null) return null;
             return switch (source.trim().toLowerCase()) {
+                // Purpose: Converts a String representation of an admin role to the corresponding Admin.Role enum.
+                // This converter is used to map the role field from AdminCreationRequestDTO to Admin entity
                 case "super admin", "super_admin", "superadmin" -> Admin.Role.SUPER_ADMIN;
                 case "manager" -> Admin.Role.MANAGER;
                 case "staff" -> Admin.Role.STAFF;
                 default -> throw new IllegalArgumentException("Invalid admin role: " + source);
             };
         };
+        
+        // Purpose: Maps the role field from AdminCreationRequestDTO to Admin entity using the roleConverter.
+        // This mapping ensures that the role is converted from a String to the Admin.Role enum type
         modelMapper.typeMap(AdminCreationRequestDTO.class, Admin.class)
                 .addMappings(mapper -> mapper.using(roleConverter).map(AdminCreationRequestDTO::getRole, Admin::setRole));
-        // Product Price Converter: Double (DTO) <-> BigDecimal (Entity)
+        
+         // Product Price Converter: Double (DTO) <-> BigDecimal (Entity)
         Converter<Double, BigDecimal> doubleToBigDecimal = ctx -> ctx.getSource() == null ? null : BigDecimal.valueOf(ctx.getSource());
+        
+        // Purpose: Converts a Double value to BigDecimal, handling null values gracefully.
+        // This converter is used to map the price field from ProductDTO to Product entity.
         Converter<BigDecimal, Double> bigDecimalToDouble = ctx -> ctx.getSource() == null ? null : ctx.getSource().doubleValue();
+        
+        // Purpose: Maps the price field from ProductDTO to Product entity using the doubleToBigDecimal converter.
+        // This mapping ensures that the price is converted from Double to BigDecimal for the Product entity   
         modelMapper.typeMap(ProductDTO.class, Product.class)
                 .addMappings(mapper -> mapper.using(doubleToBigDecimal).map(ProductDTO::getPrice, Product::setPrice));
+        
+        // Purpose: Maps the price field from Product entity to ProductDTO using the bigDecimalToDouble converter.
+        // This mapping ensures that the price is converted from BigDecimal to Double for the ProductDTO
         modelMapper.typeMap(Product.class, ProductDTO.class)
                 .addMappings(mapper -> mapper.using(bigDecimalToDouble).map(Product::getPrice, ProductDTO::setPrice));
+        
+        // Purpose: Configures the ModelMapper bean to ignore null values during mapping.
+        // This setting prevents null values in the source object from overwriting existing values in the destination
         return modelMapper;
     }
 }

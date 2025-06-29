@@ -23,6 +23,7 @@ public class EspressionistEcommerceApplication {
     private String mailUsername;
 
     @PostConstruct
+    // Logs the Spring Mail username at application startup.
     public void logMailUsername() {
         System.out.println("Spring Mail Username at startup: " + mailUsername);
     }

@@ -26,11 +26,12 @@ public class WebConfig implements WebMvcConfigurer {
     /**
      * Configures resource handlers to serve static files from the uploads directory.
      * This method maps requests to /uploads/** to the local uploads directory.
-     * @param registry ResourceHandlerRegistry to register resource handlers
      */
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         // Serve files from /uploads/** URL, mapping to the uploads directory relative to backend working dir
         logger.info("[WebConfig] Serving /uploads/** from: uploads/ (relative to backend working directory)");
+        // This allows the application to serve files uploaded by users, such as product images
+        // The files will be accessible via URLs like http://localhost:8080/uploads/filename
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:uploads/");
     }
@@ -48,6 +49,6 @@ public class WebConfig implements WebMvcConfigurer {
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD") // Allow common HTTP methods
             .allowedOriginPatterns("*") // Allow all origin patterns 
             .allowedHeaders("*")    // Allow all headers
-            .allowCredentials(true);    
+            .allowCredentials(true);  // Allow credentials (cookies, authorization headers, etc.)
     }
 }

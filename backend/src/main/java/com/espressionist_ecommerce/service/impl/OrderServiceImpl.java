@@ -127,66 +127,66 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = orderRequestDTO.getItems().stream()
                 .map(itemDTO -> {
                     Product product = productRepository.findById(itemDTO.getProductId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + itemDTO.getProductId()));
+                            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + itemDTO.getProductId())); // Product lookup
                     if (product.isArchived()) {
-                        throw new IllegalStateException("Product is archived and cannot be ordered: " + product.getName());
+                        throw new IllegalStateException("Product is archived and cannot be ordered: " + product.getName()); // Check if product is archived
                     }
                     if (product.getStock() < itemDTO.getQuantity()) {
                         throw new IllegalArgumentException(
                                 "Insufficient stock for product: " + product.getName() +
                                 ". Available: " + product.getStock() +
-                                ", Requested: " + itemDTO.getQuantity());
+                                ", Requested: " + itemDTO.getQuantity());  // Check stock availability
                     }
-                    product.setStock(product.getStock() - itemDTO.getQuantity());
-                    productRepository.save(product);
-                    OrderItem orderItem = new OrderItem();
-                    orderItem.setProduct(product);
-                    orderItem.setQuantity(itemDTO.getQuantity());
-                    orderItem.setName(product.getName());
-                    orderItem.setPrice(product.getPrice());
-                    orderItem.setImage(product.getImage());
-                    orderItem.setOrder(order);
-                    return orderItem;
+                    product.setStock(product.getStock() - itemDTO.getQuantity()); // Deduct stock
+                    productRepository.save(product); // Save updated product stock
+                    OrderItem orderItem = new OrderItem();  // Create new OrderItem entity
+                    orderItem.setProduct(product); // Set product reference
+                    orderItem.setQuantity(itemDTO.getQuantity()); // Set quantity from OrderItemDTO
+                    orderItem.setName(product.getName()); // Set product name
+                    orderItem.setPrice(product.getPrice()); // Set product price
+                    orderItem.setImage(product.getImage()); // Set product image
+                    orderItem.setOrder(order); // Set back-reference to Order
+                    return orderItem; // Return the mapped OrderItem entity
                 })
-                .collect(Collectors.toList());
-        order.setItems(orderItems);
+                .collect(Collectors.toList()); // Collect OrderItem entities from DTOs
+        order.setItems(orderItems); // Set the list of OrderItems in the Order entity
         // Calculate subtotal
         for (OrderItem item : order.getItems()) {
             BigDecimal itemTotal = item.getPrice().multiply(new BigDecimal(item.getQuantity()));
-            subtotal = subtotal.add(itemTotal);
+            subtotal = subtotal.add(itemTotal); // Sum up item totals to get subtotal
         }
-        order.setSubtotal(subtotal);
+        order.setSubtotal(subtotal); // Set subtotal in the Order entity
         // Calculate VAT (example: 12% VAT rate)
         BigDecimal vatRate = new BigDecimal("0.12"); // Match frontend VAT
-        BigDecimal vatAmount = subtotal.multiply(vatRate);
-        order.setVat(vatAmount.setScale(2, RoundingMode.HALF_UP));
+        BigDecimal vatAmount = subtotal.multiply(vatRate); // Calculate VAT based on subtotal
+        order.setVat(vatAmount.setScale(2, RoundingMode.HALF_UP)); // Set VAT amount in the Order entity, rounding to 2 decimal places
         // Calculate total
-        BigDecimal total = subtotal.add(order.getVat());
-        order.setTotal(total.setScale(2, RoundingMode.HALF_UP));   
+        BigDecimal total = subtotal.add(order.getVat()); // Total is subtotal + VAT
+        order.setTotal(total.setScale(2, RoundingMode.HALF_UP)); // Set total in the Order entity, rounding to 2 decimal places 
         // Set archived status to false by default
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order); // Save the order to the repository
         // Send confirmation email only after saving, and use the savedOrder object
-        sendStatusEmail(savedOrder, Order.OrderStatus.PENDING);
-        return modelMapper.map(savedOrder, OrderDTO.class);
+        sendStatusEmail(savedOrder, Order.OrderStatus.PENDING); // Send confirmation email with initial status PENDING
+        return modelMapper.map(savedOrder, OrderDTO.class); // Map the saved Order entity to OrderDTO and return it
     }
     @Override
     // Retrieves an order by its unique code, mapping to OrderDTO
     // If the order is not found, it throws a ResourceNotFoundException with a descriptive message.
     public OrderDTO getOrderByCode(String code) {
         Order order = orderRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + code));
-        OrderDTO dto = modelMapper.map(order, OrderDTO.class);
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + code)); // Find order by code
+        OrderDTO dto = modelMapper.map(order, OrderDTO.class); // Map Order entity to OrderDTO
         // Manually map customer fields to nested CustomerDTO
-        CustomerDTO customer = new CustomerDTO();
-        customer.setName(order.getCustomerName());
-        customer.setEmail(order.getCustomerEmail());
-        customer.setPhone(order.getCustomerPhone());
-        customer.setAddress(order.getCustomerAddress());
-        customer.setCity(order.getCustomerCity());
-        customer.setPostalCode(order.getCustomerPostalCode());
-        customer.setNotes(order.getCustomerNotes());
-        dto.setCustomer(customer);
-        return dto;
+        CustomerDTO customer = new CustomerDTO(); // Create a new CustomerDTO
+        customer.setName(order.getCustomerName()); // Set customer name
+        customer.setEmail(order.getCustomerEmail()); // Set customer email
+        customer.setPhone(order.getCustomerPhone()); // Set customer phone
+        customer.setAddress(order.getCustomerAddress()); // Set customer address
+        customer.setCity(order.getCustomerCity()); // Set customer city
+        customer.setPostalCode(order.getCustomerPostalCode()); // Set customer postal code
+        customer.setNotes(order.getCustomerNotes()); // Set customer notes
+        dto.setCustomer(customer); // Set the CustomerDTO in the OrderDTO
+        return dto; // Return the mapped OrderDTO with customer details
     }
     @Override
     // Retrieves all orders, mapping each Order entity to OrderDTO
@@ -196,18 +196,18 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> {
                     OrderDTO dto = modelMapper.map(order, OrderDTO.class);
                     // Manually map customer fields to nested CustomerDTO
-                    CustomerDTO customer = new CustomerDTO();
-                    customer.setName(order.getCustomerName());
-                    customer.setEmail(order.getCustomerEmail());
-                    customer.setPhone(order.getCustomerPhone());
-                    customer.setAddress(order.getCustomerAddress());
-                    customer.setCity(order.getCustomerCity());
-                    customer.setPostalCode(order.getCustomerPostalCode());
-                    customer.setNotes(order.getCustomerNotes());
-                    dto.setCustomer(customer);
-                    return dto;
+                    CustomerDTO customer = new CustomerDTO(); // Create a new CustomerDTO
+                    customer.setName(order.getCustomerName()); // Set customer name
+                    customer.setEmail(order.getCustomerEmail()); // Set customer email
+                    customer.setPhone(order.getCustomerPhone()); // Set customer phone
+                    customer.setAddress(order.getCustomerAddress()); // Set customer address
+                    customer.setCity(order.getCustomerCity()); // Set customer city
+                    customer.setPostalCode(order.getCustomerPostalCode()); // Set customer postal code
+                    customer.setNotes(order.getCustomerNotes()); // Set customer notes
+                    dto.setCustomer(customer); // Set the CustomerDTO in the OrderDTO
+                    return dto; // Return the mapped OrderDTO with customer details
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()); // Collect all OrderDTOs into a list
     }
     @Override
     // Updates the status of an existing order by its ID
@@ -220,22 +220,22 @@ public class OrderServiceImpl implements OrderService {
             order.setStatus(newStatus);
             // Only send status email if not resetting to PENDING (to avoid duplicate confirmation emails)
             if (newStatus != Order.OrderStatus.PENDING) {
-                sendStatusEmail(order, newStatus);
+                sendStatusEmail(order, newStatus);  // Send email notification for status change
             }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid order status: " + status, e);
         }
-        Order updatedOrder = orderRepository.save(order);
-        return modelMapper.map(updatedOrder, OrderDTO.class);
+        Order updatedOrder = orderRepository.save(order);   // Save the updated order
+        return modelMapper.map(updatedOrder, OrderDTO.class); // Map to OrderDTO and return
     }
     @Override
     // Archives an existing order by its ID
     public OrderDTO archiveOrder(Long id, boolean archived) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
-        order.setArchived(archived);
-        Order updatedOrder = orderRepository.save(order);
-        return modelMapper.map(updatedOrder, OrderDTO.class);
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id)); // Ensure the order exists
+        order.setArchived(archived); // Set the archived status
+        Order updatedOrder = orderRepository.save(order); // Save the updated order
+        return modelMapper.map(updatedOrder, OrderDTO.class); // Map to OrderDTO and return
     }
     @Override
     // For backward compatibility, this method defaults to archiving (setting archived = true)
@@ -249,26 +249,28 @@ public class OrderServiceImpl implements OrderService {
     // This method allows both status updates and archiving in a single operation.
     public OrderDTO updateOrderStatusAndArchive(Long id, String status, boolean archived) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));// Ensure the order exists
         try {
-            Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+            Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());// Convert status string to enum
             order.setStatus(newStatus);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid order status: " + status, e);
+            throw new IllegalArgumentException("Invalid order status: " + status, e);// Handle invalid status
         }
         order.setArchived(archived);
-        Order updatedOrder = orderRepository.save(order);
-        return modelMapper.map(updatedOrder, OrderDTO.class);
+        Order updatedOrder = orderRepository.save(order); // Save the updated order
+        return modelMapper.map(updatedOrder, OrderDTO.class); // Map to OrderDTO and return
     }
     // Generates a short, memorable order code
     // The code starts with "ESP-" followed by 6 random alphanumeric characters.
     private String generateShortOrderCode() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder sb = new StringBuilder("ESP-");
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Alphanumeric characters for the code
+        // Use StringBuilder for efficient string concatenation
+        StringBuilder sb = new StringBuilder("ESP-"); // Prefix with "ESP-"
+        // Generate 6 random characters from the set
         for (int i = 0; i < 6; i++) {
-            int idx = (int) (Math.random() * chars.length());
-            sb.append(chars.charAt(idx));
+            int idx = (int) (Math.random() * chars.length()); // Generate a random index
+            sb.append(chars.charAt(idx)); // Append a random character from the set
         }
-        return sb.toString();
+        return sb.toString(); // Ensure the code is unique
     }
 }
