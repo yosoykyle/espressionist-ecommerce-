@@ -20,9 +20,11 @@ const nextConfig = {
   // update the IPs below to match your new local IP (find it with `ipconfig` or `ifconfig`).
   allowedDevOrigins: [
     'http://localhost:3000',
-    'http://192.168.1.7:3000', // <-- Change this to your new IP if it changes
+   // 'http://192.168.1.7:3000', // <-- Change this to your new IP if it changes
+    'http://172.24.0.1:3000',
     'https://localhost:3000',
-    'https://192.168.1.7:3000', // <-- Change this to your new IP if it changes
+   // 'https://192.168.1.7:3000', // <-- Change this to your new IP if it changes
+    'https://172.24.0.1:3000',
   ],
 }
 
