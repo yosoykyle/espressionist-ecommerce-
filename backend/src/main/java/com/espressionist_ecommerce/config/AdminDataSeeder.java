@@ -19,8 +19,9 @@ public class AdminDataSeeder implements CommandLineRunner {
     // Logger for logging messages during the seeding process
     private static final Logger logger = LoggerFactory.getLogger(AdminDataSeeder.class);
 
-    private final AdminRepository adminRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final AdminRepository adminRepository; // Repository for Admin entity operations
+    private final PasswordEncoder passwordEncoder; // Added PasswordEncoder for password hashing
+
     // PasswordEncoder is used to hash the default admin password securely
     public AdminDataSeeder(AdminRepository adminRepository, PasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;

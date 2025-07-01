@@ -23,6 +23,7 @@ export default function ProductsPage() {
   const { addItem } = useCart()
   const { toast } = useToast()
 
+  // Load products when the component mounts
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -45,7 +46,7 @@ export default function ProductsPage() {
 
     loadProducts()
   }, [toast])
-
+//  Filter products based on search and category
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch =
@@ -56,7 +57,8 @@ export default function ProductsPage() {
     })
   }, [products, searchTerm, selectedCategory])
 
-  const handleAddToCart = (product: Product) => {
+  // Handle adding product to cart
+  const handleAddToCart = (product: Product) => {   
     if (product.stock === 0) {
       toast({
         title: "Out of Stock",
@@ -65,7 +67,7 @@ export default function ProductsPage() {
       })
       return
     }
-
+    
     addItem({
       id: product.id,
       name: product.name,

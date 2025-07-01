@@ -7,7 +7,7 @@ import {
   type Product,
   type Order,
   type Admin,
-} from "./data-store"
+} from "./data-store";
 import { fetchWithAuth } from "./fetch-wrapper";
 
 // JWT storage helper
@@ -18,12 +18,12 @@ function getJwt(): string | null {
 // Utility to extract error message from backend response
 async function extractError(response: Response): Promise<string> {
   try {
-    const data = await response.json();
-    if (data && data.message) return data.message;
-    if (typeof data === 'string') return data;
-    return response.statusText;
+    const data = await response.json(); // Parse JSON response
+    if (data && data.message) return data.message; // Return error message if available
+    if (typeof data === 'string') return data; // Return raw string if no message
+    return response.statusText; // Return status text if no JSON message
   } catch {
-    return response.statusText;
+    return response.statusText; // Return status text if parsing fails
   }
 }
 
@@ -35,9 +35,9 @@ export const productService = {
    * Calls GET /api/products
    */
   getAllProducts: async (): Promise<Product[]> => {
-    const response = await fetch("/api/products");
-    if (!response.ok) throw new Error(await extractError(response));
-    return response.json();
+    const response = await fetch("/api/products"); // Fetch all products
+    if (!response.ok) throw new Error(await extractError(response)); // Handle non-successful responses
+    return response.json(); // Cast to Product[]
   },
 
   /**
@@ -45,7 +45,7 @@ export const productService = {
    * Calls GET /api/products/{id}
    */
   getProductById: async (id: string): Promise<Product | null> => {
-    const response = await fetch(`/api/products/${id}`);
+    const response = await fetch(`/api/products/${id}`); 
     if (response.status === 404) return null;
     if (!response.ok) throw new Error(await extractError(response));
     return response.json();
