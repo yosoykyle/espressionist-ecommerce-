@@ -23,15 +23,16 @@ Espressionist Ecommerce is a full-stack web application designed to provide a se
 ## Table of Contents
 1. [Overview](#overview)
 2. [Project Structure](#project-structure)
-3. [Comprehensive Data Flow (with Analogy)](#comprehensive-data-flow-with-analogy)
-4. [Setup & Installation](#setup--installation)
-5. [Configuration](#configuration)
-6. [Running the System](#running-the-system)
-7. [Testing](#testing)
-8. [Key Folders, Layers & Responsibilities](#key-folders-layers--responsibilities)
-9. [Common Development Tasks](#common-development-tasks)
-10. [Troubleshooting & Tips](#troubleshooting--tips)
-11. [Contact & Support](#contact--support)
+3. [Detailed Backend Data Flow Guide](#detailed-backend-data-flow-guide)
+4. [Comprehensive Data Flow (with Analogy)](#comprehensive-data-flow-with-analogy)
+5. [Setup & Installation](#setup--installation)
+6. [Configuration](#configuration)
+7. [Running the System](#running-the-system)
+8. [Testing](#testing)
+9. [Key Folders, Layers & Responsibilities](#key-folders-layers--responsibilities)
+10. [Common Development Tasks](#common-development-tasks)
+11. [Troubleshooting & Tips](#troubleshooting--tips)
+12. [Contact & Support](#contact--support)
 
 ---
 
@@ -74,7 +75,18 @@ frontend/
 
 ---
 
+## Detailed Backend Data Flow Guide
+For an in-depth technical explanation of the backend architecture, data processing flow, security mechanisms, error handling, and layer-by-layer responsibilities within the Spring Boot application, please refer to our comprehensive guide:
+
+- **[Backend Data Flow Guide](./backend-data-flow-guide.md)**
+
+This guide is particularly useful for understanding the intricate workings of the backend, complementing the higher-level overview provided below.
+
+---
+
 ## Comprehensive Data Flow (with Analogy)
+
+**Note:** This section provides a high-level analogy and simplified step-by-step flow. For a more granular, technical breakdown of the backend processes, please see the [Backend Data Flow Guide](./backend-data-flow-guide.md).
 
 ### Analogy: The Restaurant
 - **Frontend** is the customer and the waiter.
@@ -198,6 +210,8 @@ A customer (user) places an order (request), the waiter (frontend) brings it to 
 ---
 
 ## Key Folders, Layers & Responsibilities
+**Note:** The following is a summary of key backend folders and their general responsibilities. For a comprehensive explanation of each backend layer, its components, example code, and how data is processed and transformed, refer to the detailed [Backend Data Flow Guide](./backend-data-flow-guide.md).
+
 - **config/**: App, security, and web configuration.
 - **controller/**: REST API endpoints for admin, products, orders, authentication, and image management.
 - **dto/**: Data Transfer Objects for requests and responses.
