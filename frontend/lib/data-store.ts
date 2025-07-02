@@ -1,5 +1,9 @@
 // Data models for backend integration
 
+//purpose: Define TypeScript interfaces for data models used in the application.
+// This file contains interfaces for Product, Order, Admin, and CheckoutOrder.
+
+// Product interface for product details
 export interface Product {
   id: string
   name: string
@@ -13,6 +17,7 @@ export interface Product {
   updatedAt: string
 }
 
+// Order interface for both user and admin views
 export interface Order {
   id: string
   code: string
@@ -42,6 +47,8 @@ export interface Order {
   updatedAt: string
 }
 
+// Admin interface for managing users and products
+// This interface is used for admin user management and product management
 export interface Admin {
   id: string
   username: string
@@ -56,6 +63,8 @@ export interface Admin {
 }
 
 // Add this type for the checkout payload
+// This type is used when submitting a new order from the checkout page
+// It includes only the necessary fields for creating an order
 export type CheckoutOrder = {
   items: { productId: string; quantity: number }[];
   customer: {
@@ -70,6 +79,8 @@ export type CheckoutOrder = {
 };
 
 // Stores that fetch from backend API
+// This file defines stores that interact with the backend API services
+// It includes stores for products, orders, and admin users.
 import { productService, orderService, adminUserService, adminProductService, adminOrderService } from "./api-service";
 
 export const productStore = {
@@ -92,6 +103,8 @@ export const adminStore = {
   getAll: async () => adminUserService.getAllAdmins(),
 };
 
+// Initialize data store
+// This function can be used to prefetch and cache data if needed
 export async function initializeData() {
   // Optionally prefetch and cache data here if needed
   // For now, this is a no-op since stores fetch live from backend

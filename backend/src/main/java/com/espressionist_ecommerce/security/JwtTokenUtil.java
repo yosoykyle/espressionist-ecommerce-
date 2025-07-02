@@ -16,6 +16,8 @@ import java.util.function.Function;
 /**
  * Purpose: Utility class for generating and validating JWT tokens.
  * Provides methods to extract claims, generate tokens, and validate them against user details.
+ * In simple terms, this class is used to create and verify JSON Web Tokens (JWTs) for user authentication.
+ * It allows the application to securely issue tokens that can be used to authenticate users in subsequent requests.
  */
 @Component
 public class JwtTokenUtil {

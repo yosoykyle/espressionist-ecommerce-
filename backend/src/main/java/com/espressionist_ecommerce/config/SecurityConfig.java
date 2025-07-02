@@ -22,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 /**
  * Purpose: Configures security settings for the application, including JWT authentication, CORS, and endpoint access control.
  * This class sets up the security filter chain, defines public and protected endpoints, and integrates JWT authentication.
+ * In simple terms, this class is used to secure the application by defining which endpoints are accessible without authentication
+ * and which require a valid JWT token for access. It also configures how user authentication is performed. 
  */
 public class SecurityConfig {
     // Injecting JwtRequestFilter and UserDetailsService to handle JWT authentication and user details
@@ -52,6 +54,7 @@ public class SecurityConfig {
     /**
      * Security filter chain bean that configures HTTP security settings.
      * This method sets up CORS, CSRF protection, endpoint access control, and session management.
+     * In simple terms, this method defines how the application handles security for incoming requests. 
      */
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -67,9 +70,7 @@ public class SecurityConfig {
                     "/uploads/**"
                 ).permitAll()
                 // Admin-only endpoints (authenticated)
-                .requestMatchers("/admin/**", "/admin/api/**").authenticated()
-                // All other requests must be authenticated
-                .anyRequest().authenticated() 
+                .requestMatchers("/admin/**", "/admin/api/**").authenticated().anyRequest().authenticated() // Require authentication for all other requests
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

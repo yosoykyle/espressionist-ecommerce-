@@ -11,11 +11,15 @@ import com.espressionist_ecommerce.entity.Product;
 
 @Configuration
 // Purpose: Configuration class for ModelMapper, defining custom converters for specific DTO to Entity mappings.
-// This class sets up the ModelMapper bean and configures type mappings for Admin and Product entities
+// This class sets up the ModelMapper bean and configures type mappings for Admin and Product entities.
+// in simple terms, this class is used to convert between Data Transfer Objects (DTOs) and Entities in the application.
+// It provides a way to map fields between different object types, such as converting a String role 
+
 public class ModelMapperConfig {
     @Bean
     // Purpose: Provides a ModelMapper bean with custom converters for specific DTO to Entity mappings.
     // This method configures the ModelMapper to handle conversions between DTOs and Entities, such
+    
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         // Admin Role Converter: String (DTO) -> Admin.Role (Entity)

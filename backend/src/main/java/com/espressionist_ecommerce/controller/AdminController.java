@@ -23,7 +23,11 @@ import lombok.RequiredArgsConstructor;
 /**
  * AdminController handles requests related to admin user management.
  * It provides endpoints for creating, updating, archiving, and restoring admin users.
+ * In simple terms, this class is used to manage admin users in the application.
+ * It allows the creation of new admin users, updating existing ones, archiving (deactivating) admin users,
+ * and restoring archived admin users.
  */
+
 public class AdminController {
     // Service for handling admin user operations
     private final AdminService adminService;

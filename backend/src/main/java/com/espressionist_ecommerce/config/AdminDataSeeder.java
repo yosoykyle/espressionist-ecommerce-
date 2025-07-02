@@ -11,6 +11,9 @@ import com.espressionist_ecommerce.repository.AdminRepository;
 /**
  * Purpose: Seeds the database with a default admin user if no admin accounts exist.
  * This is useful for initial setup and testing purposes.
+ * In simple terms, this class checks if there are any admin accounts in the database,
+ * and if not, it creates a default admin user with a predefined username, email, and password.
+ * This ensures that there is always at least one admin user available for managing the application.    
  */
 @Component
 // Provides a CommandLineRunner to execute code after the application context is loaded

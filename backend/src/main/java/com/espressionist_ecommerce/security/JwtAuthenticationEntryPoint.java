@@ -10,6 +10,8 @@ import java.io.IOException;
 /**
  * Purpose: Handles unauthorized access attempts by sending a 401 Unauthorized response.
  * This is used when a user tries to access a protected resource without valid authentication.
+ * In simple terms, this class is used to intercept requests that do not have valid authentication tokens
+ * and respond with a 401 Unauthorized error. It ensures that users cannot access protected resources.
  */
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {

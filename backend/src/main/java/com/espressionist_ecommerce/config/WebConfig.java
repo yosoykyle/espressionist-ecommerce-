@@ -13,6 +13,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * Purpose: Configures web-related settings such as CORS and resource handlers for serving static files.
  * This configuration allows CORS requests from specified origins and serves files from the uploads directory.
+ * In simple terms, this class is used to set up the web application to handle cross-origin requests
+ * and to serve static files (like images or documents) from a specific directory on the server.
+ * It ensures that the frontend application can access resources like product images and allows requests from the frontend.
  */
 public class WebConfig implements WebMvcConfigurer {
     /** Logger for WebConfig class */
@@ -38,6 +41,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     /**
+     * CORS stands for Cross-Origin Resource Sharing, which allows or restricts resources to be requested from another domain outside the domain from which the resource originated.
      * Configures CORS mappings to allow cross-origin requests from specified origins.
      * This method allows requests from the frontend development server and a specified LAN IP.
      * @param registry CorsRegistry to register CORS mappings
