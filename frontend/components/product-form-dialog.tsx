@@ -38,6 +38,7 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave, product
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [hasChanges, setHasChanges] = useState(false)
+  const [duplicateError, setDuplicateError] = useState<string>("")
 
   useEffect(() => {
     if (open) {
@@ -90,6 +91,30 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave, product
     setHasChanges(changed)
   }, [formData, selectedFile, product])
 
+  // Duplicate check effect
+  useEffect(() => {
+    const name = formData.name.trim().toLowerCase();
+    const category = formData.category.trim().toLowerCase();
+    if (!name || !category) {
+      setDuplicateError("");
+      return;
+    }
+    const isDuplicate = products.some((p) => {
+      if (product && p.id === product.id) return false; // ignore self on update
+      return (
+        p.name.trim().toLowerCase() === name &&
+        p.category.trim().toLowerCase() === category
+      );
+    });
+    if (isDuplicate) {
+      setDuplicateError(
+        `A product named "${formData.name.trim()}" already exists in category "${formData.category.trim()}".`
+      );
+    } else {
+      setDuplicateError("");
+    }
+  }, [formData.name, formData.category, products, product])
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
@@ -110,8 +135,9 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave, product
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateForm()) return
+    e.preventDefault();
+    if (duplicateError) return; // Prevent submit if duplicate
+    if (!validateForm()) return;
     setUploading(true)
     let imageFilename = formData.image
     try {
@@ -228,9 +254,10 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave, product
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className={errors.name ? "border-red-500" : ""}
+                className={errors.name || duplicateError ? "border-red-500" : ""}
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              {duplicateError && <p className="text-red-500 text-sm mt-1">{duplicateError}</p>}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -329,7 +356,7 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave, product
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90" disabled={uploading || (product ? !hasChanges : false)}>
+            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90" disabled={uploading || !!duplicateError || (product ? !hasChanges : false)}>
               {uploading ? "Uploading..." : product ? "Update Product" : "Create Product"}
             </Button>
           </div>
