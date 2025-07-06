@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { Product } from "@/lib/data-store"
+import { useRouter } from "next/navigation"
+import { Plus } from "lucide-react"
 
 interface ProductDetailsDialogProps {
   product: Product | null
@@ -14,6 +16,7 @@ interface ProductDetailsDialogProps {
 }
 
 export function ProductDetailsDialog({ product, open, onClose, onAddToCart }: ProductDetailsDialogProps) {
+  const router = useRouter();
   if (!product) return null
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -58,13 +61,26 @@ export function ProductDetailsDialog({ product, open, onClose, onAddToCart }: Pr
             <div className="text-sm text-gray-500 mt-2">In Stock: {product.stock}</div>
           </div>
         </div>
-        <div className="sticky bottom-0 z-20 flex gap-2 p-4 flex-col sm:flex-row bg-white border-t border-gray-200">
+        <div className="sticky bottom-0 z-20 flex gap-2 p-4 flex-row bg-white border-t border-gray-200">
           <Button
-            className="bg-[#f97316] hover:bg-[#ea680f] w-full sm:w-auto"
+            className="flex-1 bg-brand-primary hover:bg-brand-primary/90 h-10 text-sm gap-2 rounded-xl"
+            onClick={() => router.push(`/checkout?productId=${product.id}`)}
+            disabled={product.stock === 0}
+            type="button"
+          >
+            Buy Now
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-xl border-gray-300"
             onClick={() => onAddToCart(product)}
             disabled={product.stock === 0}
+            aria-label="Add to Cart"
+            title="Add to Cart"
+            type="button"
           >
-            {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+            <Plus className="h-5 w-5" />
           </Button>
         </div>
       </DialogContent>

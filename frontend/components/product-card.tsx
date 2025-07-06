@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { Product } from "@/lib/data-store"
+import { useRouter } from "next/navigation"
 
 interface ProductCardProps {
   product: Product
@@ -14,9 +15,15 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps) {
+  const router = useRouter();
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
     onAddToCart(product)
+  }
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/checkout?productId=${product.id}`);
   }
 
   const handleClick = () => {
@@ -73,14 +80,28 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
 
       {/* Action Section - Reduced padding and button height */}
       <CardFooter className="p-3 pt-0 min-[375px]:p-4 min-[375px]:pt-0">
-        <Button
-          className="w-full bg-[#f97316] hover:bg-[#ea680f] h-9 min-[375px]:h-10 text-sm gap-2 rounded-xl"
-          onClick={handleAddToCart}
-          disabled={product.stock === 0}
-        >
-          <Plus className="h-4 w-4" />
-          Add to Cart
-        </Button>
+        <div className="flex gap-2 w-full flex-row">
+          <Button
+            className="flex-1 bg-brand-primary hover:bg-brand-primary/90 h-10 text-sm gap-2 rounded-xl"
+            onClick={handleBuyNow}
+            disabled={product.stock === 0}
+            type="button"
+          >
+            Buy Now
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-xl border-gray-300"
+            onClick={handleAddToCart}
+            disabled={product.stock === 0}
+            aria-label="Add to Cart"
+            title="Add to Cart"
+            type="button"
+          >
+            <Plus className="h-5 w-5" />
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   )
