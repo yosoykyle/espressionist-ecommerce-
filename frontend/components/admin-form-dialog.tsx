@@ -32,6 +32,7 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [hasChanges, setHasChanges] = useState(false)
+  const [duplicateError, setDuplicateError] = useState<string>("")
 
   useEffect(() => {
     if (admin) {
@@ -75,6 +76,31 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
     setHasChanges(changed)
   }, [formData.username, formData.email, formData.role, formData.password, admin])
 
+  // Duplicate check effect
+  useEffect(() => {
+    const username = formData.username.trim().toLowerCase();
+    const email = formData.email.trim().toLowerCase();
+    if (!username && !email) {
+      setDuplicateError("");
+      return;
+    }
+    adminStore.getAll().then((existingAdmins) => {
+      const duplicateUsername = existingAdmins.find(
+        (a) => a.username.trim().toLowerCase() === username && (!admin || a.id !== admin.id)
+      );
+      const duplicateEmail = existingAdmins.find(
+        (a) => a.email.trim().toLowerCase() === email && (!admin || a.id !== admin.id)
+      );
+      if (duplicateUsername) {
+        setDuplicateError("Username already exists");
+      } else if (duplicateEmail) {
+        setDuplicateError("Email already exists");
+      } else {
+        setDuplicateError("");
+      }
+    });
+  }, [formData.username, formData.email, admin]);
+
   const validateForm = async () => {
     const newErrors: Record<string, string> = {}
 
@@ -104,23 +130,13 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
       }
     }
 
-    // Check for duplicate username/email
-    const existingAdmins = await adminStore.getAll()
-    const duplicateUsername = existingAdmins.find(
-      (a) => a.username === formData.username && (!admin || a.id !== admin.id),
-    )
-    const duplicateEmail = existingAdmins.find((a) => a.email === formData.email && (!admin || a.id !== admin.id))
-
-    if (duplicateUsername) newErrors.username = "Username already exists"
-    if (duplicateEmail) newErrors.email = "Email already exists"
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
+    if (duplicateError) return; // Prevent submit if duplicate
     if (!(await validateForm())) return
 
     const adminData: any = {
@@ -179,9 +195,10 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              className={errors.username ? "border-red-500" : ""}
+              className={errors.username || duplicateError === "Username already exists" ? "border-red-500" : ""}
             />
             {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
+            {duplicateError === "Username already exists" && <p className="text-red-500 text-sm mt-1">{duplicateError}</p>}
           </div>
 
           <div>
@@ -192,9 +209,10 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
               type="email"
               value={formData.email}
               onChange={handleInputChange}
-              className={errors.email ? "border-red-500" : ""}
+              className={errors.email || duplicateError === "Email already exists" ? "border-red-500" : ""}
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {duplicateError === "Email already exists" && <p className="text-red-500 text-sm mt-1">{duplicateError}</p>}
           </div>
 
           <div>
@@ -253,7 +271,7 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90" disabled={admin ? !hasChanges : false}>
+            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90" disabled={!!duplicateError || (admin ? !hasChanges : false)}>
               {admin ? "Update Admin" : "Create Admin"}
             </Button>
           </div>

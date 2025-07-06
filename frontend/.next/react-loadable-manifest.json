@@ -1,8 +1,4 @@
 {
-  "components\\order-details-dialog.tsx -> @/lib/api-service": {
-    "id": "components\\order-details-dialog.tsx -> @/lib/api-service",
-    "files": []
-  },
   "node_modules\\next\\dist\\client\\components\\react-dev-overlay\\utils\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts": {
     "id": "node_modules\\next\\dist\\client\\components\\react-dev-overlay\\utils\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts",
     "files": [
