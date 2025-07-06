@@ -12,6 +12,7 @@ export interface CartItem {
   quantity: number
   image: string
   stock: number
+  category: string // <-- add this
 }
 
 interface CartContextType {
@@ -57,6 +58,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                   price: product.price,
                   image: typeof product.image === "string" ? product.image : "",
                   stock: product.stock,
+                  category: product.category, // <-- set category
                   // Ensure quantity doesn't exceed current stock
                   quantity: Math.min(item.quantity, product.stock),
                 })
@@ -113,7 +115,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           )
         }
 
-        return [...currentItems, { ...newItem, quantity: 1, stock: product.stock }]
+        return [...currentItems, { ...newItem, quantity: 1, stock: product.stock, category: product.category }]
       })
     } catch (error) {
       console.error("Error adding item to cart:", error)

@@ -18,6 +18,12 @@ export interface Product {
 }
 
 // Order interface for both user and admin views
+export interface ShippingFeeBreakdownItem {
+  category: string;
+  type: 'base' | 'additional';
+  fee: number;
+}
+
 export interface Order {
   id: string
   code: string
@@ -45,6 +51,9 @@ export interface Order {
   archived: boolean
   createdAt: string
   updatedAt: string
+  shippingFeeBreakdown?: ShippingFeeBreakdownItem[];
+  shippingFeeExplanation?: string;
+  shippingFeeTotal: number; // Persisted shipping fee total for the order
 }
 
 // Admin interface for managing users and products

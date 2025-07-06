@@ -1,9 +1,7 @@
 {
-  "/admin/page": "app/admin/page.js",
-  "/(customer)/products/page": "app/(customer)/products/page.js",
   "/admin/dashboard/page": "app/admin/dashboard/page.js",
-  "/(customer)/cart/page": "app/(customer)/cart/page.js",
-  "/(customer)/order-success/page": "app/(customer)/order-success/page.js",
   "/admin/admins/page": "app/admin/admins/page.js",
-  "/admin/orders/page": "app/admin/orders/page.js"
+  "/(customer)/products/page": "app/(customer)/products/page.js",
+  "/admin/orders/page": "app/admin/orders/page.js",
+  "/admin/products/page": "app/admin/products/page.js"
 }

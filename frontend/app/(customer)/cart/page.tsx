@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useCart } from "@/components/cart-provider"
 import type { Product } from "@/lib/data-store"
 import { useEffect, useState } from "react"
+import { shippingFeeService, productService } from "@/lib/api-service"
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, total } = useCart()
@@ -16,31 +17,18 @@ export default function CartPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
+  // --- Shipping Fee Estimate Logic for Cart Summary ---
+  const [shippingFees, setShippingFees] = useState<Record<string, { baseFee: number; additionalFee: number }> | null>(null)
+  const [shippingFeeBreakdown, setShippingFeeBreakdown] = useState<any[]>([])
+
   useEffect(() => {
-    // Fetch all products from backend on mount using fetch
+    // Fetch all products from backend on mount using api-service
     async function fetchProducts() {
       setLoading(true)
       try {
-        const res = await fetch("/api/products", {
-          method: "GET",
-          headers: {
-            "accept": "application/json"
-          }
-        })
-        console.log('Fetch response:', res)
-        if (!res.ok) throw new Error("Failed to fetch products")
-        const data = await res.json()
-        console.log('Fetched data:', data)
-        // Handle both array and object with products property
-        if (Array.isArray(data)) {
-          setProducts(data)
-        } else if (data.products && Array.isArray(data.products)) {
-          setProducts(data.products)
-        } else {
-          setProducts([])
-        }
+        const data = await productService.getAllProducts()
+        setProducts(data)
       } catch (e) {
-        console.error('Error fetching products:', e)
         setProducts([])
       } finally {
         setLoading(false)
@@ -68,6 +56,47 @@ export default function CartPage() {
     })
     setStockWarnings(warnings)
   }, [items, products, loading])
+
+  // --- Shipping Fee Logic ---
+  useEffect(() => {
+    async function fetchShippingFees() {
+      try {
+        const data = await shippingFeeService.getAllShippingFees()
+        // DEBUG: Log the shipping fees fetched from API
+        console.log('Shipping fees API response:', data)
+        setShippingFees(data)
+      } catch (e) {
+        setShippingFees(null)
+      }
+    }
+    fetchShippingFees()
+  }, [])
+
+  useEffect(() => {
+    if (!shippingFees || !items.length) {
+      setShippingFeeBreakdown([])
+      return
+    }
+    // Use product category label directly for lookup
+    const categories = Array.from(new Set(items.map((item) => item.category)))
+    // DEBUG: Log the categories being used for shipping fee lookup
+    console.log('Cart item categories for shipping fee:', categories)
+    const fees = categories
+      .map((cat) => ({ category: cat, ...shippingFees[cat] }))
+      .filter((f) => f.baseFee !== undefined)
+      .sort((a, b) => b.baseFee - a.baseFee)
+    const breakdown: any[] = []
+    let feeTotal = 0
+    if (fees.length) {
+      breakdown.push({ category: fees[0].category, type: 'base', fee: fees[0].baseFee })
+      feeTotal += fees[0].baseFee
+      for (let i = 1; i < fees.length; i++) {
+        breakdown.push({ category: fees[i].category, type: 'additional', fee: fees[i].additionalFee })
+        feeTotal += fees[i].additionalFee
+      }
+    }
+    setShippingFeeBreakdown(breakdown)
+  }, [items, shippingFees])
 
   const getMaxQuantity = (itemId: string) => {
     const product = products.find((p) => Number(p.id) === Number(itemId))
@@ -102,6 +131,9 @@ export default function CartPage() {
     )
   }
 
+  // Calculate estimated shipping fee for cart summary
+  const estimatedShippingFee = shippingFeeBreakdown.reduce((sum, fee) => sum + Number(fee.fee || 0), 0)
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-md md:max-w-2xl lg:max-w-6xl">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
@@ -116,6 +148,16 @@ export default function CartPage() {
                 <p key={index}>{warning}</p>
               ))}
             </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Shipping Fee Warning */}
+      {estimatedShippingFee === 0 && items.length > 0 && (
+        <Alert className="mb-4 border-red-200 bg-red-50">
+          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            Shipping fee is currently set to ₱0.00. This may be due to missing or incorrect shipping configuration. Please contact the store admin if this is unexpected.
           </AlertDescription>
         </Alert>
       )}
@@ -267,17 +309,21 @@ export default function CartPage() {
                 <span>Subtotal</span>
                 <span>₱{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
-
+              {/* Shipping Fee row */}
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Shipping Fee</span>
+                <span>₱{estimatedShippingFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>VAT (12%)</span>
-                <span>Calculated at checkout</span>
+                <span>₱{(Math.round(total * 0.12 * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
 
               <hr />
 
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span className="text-brand-primary">₱{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-brand-primary">₱{(total + estimatedShippingFee + Math.round(total * 0.12 * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
 
               <Button

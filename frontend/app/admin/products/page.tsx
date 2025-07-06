@@ -15,6 +15,7 @@ import { AdminLayout } from "@/components/admin-layout"
 import { useToast } from "@/hooks/use-toast"
 import { productStore, initializeData, type Product } from "@/lib/data-store"
 import { ProductFormDialog } from "@/components/product-form-dialog"
+import { EditShippingFeesDialog } from "@/components/edit-shipping-fees-dialog"
 import {
   Table,
   TableBody,
@@ -33,6 +34,7 @@ export function AdminProductsPage() {
   const [showArchived, setShowArchived] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isShippingDialogOpen, setIsShippingDialogOpen] = useState(false)
   const [currentAdmin, setCurrentAdmin] = useState<Admin | null>(null)
 
   useEffect(() => {
@@ -99,6 +101,7 @@ export function AdminProductsPage() {
   const canEditProduct = currentAdmin && ["SUPER_ADMIN", "MANAGER"].includes(currentAdmin.role)
   const canArchiveProduct = canEditProduct
   const canAddProduct = canEditProduct
+  const canEditShippingFees = canEditProduct
 
   if (!isAuthenticated) {
     return <div>Loading...</div>
@@ -128,24 +131,36 @@ export function AdminProductsPage() {
                 </>
               )}
             </Button>
-            <Button 
-              onClick={() => {
-                if (!canAddProduct) {
-                  toast({
-                    title: "Permission Denied",
-                    description: "You do not have permission to add products.",
-                    variant: "destructive",
-                  })
-                  return
-                }
-                handleCreate()
-              }}
-              className="flex-1 sm:flex-none bg-brand-primary hover:bg-brand-primary/90"
-              disabled={!canAddProduct}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Product
-            </Button>
+            {canAddProduct && (
+              <Button
+                onClick={() => {
+                  if (!canAddProduct) {
+                    toast({
+                      title: "Permission Denied",
+                      description: "You do not have permission to add products.",
+                      variant: "destructive",
+                    })
+                    return
+                  }
+                  handleCreate()
+                }}
+                className="flex-1 sm:flex-none bg-brand-primary hover:bg-brand-primary/90"
+                disabled={!canAddProduct}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Product
+              </Button>
+            )}
+            {canEditShippingFees && (
+              <Button
+                variant="outline"
+                onClick={() => setIsShippingDialogOpen(true)}
+                className="flex-1 sm:flex-none"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Shipping Fees
+              </Button>
+            )}
           </div>
         </div>
 
@@ -293,6 +308,12 @@ export function AdminProductsPage() {
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onSave={handleSave}
+          products={products} // Pass all products as a prop for duplicate check
+        />
+        <EditShippingFeesDialog
+          open={isShippingDialogOpen}
+          onOpenChange={setIsShippingDialogOpen}
+          canEdit={!!canEditShippingFees}
         />
       </div>
     </AdminLayout>

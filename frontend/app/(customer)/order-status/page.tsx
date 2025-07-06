@@ -21,6 +21,20 @@ const statusColors = {
   Cancelled: "bg-red-100 text-red-800",
 }
 
+const formatOrderCode = (input: string) => {
+  // Remove all non-alphanumeric characters, make uppercase
+  let code = input.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  // Ensure it starts with ESP-
+  if (!code.startsWith('ESP')) {
+    code = 'ESP' + code;
+  }
+  // Insert dash after ESP if not present
+  if (!code.startsWith('ESP-')) {
+    code = code.replace(/^ESP/, 'ESP-');
+  }
+  return code;
+};
+
 export default function OrderStatusPage() {
   const [orderCode, setOrderCode] = useState("")
   const [orderData, setOrderData] = useState<Order | null>(null)
@@ -39,7 +53,9 @@ export default function OrderStatusPage() {
     setError("")
 
     try {
-      const order = await orderService.getOrderStatus(orderCode.toUpperCase())
+      const formattedCode = formatOrderCode(orderCode);
+      setOrderCode(formattedCode); // update input field to formatted code
+      const order = await orderService.getOrderStatus(formattedCode)
 
       if (order) {
         setOrderData(order)
@@ -229,6 +245,10 @@ export default function OrderStatusPage() {
                         <div className="flex justify-between">
                           <span>VAT (12%)</span>
                           <span>₱{orderData.vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Shipping Fee</span>
+                          <span>₱{orderData.shippingFeeTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                         <div className="flex justify-between font-semibold text-lg">
                           <span>Total</span>

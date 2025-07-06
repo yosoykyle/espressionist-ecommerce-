@@ -148,32 +148,36 @@ export default function AdminAdminsPage() {
             <p className="text-gray-600">Manage system administrators and their roles</p>
           </div>
           <div className="flex items-center gap-2 self-stretch sm:self-auto">
-            <Button
-              variant="outline"
-              onClick={() => setShowArchived(!showArchived)}
-              className="flex-1 sm:flex-none"
-              disabled={!canManageAdmins}
-            >
-              {showArchived ? "Show Active" : "Show Archived"}
-            </Button>
-            <Button 
-              onClick={() => {
-                if (!canManageAdmins) {
-                  toast({
-                    title: "Permission Denied",
-                    description: "You do not have permission to add admins.",
-                    variant: "destructive",
-                  })
-                  return
-                }
-                handleCreate()
-              }}
-              className="flex-1 sm:flex-none bg-brand-primary hover:bg-brand-primary/90"
-              disabled={!canManageAdmins}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Admin
-            </Button>
+            {canManageAdmins && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowArchived(!showArchived)}
+                  className="flex-1 sm:flex-none"
+                  disabled={!canManageAdmins}
+                >
+                  {showArchived ? "Show Active" : "Show Archived"}
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (!canManageAdmins) {
+                      toast({
+                        title: "Permission Denied",
+                        description: "You do not have permission to add admins.",
+                        variant: "destructive",
+                      })
+                      return
+                    }
+                    handleCreate()
+                  }}
+                  className="flex-1 sm:flex-none bg-brand-primary hover:bg-brand-primary/90"
+                  disabled={!canManageAdmins}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Admin
+                </Button>
+              </>
+            )}
           </div>
         </div>
 

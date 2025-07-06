@@ -19,6 +19,7 @@ public class OrderDTO {
     private BigDecimal subtotal;
     private BigDecimal vat;
     private BigDecimal total;
+    private BigDecimal shippingFeeTotal;
     private Boolean archived;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

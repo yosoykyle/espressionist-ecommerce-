@@ -67,7 +67,9 @@ public class SecurityConfig {
                     "/api/products", "/api/products/**", "/api/products/*/image",
                     "/api/checkout", "/api/checkout/**",
                     "/api/order-status/*",
-                    "/uploads/**"
+                    "/uploads/**",
+                    // Allow public GET access to shipping fees
+                    "/api/shipping-fees"
                 ).permitAll()
                 // Admin-only endpoints (authenticated)
                 .requestMatchers("/admin/**", "/admin/api/**").authenticated().anyRequest().authenticated() // Require authentication for all other requests

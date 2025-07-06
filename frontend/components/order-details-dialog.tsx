@@ -128,6 +128,10 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange, 
                   <span>VAT (12%)</span>
                   <span>₱{order.vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span>Shipping Fee</span>
+                  <span>₱{order.shippingFeeTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
                 <hr />
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>

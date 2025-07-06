@@ -358,3 +358,28 @@ export const adminUserService = {
     return response.json();
   },
 }
+
+export const shippingFeeService = {
+  /**
+   * Get all shipping fees (base and additional) for each category
+   * Calls GET /api/shipping-fees
+   */
+  getAllShippingFees: async (): Promise<Record<string, { baseFee: number; additionalFee: number }>> => {
+    const response = await fetch("/api/shipping-fees");
+    if (!response.ok) throw new Error("Failed to fetch shipping fees");
+    return response.json();
+  },
+  /**
+   * Update shipping fees
+   * Calls PUT /api/shipping-fees
+   */
+  updateShippingFees: async (fees: Record<string, { baseFee: number; additionalFee: number }>) => {
+    const response = await fetch("/api/shipping-fees", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fees),
+    });
+    if (!response.ok) throw new Error("Failed to update shipping fees");
+    return response.json();
+  },
+};

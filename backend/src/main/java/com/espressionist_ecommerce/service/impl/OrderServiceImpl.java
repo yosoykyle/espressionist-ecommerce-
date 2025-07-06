@@ -15,12 +15,13 @@ import com.espressionist_ecommerce.dto.OrderRequestDTO;
 import com.espressionist_ecommerce.entity.Order;
 import com.espressionist_ecommerce.entity.OrderItem;
 import com.espressionist_ecommerce.entity.Product;
+import com.espressionist_ecommerce.entity.ShippingFee;
 import com.espressionist_ecommerce.exception.ResourceNotFoundException;
 import com.espressionist_ecommerce.repository.OrderRepository;
 import com.espressionist_ecommerce.repository.ProductRepository;
 import com.espressionist_ecommerce.service.EmailService;
 import com.espressionist_ecommerce.service.OrderService;
-import lombok.RequiredArgsConstructor;
+import com.espressionist_ecommerce.service.ShippingFeeService;
 import java.time.LocalDateTime;
 
 /**
@@ -28,12 +29,16 @@ import java.time.LocalDateTime;
  * Provides methods to place orders, retrieve orders by code or all orders, update order status, and archive orders.
  */
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class OrderServiceImpl implements OrderService {
-    private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
-    private final ModelMapper modelMapper;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private ModelMapper modelMapper;
+    @Autowired
+    private ShippingFeeService shippingFeeService;
     @Autowired
     private EmailService emailService;
 
@@ -92,7 +97,11 @@ public class OrderServiceImpl implements OrderService {
                 .append(")\n");
         }
         emailText.append("\nSubtotal: ").append(formatCurrency(order.getSubtotal()));
-        emailText.append("\nVAT (12%): ").append(formatCurrency(order.getVat()));
+        // Use persisted shipping fee total
+        emailText.append("\nShipping Fee: ").append(formatCurrency(order.getShippingFeeTotal()));
+        emailText.append("\n");
+        emailText.append("Shipping fee is calculated as follows: For each order, the category with the highest base shipping fee is charged as the base. Each additional category in the order is charged its respective additional fee. Only the following categories are valid: Coffee & Tea, Art & Merch, Gift Set, Gear. Shipping fees are never negative and are set by the store admin.\n");
+        emailText.append("VAT (12%): ").append(formatCurrency(order.getVat()));
         emailText.append("\nTotal: ").append(formatCurrency(order.getTotal()));
         emailText.append("\n\nShipping to: ")
             .append(order.getCustomerName()).append(", ")
@@ -121,72 +130,122 @@ public class OrderServiceImpl implements OrderService {
         order.setCode(generateShortOrderCode()); // Generate a short, memorable order code
         order.setStatus(Order.OrderStatus.PENDING); // Default status
         order.setDate(LocalDateTime.now()); // Set current date/time
-        // Initialize subtotal, VAT, and total
+        // Initialize subtotal (sum of item prices only)
         BigDecimal subtotal = BigDecimal.ZERO;
         // Map OrderItemDTOs to OrderItem entities
         List<OrderItem> orderItems = orderRequestDTO.getItems().stream()
                 .map(itemDTO -> {
                     Product product = productRepository.findById(itemDTO.getProductId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + itemDTO.getProductId())); // Product lookup
+                            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + itemDTO.getProductId()));
                     if (product.isArchived()) {
-                        throw new IllegalStateException("Product is archived and cannot be ordered: " + product.getName()); // Check if product is archived
+                        throw new IllegalStateException("Product is archived and cannot be ordered: " + product.getName());
                     }
                     if (product.getStock() < itemDTO.getQuantity()) {
                         throw new IllegalArgumentException(
                                 "Insufficient stock for product: " + product.getName() +
                                 ". Available: " + product.getStock() +
-                                ", Requested: " + itemDTO.getQuantity());  // Check stock availability
+                                ", Requested: " + itemDTO.getQuantity());
                     }
-                    product.setStock(product.getStock() - itemDTO.getQuantity()); // Deduct stock
-                    productRepository.save(product); // Save updated product stock
-                    OrderItem orderItem = new OrderItem();  // Create new OrderItem entity
-                    orderItem.setProduct(product); // Set product reference
-                    orderItem.setQuantity(itemDTO.getQuantity()); // Set quantity from OrderItemDTO
-                    orderItem.setName(product.getName()); // Set product name
-                    orderItem.setPrice(product.getPrice()); // Set product price
-                    orderItem.setImage(product.getImage()); // Set product image
-                    orderItem.setOrder(order); // Set back-reference to Order
-                    return orderItem; // Return the mapped OrderItem entity
+                    product.setStock(product.getStock() - itemDTO.getQuantity());
+                    productRepository.save(product);
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setProduct(product);
+                    orderItem.setQuantity(itemDTO.getQuantity());
+                    orderItem.setName(product.getName());
+                    orderItem.setPrice(product.getPrice());
+                    orderItem.setImage(product.getImage());
+                    orderItem.setOrder(order);
+                    return orderItem;
                 })
-                .collect(Collectors.toList()); // Collect OrderItem entities from DTOs
-        order.setItems(orderItems); // Set the list of OrderItems in the Order entity
-        // Calculate subtotal
+                .collect(Collectors.toList());
+        order.setItems(orderItems);
+        // Calculate subtotal (sum of item prices only)
         for (OrderItem item : order.getItems()) {
             BigDecimal itemTotal = item.getPrice().multiply(new BigDecimal(item.getQuantity()));
-            subtotal = subtotal.add(itemTotal); // Sum up item totals to get subtotal
+            subtotal = subtotal.add(itemTotal);
         }
-        order.setSubtotal(subtotal); // Set subtotal in the Order entity
-        // Calculate VAT (example: 12% VAT rate)
-        BigDecimal vatRate = new BigDecimal("0.12"); // Match frontend VAT
-        BigDecimal vatAmount = subtotal.multiply(vatRate); // Calculate VAT based on subtotal
-        order.setVat(vatAmount.setScale(2, RoundingMode.HALF_UP)); // Set VAT amount in the Order entity, rounding to 2 decimal places
-        // Calculate total
-        BigDecimal total = subtotal.add(order.getVat()); // Total is subtotal + VAT
-        order.setTotal(total.setScale(2, RoundingMode.HALF_UP)); // Set total in the Order entity, rounding to 2 decimal places 
-        // Set archived status to false by default
-        Order savedOrder = orderRepository.save(order); // Save the order to the repository
-        // Send confirmation email only after saving, and use the savedOrder object
-        sendStatusEmail(savedOrder, Order.OrderStatus.PENDING); // Send confirmation email with initial status PENDING
-        return modelMapper.map(savedOrder, OrderDTO.class); // Map the saved Order entity to OrderDTO and return it
+        // --- Shipping Fee Calculation (Base + Additional, always uses persisted fees) ---
+        java.util.List<ShippingFee> persistedFees = shippingFeeService.getAllShippingFees();
+        java.util.Map<String, ShippingFee> categoryFees = new java.util.HashMap<>();
+        for (ShippingFee fee : persistedFees) {
+            categoryFees.put(fee.getCategory().toString(), fee);
+        }
+        java.util.Set<String> categories = orderItems.stream()
+            .map(item -> item.getProduct().getCategory())
+            .collect(java.util.stream.Collectors.toSet());
+        java.util.List<ShippingFee> fees = categories.stream()
+            .map(categoryFees::get)
+            .filter(java.util.Objects::nonNull)
+            .sorted((a, b) -> b.getBaseFee().compareTo(a.getBaseFee()))
+            .collect(java.util.stream.Collectors.toList());
+        // Build shipping fee breakdown and sum shippingFee
+        java.util.List<java.util.Map<String, Object>> shippingFeeBreakdown = new java.util.ArrayList<>();
+        BigDecimal shippingFee = BigDecimal.ZERO;
+        boolean allZeroFees = true;
+        if (!fees.isEmpty()) {
+            ShippingFee base = fees.get(0);
+            java.util.Map<String, Object> baseMap = new java.util.HashMap<>();
+            baseMap.put("category", base.getCategory().toString());
+            baseMap.put("type", "base");
+            baseMap.put("fee", base.getBaseFee());
+            shippingFeeBreakdown.add(baseMap);
+            shippingFee = shippingFee.add(base.getBaseFee());
+            if (base.getBaseFee().compareTo(BigDecimal.ZERO) > 0) allZeroFees = false;
+            for (int i = 1; i < fees.size(); i++) {
+                ShippingFee addl = fees.get(i);
+                java.util.Map<String, Object> addlMap = new java.util.HashMap<>();
+                addlMap.put("category", addl.getCategory().toString());
+                addlMap.put("type", "additional");
+                addlMap.put("fee", addl.getAdditionalFee());
+                shippingFeeBreakdown.add(addlMap);
+                shippingFee = shippingFee.add(addl.getAdditionalFee());
+                if (addl.getAdditionalFee().compareTo(BigDecimal.ZERO) > 0) allZeroFees = false;
+            }
+        }
+        if (categories.size() != fees.size()) {
+            throw new IllegalStateException("Shipping fee missing for one or more product categories in the order.");
+        }
+        // Throw error if all shipping fees are zero (unless cart is empty)
+        if (fees.size() > 0 && allZeroFees) {
+            throw new IllegalStateException("Shipping fee configuration is missing or set to zero for all categories. Please contact the store admin.");
+        }
+        // --- VAT and Total Calculation: VAT is only on item subtotal (not shipping fee) ---
+        BigDecimal vat = subtotal.multiply(new BigDecimal("0.12")).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal total = subtotal.add(shippingFee).add(vat).setScale(2, RoundingMode.HALF_UP);
+        order.setSubtotal(subtotal);
+        order.setVat(vat);
+        order.setTotal(total);
+        // Persist the shipping fee total at order time
+        order.setShippingFeeTotal(shippingFee);
+        // Save order
+        Order savedOrder = orderRepository.save(order);
+        // Send confirmation email
+        sendStatusEmail(savedOrder, Order.OrderStatus.PENDING);
+        // Build response DTO
+        OrderDTO dto = modelMapper.map(savedOrder, OrderDTO.class);
+        dto.setShippingFeeTotal(savedOrder.getShippingFeeTotal());
+        return dto;
     }
     @Override
     // Retrieves an order by its unique code, mapping to OrderDTO
     // If the order is not found, it throws a ResourceNotFoundException with a descriptive message.
     public OrderDTO getOrderByCode(String code) {
         Order order = orderRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + code)); // Find order by code
-        OrderDTO dto = modelMapper.map(order, OrderDTO.class); // Map Order entity to OrderDTO
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + code));
+        OrderDTO dto = modelMapper.map(order, OrderDTO.class);
         // Manually map customer fields to nested CustomerDTO
-        CustomerDTO customer = new CustomerDTO(); // Create a new CustomerDTO
-        customer.setName(order.getCustomerName()); // Set customer name
-        customer.setEmail(order.getCustomerEmail()); // Set customer email
-        customer.setPhone(order.getCustomerPhone()); // Set customer phone
-        customer.setAddress(order.getCustomerAddress()); // Set customer address
-        customer.setCity(order.getCustomerCity()); // Set customer city
-        customer.setPostalCode(order.getCustomerPostalCode()); // Set customer postal code
-        customer.setNotes(order.getCustomerNotes()); // Set customer notes
-        dto.setCustomer(customer); // Set the CustomerDTO in the OrderDTO
-        return dto; // Return the mapped OrderDTO with customer details
+        CustomerDTO customer = new CustomerDTO();
+        customer.setName(order.getCustomerName());
+        customer.setEmail(order.getCustomerEmail());
+        customer.setPhone(order.getCustomerPhone());
+        customer.setAddress(order.getCustomerAddress());
+        customer.setCity(order.getCustomerCity());
+        customer.setPostalCode(order.getCustomerPostalCode());
+        customer.setNotes(order.getCustomerNotes());
+        dto.setCustomer(customer);
+        // Use persisted shipping fee total
+        dto.setShippingFeeTotal(order.getShippingFeeTotal());
+        return dto;
     }
     @Override
     // Retrieves all orders, mapping each Order entity to OrderDTO
@@ -196,18 +255,20 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> {
                     OrderDTO dto = modelMapper.map(order, OrderDTO.class);
                     // Manually map customer fields to nested CustomerDTO
-                    CustomerDTO customer = new CustomerDTO(); // Create a new CustomerDTO
-                    customer.setName(order.getCustomerName()); // Set customer name
-                    customer.setEmail(order.getCustomerEmail()); // Set customer email
-                    customer.setPhone(order.getCustomerPhone()); // Set customer phone
-                    customer.setAddress(order.getCustomerAddress()); // Set customer address
-                    customer.setCity(order.getCustomerCity()); // Set customer city
-                    customer.setPostalCode(order.getCustomerPostalCode()); // Set customer postal code
-                    customer.setNotes(order.getCustomerNotes()); // Set customer notes
-                    dto.setCustomer(customer); // Set the CustomerDTO in the OrderDTO
-                    return dto; // Return the mapped OrderDTO with customer details
+                    CustomerDTO customer = new CustomerDTO();
+                    customer.setName(order.getCustomerName());
+                    customer.setEmail(order.getCustomerEmail());
+                    customer.setPhone(order.getCustomerPhone());
+                    customer.setAddress(order.getCustomerAddress());
+                    customer.setCity(order.getCustomerCity());
+                    customer.setPostalCode(order.getCustomerPostalCode());
+                    customer.setNotes(order.getCustomerNotes());
+                    dto.setCustomer(customer);
+                    // Use persisted shipping fee total
+                    dto.setShippingFeeTotal(order.getShippingFeeTotal());
+                    return dto;
                 })
-                .collect(Collectors.toList()); // Collect all OrderDTOs into a list
+                .collect(Collectors.toList());
     }
     @Override
     // Updates the status of an existing order by its ID

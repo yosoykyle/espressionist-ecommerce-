@@ -30,6 +30,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
     private static final String UPLOAD_DIR = "uploads/products";
+    private static final List<String> ALLOWED_CATEGORIES = List.of(
+        "Coffee & Tea", "Art & Merch", "Gift Set", "Gear"
+    );
 
     @Override
     // Uploads a product image, saves it to the filesystem, and updates the product entity
@@ -95,6 +98,9 @@ public class ProductServiceImpl implements ProductService {
     // Creates a new product from the provided ProductDTO
     // Converts the price from Double to BigDecimal for the entity, and maps back to ProductDTO
     public ProductDTO createProduct(ProductDTO productDTO) {
+        if (!ALLOWED_CATEGORIES.contains(productDTO.getCategory())) {
+            throw new IllegalArgumentException("Invalid product category. Allowed: " + ALLOWED_CATEGORIES);
+        }
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice() != null ? java.math.BigDecimal.valueOf(productDTO.getPrice()) : null);
@@ -120,14 +126,21 @@ public class ProductServiceImpl implements ProductService {
     // Updates an existing product by its ID with the provided ProductDTO
     // Converts the price from Double to BigDecimal for the entity, and maps back to ProductDTO
     public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
+        if (!ALLOWED_CATEGORIES.contains(productDTO.getCategory())) {
+            throw new IllegalArgumentException("Invalid product category. Allowed: " + ALLOWED_CATEGORIES);
+        }
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        product.setName(productDTO.getName());
-        product.setPrice(productDTO.getPrice() != null ? BigDecimal.valueOf(productDTO.getPrice()) : null);
-        product.setCategory(productDTO.getCategory());
-        product.setImage(productDTO.getImage());
-        product.setStock(productDTO.getStock());
-        product.setDescription(productDTO.getDescription());
+        // Only update fields that are present (non-null)
+        if (productDTO.getName() != null) product.setName(productDTO.getName());
+        if (productDTO.getPrice() != null) product.setPrice(BigDecimal.valueOf(productDTO.getPrice()));
+        if (productDTO.getCategory() != null) product.setCategory(productDTO.getCategory());
+        if (productDTO.getStock() != null) product.setStock(productDTO.getStock());
+        if (productDTO.getDescription() != null) product.setDescription(productDTO.getDescription());
+        // Only update image if provided and not empty
+        if (productDTO.getImage() != null && !productDTO.getImage().isEmpty()) {
+            product.setImage(productDTO.getImage());
+        }
         product = productRepository.save(product);
         return modelMapper.map(product, ProductDTO.class);
     }
@@ -152,6 +165,11 @@ public class ProductServiceImpl implements ProductService {
         product.setArchived(true);
         productRepository.save(product);
         return modelMapper.map(product, ProductDTO.class);
+    }
+
+    // Service method to check for duplicate product by name and category (case-insensitive, trimmed)
+    public boolean existsDuplicateProduct(String name, String category) {
+        return productRepository.findByNameAndCategoryIgnoreCaseTrimmed(name, category) != null;
     }
 
     // ...implement other ProductService methods or delegate to existing service...

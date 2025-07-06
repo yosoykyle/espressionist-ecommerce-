@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useCart } from "@/components/cart-provider"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
-import { orderService, productService } from "@/lib/api-service"
+import { orderService, productService, shippingFeeService } from "@/lib/api-service"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -30,9 +30,44 @@ export default function CheckoutPage() {
     notes: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [shippingFees, setShippingFees] = useState<Record<string, { baseFee: number; additionalFee: number }> | null>(null)
+  const [shippingFeeBreakdown, setShippingFeeBreakdown] = useState<any[]>([])
+  const [shippingFeeExplanation] = useState<string>(
+    "Shipping fee is calculated as follows: For each order, the category with the highest base shipping fee is charged as the base. Each additional category in the order is charged its respective additional fee. Only the following categories are valid: Coffee & Tea, Art & Merch, Gift Set, Gear. Shipping fees are never negative and are set by the store admin."
+  )
 
+  // Fetch shipping fees on mount
+  useEffect(() => {
+    shippingFeeService.getAllShippingFees().then(setShippingFees).catch(() => setShippingFees(null))
+  }, [])
+
+  // Calculate shipping fee breakdown whenever items or shippingFees change
+  useEffect(() => {
+    if (!shippingFees || !items.length) {
+      setShippingFeeBreakdown([])
+      return
+    }
+    // Use product category label directly for lookup
+    const categories = Array.from(new Set(items.map((item) => item.category)))
+    const fees = categories
+      .map((cat) => ({ category: cat, ...shippingFees[cat] }))
+      .filter((f) => f.baseFee !== undefined)
+      .sort((a, b) => b.baseFee - a.baseFee)
+    const breakdown: any[] = []
+    if (fees.length) {
+      breakdown.push({ category: fees[0].category, type: 'base', fee: fees[0].baseFee })
+      for (let i = 1; i < fees.length; i++) {
+        breakdown.push({ category: fees[i].category, type: 'additional', fee: fees[i].additionalFee })
+      }
+    }
+    setShippingFeeBreakdown(breakdown)
+  }, [items, shippingFees])
+
+  // Calculate shipping fee total
+  const shippingFeeTotal = shippingFeeBreakdown.reduce((sum, fee) => sum + Number(fee.fee || 0), 0)
+  // VAT is now only on the item subtotal (not including shipping fee)
   const vat = total * 0.12
-  const totalWithVat = total + vat
+  const totalWithVat = total + shippingFeeTotal + vat
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -354,14 +389,41 @@ export default function CheckoutPage() {
                   <span>Subtotal</span>
                   <span>₱{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
-
+                {shippingFeeBreakdown.length > 0 && (
+                  <>
+                    <div className="flex justify-between">
+                      <span>Shipping Fee</span>
+                      <span>₱{shippingFeeTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <details className="mt-2 group">
+                      <summary className="font-semibold text-orange-700 mb-2 flex items-center cursor-pointer select-none">
+                        <svg className="h-5 w-5 mr-2 text-orange-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                        Shipping Fee Breakdown
+                      </summary>
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mt-2">
+                        <ul className="text-sm text-orange-800 ml-2 space-y-1 mb-2">
+                          {shippingFeeBreakdown.map((fee, idx) => (
+                            <li key={idx} className="flex items-center gap-2">
+                              <span className={fee.type === 'base' ? 'font-bold text-orange-700' : 'text-orange-800'}>
+                                {fee.type === 'base' ? 'Base category' : 'Additional category'}:
+                              </span>
+                              <span className="font-medium">{fee.category}</span>
+                              <span className="text-orange-500">(₱{Number(fee.fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="bg-orange-100 rounded p-2 text-xs text-orange-700 border border-orange-200">
+                          Shipping fee is calculated as follows: For each order, the category with the highest base shipping fee is charged as the base. Each additional category in the order is charged its respective additional fee. Only the following categories are valid: Coffee & Tea, Art & Merch, Gift Set, Gear. Shipping fees are never negative and are set by the store admin.
+                        </div>
+                      </div>
+                    </details>
+                  </>
+                )}
                 <div className="flex justify-between">
                   <span>VAT (12%)</span>
                   <span>₱{vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
-
                 <hr />
-
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
                   <span className="text-brand-primary">₱{totalWithVat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>

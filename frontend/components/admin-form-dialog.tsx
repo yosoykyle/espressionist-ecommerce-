@@ -31,6 +31,7 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
     role: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
     if (admin) {
@@ -51,7 +52,28 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
       })
     }
     setErrors({})
+    setHasChanges(false)
   }, [admin, open])
+
+  // Track changes for enabling/disabling the submit button
+  useEffect(() => {
+    if (!admin) {
+      setHasChanges(
+        formData.username.trim() !== "" ||
+        formData.email.trim() !== "" ||
+        formData.password !== "" ||
+        formData.role !== ""
+      )
+      return
+    }
+    // Compare all fields to admin, ignore confirmPassword
+    const changed =
+      formData.username.trim() !== (admin.username || "") ||
+      formData.email.trim() !== (admin.email || "") ||
+      formData.role !== (admin.role || "") ||
+      (formData.password !== "")
+    setHasChanges(changed)
+  }, [formData.username, formData.email, formData.role, formData.password, admin])
 
   const validateForm = async () => {
     const newErrors: Record<string, string> = {}
@@ -231,7 +253,7 @@ export function AdminFormDialog({ admin, open, onOpenChange, onSave }: AdminForm
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90">
+            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90" disabled={admin ? !hasChanges : false}>
               {admin ? "Update Admin" : "Create Admin"}
             </Button>
           </div>

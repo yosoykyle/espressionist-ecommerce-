@@ -132,6 +132,10 @@ export default function OrderSuccessPage() {
                     <span>₱{orderData.subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between">
+                    <span>Shipping Fee</span>
+                    <span>₱{orderData.shippingFeeTotal?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span>VAT (12%)</span>
                     <span>₱{orderData.vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
@@ -193,3 +197,4 @@ export default function OrderSuccessPage() {
     </div>
   )
 }
+

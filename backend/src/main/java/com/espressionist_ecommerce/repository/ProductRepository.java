@@ -1,6 +1,8 @@
 package com.espressionist_ecommerce.repository;
 import com.espressionist_ecommerce.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -9,5 +11,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    // Additional custom query methods can be defined here if needed
+    // Custom query to check for duplicate product by name and category (case-insensitive, trimmed)
+    @Query("SELECT p FROM Product p WHERE LOWER(TRIM(p.name)) = LOWER(TRIM(:name)) AND LOWER(TRIM(p.category)) = LOWER(TRIM(:category))")
+    Product findByNameAndCategoryIgnoreCaseTrimmed(@Param("name") String name, @Param("category") String category);
 }

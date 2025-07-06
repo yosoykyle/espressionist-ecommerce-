@@ -18,11 +18,12 @@ interface ProductFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSave: () => void
+  products: Product[] // Add products prop for duplicate check
 }
 
 const categories = ["Coffee & Tea", "Art & Merch", "Gift Set", "Gear"]
 
-export function ProductFormDialog({ product, open, onOpenChange, onSave }: ProductFormDialogProps) {
+export function ProductFormDialog({ product, open, onOpenChange, onSave, products }: ProductFormDialogProps) {
   const { toast } = useToast()
   const [formData, setFormData] = useState({
     name: "",
@@ -35,29 +36,59 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [uploading, setUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
-    if (product) {
-      setFormData({
-        name: product.name,
-        price: product.price.toString(),
-        category: product.category,
-        stock: product.stock.toString(),
-        description: product.description,
-        image: product.image,
-      })
-    } else {
-      setFormData({
-        name: "",
-        price: "",
-        category: "",
-        stock: "",
-        description: "",
-        image: "",
-      })
+    if (open) {
+      if (product) {
+        setFormData({
+          name: product.name,
+          price: product.price.toString(),
+          category: product.category,
+          stock: product.stock.toString(),
+          description: product.description,
+          image: product.image,
+        })
+      } else {
+        setFormData({
+          name: "",
+          price: "",
+          category: "",
+          stock: "",
+          description: "",
+          image: "",
+        })
+      }
+      setSelectedFile(null)
+      setImagePreview(null)
+      setErrors({})
+      setHasChanges(false)
     }
-    setErrors({})
   }, [product, open])
+
+  // Helper to check if form has changes
+  useEffect(() => {
+    if (!product) {
+      setHasChanges(
+        formData.name.trim() !== "" ||
+        formData.price.trim() !== "" ||
+        formData.category !== "" ||
+        formData.stock.trim() !== "" ||
+        formData.description.trim() !== "" ||
+        selectedFile !== null
+      )
+      return
+    }
+    const changed =
+      formData.name.trim() !== (product.name || "") ||
+      Number(formData.price) !== Number(product.price) ||
+      (formData.category || "") !== (product.category || "") ||
+      Number(formData.stock) !== Number(product.stock) ||
+      formData.description.trim() !== (product.description || "") ||
+      (selectedFile !== null)
+    setHasChanges(changed)
+  }, [formData, selectedFile, product])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -114,15 +145,27 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
         }
       }
       // Save or update product with image filename
-      const productData = {
+      const productData: any = { // Use 'any' for flexibility or define a more specific type
         name: formData.name.trim(),
         price: Number(formData.price),
         category: formData.category,
         stock: Number(formData.stock),
         description: formData.description.trim(),
-        image: imageFilename || "/placeholder.svg?height=300&width=300",
         archived: false,
       }
+
+      // Only include the image in the payload if a new file was selected and uploaded,
+      // or if it's a new product and an image was uploaded.
+      // For existing products, if no new file is selected, 'imageFilename' will hold the original image path from formData,
+      // and we should not send it back unless it changed (i.e., selectedFile was present).
+      if (selectedFile) {
+        productData.image = imageFilename;
+      } else if (!product) { // New product without an image explicitly selected
+        productData.image = "/placeholder.svg?height=300&width=300";
+      }
+      // If 'selectedFile' is null and it's an existing product, 'image' field is omitted from productData.
+      // The backend should interpret this as "do not update the image".
+
       await (product
         ? adminProductService.saveProduct({ ...productData, id: product.id })
         : adminProductService.saveProduct(productData))
@@ -154,12 +197,12 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
     const file = e.target.files?.[0]
     if (file) {
       setSelectedFile(file)
-      // Show preview (optional, can be improved)
       const reader = new FileReader()
       reader.onload = (event) => {
-        setFormData((prev) => ({ ...prev, image: event.target?.result as string }))
+        setImagePreview(event.target?.result as string)
       }
       reader.readAsDataURL(file)
+      // Do NOT set formData.image here!
     }
   }
 
@@ -262,18 +305,15 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
               <Input id="image" name="image" type="file" accept="image/*" onChange={handleFileChange} />
               <p className="text-sm text-gray-500 mt-1">Upload an image for the product</p>
             </div>
-            {formData.image && (
+            {(imagePreview || formData.image) && (
               <div className="flex items-center gap-2">
                 <img
                   src={(() => {
-                    if (formData.image.startsWith('data:')) {
-                      // base64 preview from upload
-                      return formData.image;
-                    } else if (formData.image.startsWith('http') || formData.image.startsWith('/')) {
-                      // full URL or absolute path
+                    if (imagePreview) {
+                      return imagePreview;
+                    } else if (formData.image && (formData.image.startsWith('http') || formData.image.startsWith('/'))) {
                       return formData.image;
                     } else if (formData.image) {
-                      // filename from DB
                       return `/uploads/products/${formData.image}`;
                     } else {
                       return "/placeholder.svg";
@@ -289,7 +329,7 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90" disabled={uploading}>
+            <Button type="submit" className="flex-1 bg-brand-primary hover:bg-brand-primary/90" disabled={uploading || (product ? !hasChanges : false)}>
               {uploading ? "Uploading..." : product ? "Update Product" : "Create Product"}
             </Button>
           </div>
