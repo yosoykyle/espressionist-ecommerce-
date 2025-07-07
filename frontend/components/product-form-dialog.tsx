@@ -213,6 +213,16 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave, product
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
+    // Prevent negative stock values
+    if (name === "stock") {
+      // Only allow numbers >= 0
+      const numericValue = value.replace(/[^\d]/g, "");
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+      if (errors[name]) {
+        setErrors((prev) => ({ ...prev, [name]: "" }))
+      }
+      return;
+    }
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }))
@@ -279,6 +289,8 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave, product
                   id="stock"
                   name="stock"
                   type="number"
+                  min="0"
+                  inputMode="numeric"
                   value={formData.stock}
                   onChange={handleInputChange}
                   className={errors.stock ? "border-red-500" : ""}

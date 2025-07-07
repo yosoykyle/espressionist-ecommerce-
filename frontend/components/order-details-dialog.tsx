@@ -145,7 +145,7 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onStatusChange, 
             {/* Order Items */}
             <div>
               <h3 className="font-semibold mb-3">Order Items</h3>
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
                 {order.items.map((item) => (
                   <div key={item.id} className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow">
                     <Image

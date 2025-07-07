@@ -89,6 +89,12 @@ export default function OrderSuccessPage() {
               <p className="text-2xl font-mono font-bold text-brand-primary text-center">{orderData.code}</p>
             </div>
             <p className="text-sm text-gray-600 mt-2 text-center">Please save this code to track your order status.</p>
+            <p className="text-sm text-gray-600 text-center">
+              For returns and refunds, email:{" "}
+              <a href="mailto:vanceddotseti@gmail.com" className="text-brand-primary underline font-semibold">
+                vanceddotseti@gmail.com
+              </a>
+            </p>
           </CardContent>
         </Card>
 

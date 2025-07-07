@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import { Search } from "lucide-react"
+import { Search, ArrowUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useCart } from "@/components/cart-provider"
@@ -13,6 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { ProductDetailsDialog } from "@/components/product-details-dialog"
 
 const categories = ["All", "Coffee & Tea", "Art & Merch", "Gift Set", "Gear"]
+const PRODUCTS_PER_PAGE = 8
 
 export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -20,6 +21,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
   const { addItem } = useCart()
   const { toast } = useToast()
 
@@ -46,7 +48,13 @@ export default function ProductsPage() {
 
     loadProducts()
   }, [toast])
-//  Filter products based on search and category
+
+  // Reset to first page when filters or search change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, selectedCategory])
+
+  // Filter products based on search and category
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch =
@@ -57,8 +65,16 @@ export default function ProductsPage() {
     })
   }, [products, searchTerm, selectedCategory])
 
+  // Only show products for the current page
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * PRODUCTS_PER_PAGE
+    const end = start + PRODUCTS_PER_PAGE
+    return filteredProducts.slice(start, end)
+  }, [filteredProducts, currentPage])
+
   // Handle adding product to cart
-  const handleAddToCart = (product: Product) => {   
+  const handleAddToCart = (product: Product) => {
     if (product.stock === 0) {
       toast({
         title: "Out of Stock",
@@ -67,13 +83,14 @@ export default function ProductsPage() {
       })
       return
     }
-    
+
     addItem({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
       stock: product.stock,
+      category: product.category,
     })
 
     toast({
@@ -145,7 +162,7 @@ export default function ProductsPage() {
         <>
           {/* Products Grid - Better responsive layout */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-2 min-[375px]:gap-3 sm:gap-4 lg:gap-6">
-            {filteredProducts.map((product) => (
+            {paginatedProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -154,6 +171,30 @@ export default function ProductsPage() {
               />
             ))}
           </div>
+          {/* Pagination Controls: Only show if more than 10 products */}
+          {filteredProducts.length > 10 && (
+            <div className="flex items-center justify-center gap-4 mt-6">
+              <Button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                variant="outline"
+                className="px-4 py-2 rounded-lg"
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-gray-700">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                variant="outline"
+                className="px-4 py-2 rounded-lg"
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          )}
 
           {/* No Results - Better empty state */}
           {filteredProducts.length === 0 && (

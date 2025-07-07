@@ -112,6 +112,7 @@ public class OrderServiceImpl implements OrderService {
             emailText.append("\nNotes: ").append(order.getCustomerNotes());
         }
         emailText.append("\n\nThank you for shopping with us!\n");
+        emailText.append("For returns and refunds, email: vanceddotseti@gmail.com\n");
         emailService.sendOrderConfirmation(order.getCustomerEmail(), subject, emailText.toString());
     }
 

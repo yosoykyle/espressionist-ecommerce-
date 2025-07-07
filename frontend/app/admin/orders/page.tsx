@@ -31,6 +31,7 @@ const statusColors = {
   Delivered: "bg-green-100 text-green-800",
   Cancelled: "bg-red-100 text-red-800",
 }
+const ORDERS_PER_PAGE = 10
 export default function AdminOrdersPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -42,6 +43,7 @@ export default function AdminOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentAdmin, setCurrentAdmin] = useState<Admin | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
   useEffect(() => {
     const isLoggedIn = authService.isLoggedIn()
     if (!isLoggedIn) {
@@ -127,9 +129,14 @@ export default function AdminOrdersPage() {
   }
   // RBAC helpers
   const canUpdateOrder = currentAdmin && ["SUPER_ADMIN", "MANAGER"].includes(currentAdmin.role)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, showArchived]);
   if (!isAuthenticated) {
     return <div>Loading...</div>
   }
+  const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE);
+  const paginatedOrders = filteredOrders.slice((currentPage - 1) * ORDERS_PER_PAGE, currentPage * ORDERS_PER_PAGE);
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -217,7 +224,7 @@ export default function AdminOrdersPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredOrders.map((order) => (
+                  paginatedOrders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell>
                         <div className="font-medium">{order.code}</div>
@@ -273,6 +280,31 @@ export default function AdminOrdersPage() {
             </Table>
           </div>
         </div>
+
+        {/* Pagination Controls: Only show if more than 10 orders */}
+        {filteredOrders.length > 10 && (
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              variant="outline"
+              className="px-4 py-2 rounded-lg"
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              variant="outline"
+              className="px-4 py-2 rounded-lg"
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
 
         <OrderDetailsDialog
           order={selectedOrder}

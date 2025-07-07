@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/table"
 import { Avatar } from "@/components/ui/avatar"
 
+const ADMINS_PER_PAGE = 10
+
 export default function AdminAdminsPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -36,6 +38,7 @@ export default function AdminAdminsPage() {
   const [archiveAdmin, setArchiveAdmin] = useState<Admin | null>(null)
   const [restoreAdmin, setRestoreAdmin] = useState<Admin | null>(null)
   const [showArchived, setShowArchived] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     const isLoggedIn = authService.isLoggedIn()
@@ -64,6 +67,16 @@ export default function AdminAdminsPage() {
     const matchesArchived = showArchived ? admin.archived : !admin.archived
     return matchesSearch && matchesArchived
   })
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, showArchived])
+
+  const totalPages = Math.ceil(filteredAdmins.length / ADMINS_PER_PAGE)
+  const paginatedAdmins = filteredAdmins.slice(
+    (currentPage - 1) * ADMINS_PER_PAGE,
+    currentPage * ADMINS_PER_PAGE
+  )
 
   const handleEdit = (admin: Admin) => {
     setSelectedAdmin(admin)
@@ -225,7 +238,7 @@ export default function AdminAdminsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredAdmins.map((admin) => (
+                  paginatedAdmins.map((admin) => (
                     <TableRow key={admin.id}>
                       <TableCell>
                         <Avatar>
@@ -328,6 +341,31 @@ export default function AdminAdminsPage() {
             </Table>
           </div>
         </div>
+
+        {/* Pagination Controls: Only show if more than 10 admins */}
+        {filteredAdmins.length > 10 && (
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              variant="outline"
+              className="px-4 py-2 rounded-lg"
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              variant="outline"
+              className="px-4 py-2 rounded-lg"
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
 
         <AdminFormDialog
           admin={selectedAdmin}

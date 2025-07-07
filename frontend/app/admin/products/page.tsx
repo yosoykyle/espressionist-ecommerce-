@@ -25,6 +25,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+const PRODUCTS_PER_PAGE = 10
+
 export function AdminProductsPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -36,6 +38,7 @@ export function AdminProductsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isShippingDialogOpen, setIsShippingDialogOpen] = useState(false)
   const [currentAdmin, setCurrentAdmin] = useState<Admin | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     const isLoggedIn = authService.isLoggedIn()
@@ -63,6 +66,12 @@ export function AdminProductsPage() {
     const matchesArchived = showArchived ? product.archived : !product.archived
     return matchesSearch && matchesArchived
   })
+
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  )
 
   const handleArchiveToggle = async (product: Product) => {
     try {
@@ -102,6 +111,10 @@ export function AdminProductsPage() {
   const canArchiveProduct = canEditProduct
   const canAddProduct = canEditProduct
   const canEditShippingFees = canEditProduct
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, showArchived])
 
   if (!isAuthenticated) {
     return <div>Loading...</div>
@@ -208,7 +221,7 @@ export function AdminProductsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredProducts.map((product) => (
+                  paginatedProducts.map((product) => (
                     <TableRow key={product.id}>
                       <TableCell>
                         <div className="relative aspect-square w-16 overflow-hidden rounded-lg">
@@ -302,6 +315,31 @@ export function AdminProductsPage() {
             </Table>
           </div>
         </div>
+
+        {/* Pagination Controls: Only show if more than 10 products */}
+        {filteredProducts.length > 10 && (
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              variant="outline"
+              className="px-4 py-2 rounded-lg"
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              variant="outline"
+              className="px-4 py-2 rounded-lg"
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
 
         <ProductFormDialog
           product={selectedProduct}
