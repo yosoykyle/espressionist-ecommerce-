@@ -1214,9 +1214,6 @@ video {
 .min-w-full {
   min-width: 100%;
 }
-.min-w-\[90px\] {
-  min-width: 90px;
-}
 .max-w-2xl {
   max-width: 42rem;
 }
@@ -1413,9 +1410,6 @@ video {
 }
 .gap-8 {
   gap: 2rem;
-}
-.gap-y-2 {
-  row-gap: 0.5rem;
 }
 .space-x-1 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;

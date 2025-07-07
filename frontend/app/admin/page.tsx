@@ -161,8 +161,6 @@ export default function AdminLoginPage() {
                   {isLoading ? "Signing In..." : "Sign In"}
                 </Button>
               </form>
-
-              <div className="mt-4 text-center text-sm text-gray-500">Seeder credentials: admin / password12345678</div>
             </CardContent>
           </Card>
         </div>

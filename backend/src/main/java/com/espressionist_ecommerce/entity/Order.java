@@ -79,8 +79,8 @@ public class Order {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
     // --- Shipping Fee fields (persisted at order time) ---
-    @Column(name = "shipping_fee_total", precision = 10, scale = 2)
-    private BigDecimal shippingFeeTotal;
+    @Column(name = "shipping_fee_total", precision = 10, scale = 2, nullable = false, columnDefinition = "DECIMAL(10,2) DEFAULT 0")
+    private BigDecimal shippingFeeTotal = BigDecimal.ZERO;
     /**
      * Enum representing the possible statuses of an order.
      * This improves code readability and maintainability by using descriptive names.

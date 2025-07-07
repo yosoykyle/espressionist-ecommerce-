@@ -14,9 +14,10 @@ import { Loader2 } from "lucide-react"
 import { orderService, productService, shippingFeeService } from "@/lib/api-service"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { Minus, Plus, Trash2 } from "lucide-react"
 
 export default function CheckoutPage() {
-  const { items, total, clearCart } = useCart()
+  const { items, total, clearCart, updateQuantity, removeItem } = useCart()
   const { toast } = useToast()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -373,7 +374,38 @@ export default function CheckoutPage() {
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{item.name}</p>
-                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="w-8 h-8"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            disabled={item.quantity <= 1}
+                            aria-label="Decrease quantity"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="w-8 h-8"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            disabled={item.quantity >= item.stock}
+                            aria-label="Increase quantity"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 w-8 h-8"
+                            onClick={() => removeItem(item.id)}
+                            aria-label="Remove item"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                       <p className="text-sm font-semibold">₱{(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>

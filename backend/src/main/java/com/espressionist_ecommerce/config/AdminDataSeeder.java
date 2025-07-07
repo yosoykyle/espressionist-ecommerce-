@@ -39,24 +39,47 @@ public class AdminDataSeeder implements CommandLineRunner {
      */
     public void run(String... args) throws Exception {
         logger.info("AdminDataSeeder running...");
-        // Check if there are any admin accounts in the database
-        // If no admin accounts exist, create a default admin user
         if (adminRepository.count() == 0L) {
             logger.info("No admin accounts found. Creating default admin user.");
-            // Create a default admin user with a predefined username, email, and role
-            // The password is encoded using the PasswordEncoder bean
             Admin defaultAdmin = new Admin();
             defaultAdmin.setUsername("admin");
             defaultAdmin.setEmail("admin@example.com");
             defaultAdmin.setRole(Admin.Role.SUPER_ADMIN);
-            // Encode the password
-            String hashedPassword = passwordEncoder.encode("password12345678"); // Using a slightly more complex default
+            String hashedPassword = passwordEncoder.encode("password12345678");
             defaultAdmin.setPassword(hashedPassword);
-            // Timestamps createdAt and updatedAt should be handled automatically by @CreationTimestamp and @UpdateTimestamp
-            // defaultAdmin.setArchived(false); // This is the default in the Admin entity
             adminRepository.save(defaultAdmin);
             logger.info("Default admin user 'admin' created successfully.");
         } else {
+            var allAdmins = adminRepository.findAll();
+            // Find all SUPER_ADMINs
+            var superAdmins = allAdmins.stream().filter(a -> a.getRole() == Admin.Role.SUPER_ADMIN).toList();
+            // Find all active (not archived) SUPER_ADMINs except the seeder
+            var activeSuperAdmins = superAdmins.stream().filter(a -> !a.isArchived() && !a.getUsername().equals("admin")).toList();
+            // Find the seeder admin
+            Admin defaultAdmin = allAdmins.stream()
+                .filter(a -> a.getUsername().equals("admin") || a.getEmail().equals("admin@example.com"))
+                .findFirst().orElse(null);
+            if (activeSuperAdmins.size() > 0 && defaultAdmin != null && !defaultAdmin.isArchived()) {
+                defaultAdmin.setArchived(true);
+                adminRepository.save(defaultAdmin);
+                logger.warn("Default admin user 'admin' archived for security because another active SUPER_ADMIN exists.");
+            }
+            // If all SUPER_ADMINs are archived, but there are other active admins, unarchive the seeder admin
+            boolean allSuperAdminsArchived = superAdmins.stream().allMatch(Admin::isArchived);
+            boolean hasActiveNonSuperAdmin = allAdmins.stream().anyMatch(a -> (a.getRole() != Admin.Role.SUPER_ADMIN) && !a.isArchived());
+            boolean allAdminsArchived = allAdmins.stream().allMatch(Admin::isArchived);
+            boolean shouldUnarchiveSeeder =
+                (allSuperAdminsArchived && hasActiveNonSuperAdmin && defaultAdmin != null && defaultAdmin.isArchived()) ||
+                (allAdminsArchived && defaultAdmin != null && defaultAdmin.isArchived());
+            if (defaultAdmin != null && shouldUnarchiveSeeder) {
+                defaultAdmin.setArchived(false);
+                adminRepository.save(defaultAdmin);
+                if (allAdminsArchived) {
+                    logger.warn("All admins were archived. Seeder admin re-activated for safety.");
+                } else {
+                    logger.warn("All SUPER_ADMINs were archived but other admins are active. Seeder admin re-activated for safety.");
+                }
+            }
             logger.info("Admin accounts already exist ({}) Skipping default admin creation.", adminRepository.count());
         }
     }

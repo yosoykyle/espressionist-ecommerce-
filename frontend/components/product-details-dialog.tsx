@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import type { Product } from "@/lib/data-store"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
+import { useCart } from "@/components/cart-provider"
 
 interface ProductDetailsDialogProps {
   product: Product | null
@@ -17,6 +18,7 @@ interface ProductDetailsDialogProps {
 
 export function ProductDetailsDialog({ product, open, onClose, onAddToCart }: ProductDetailsDialogProps) {
   const router = useRouter();
+  const { clearCart, addItem, items } = useCart();
   if (!product) return null
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -64,7 +66,31 @@ export function ProductDetailsDialog({ product, open, onClose, onAddToCart }: Pr
         <div className="sticky bottom-0 z-20 flex gap-2 p-4 flex-row bg-white border-t border-gray-200">
           <Button
             className="flex-1 bg-brand-primary hover:bg-brand-primary/90 h-10 text-sm gap-2 rounded-xl"
-            onClick={() => router.push(`/checkout?productId=${product.id}`)}
+            onClick={async () => {
+              const existingItem = items.find((item) => item.id === product.id);
+              await clearCart();
+              await addItem({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                stock: product.stock,
+                category: product.category,
+              });
+              if (existingItem) {
+                for (let i = 1; i < existingItem.quantity; i++) {
+                  await addItem({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    stock: product.stock,
+                    category: product.category,
+                  });
+                }
+              }
+              router.push("/checkout");
+            }}
             disabled={product.stock === 0}
             type="button"
           >

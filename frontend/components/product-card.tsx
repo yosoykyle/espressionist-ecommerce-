@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { Product } from "@/lib/data-store"
 import { useRouter } from "next/navigation"
+import { useCart } from "@/components/cart-provider"
 
 interface ProductCardProps {
   product: Product
@@ -16,14 +17,37 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps) {
   const router = useRouter();
+  const { clearCart, addItem, items } = useCart();
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
     onAddToCart(product)
   }
 
-  const handleBuyNow = (e: React.MouseEvent) => {
+  const handleBuyNow = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(`/checkout?productId=${product.id}`);
+    const existingItem = items.find((item) => item.id === product.id);
+    await clearCart();
+    await addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      stock: product.stock,
+      category: product.category,
+    });
+    if (existingItem) {
+      for (let i = 1; i < existingItem.quantity; i++) {
+        await addItem({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          stock: product.stock,
+          category: product.category,
+        });
+      }
+    }
+    router.push("/checkout");
   }
 
   const handleClick = () => {
